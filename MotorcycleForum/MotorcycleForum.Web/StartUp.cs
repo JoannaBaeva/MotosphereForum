@@ -1,6 +1,9 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MotorcycleForum.Web.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
+using MotorcycleForum.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
