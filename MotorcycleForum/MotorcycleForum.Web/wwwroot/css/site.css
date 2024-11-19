@@ -1,12 +1,14 @@
 ﻿/********** Template CSS **********/
 :root {
-    --primary: #ff0404;
+    --primary: #D81324;
     --secondary: #0B2154;
     --light: #F2F2F2;
     --dark: #111111;
-    --bs-primary: #ff0404;
-    --bs-primary-rgb: 255, 4, 4;
+    --bs-primary: #D81324;
+    --bs-primary-rgb: 216,19,36;
 }
+
+
 
 .fw-medium {
     font-weight: 600 !important;
@@ -20,6 +22,12 @@
     z-index: 99;
 }
 
+body {
+    background-image: url("../assets/img/bg.jpg");
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+}
 
 /*** Spinner ***/
 #spinner {
@@ -34,7 +42,33 @@
         visibility: visible;
         opacity: 1;
     }
+.hero {
+    background-attachment: fixed;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Slightly softer text shadow */
+    border-top-left-radius: 15px; /* Curved top-left corner */
+    border-top-right-radius: 15px; /* Curved top-right corner */
+    overflow: hidden; /* To make sure the content doesn't overflow the curved corners */
+}
 
+.hero-content {
+    max-width: 800px;
+}
+
+.hero .btn-primary {
+    color: #ffffff;
+    background-color: var(--primary);
+    border-color: var(--primary);
+    transition: background-color 0.3s ease;
+}
+
+    .hero .btn-primary:hover {
+        background-color: #a00b19;
+        border-color: #a00b19;
+    }
 
 /*** Button ***/
 .btn {
@@ -43,7 +77,12 @@
     transition: .5s;
 }
 
-    .btn.btn-primary,
+    .btn.btn-primary {
+        --bs-btn-bg: #D81324;
+        --bs-btn-border-color: black;
+        --bs-btn-hover-color: black;
+        --bs-btn-hover-bg: white;
+    }
     .btn.btn-secondary {
         color: #FFFFFF;
     }
