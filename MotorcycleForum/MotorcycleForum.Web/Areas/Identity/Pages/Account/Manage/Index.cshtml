@@ -1,0 +1,38 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<div class="container vh-100 d-flex justify-content-center align-items-start py-5">
+    <div class="card p-5 rounded-5 shadow-lg" style="background: rgba(0, 0, 0, 0.8); max-width: 900px; width: 100%; border: none;">
+        <h3 class="text-center text-light mb-4 font-weight-bold">@ViewData["Title"]</h3>
+        <hr class="text-light mb-4" />
+
+        <div class="text-light">
+            <!-- User Details -->
+            <div class="mb-3">
+                <strong>Username:</strong> @Model.Username
+            </div>
+            <div class="mb-3">
+                <strong>First Name:</strong> FirstName
+            </div>
+            <div class="mb-3">
+                <strong>Last Name:</strong> LastName
+            </div>
+            <div class="mb-3">
+                <strong>Email:</strong> Email
+            </div>
+            <div class="mb-3">
+                <strong>Phone Number:</strong> PhoneNumber
+            </div>
+            <div class="mb-3">
+                <strong>Motorcycle Model:</strong> MotorcycleModel
+            </div>
+            <div class="mb-3">
+                <strong>Location:</strong> Location
+            </div>
+        </div>
+    </div>
+</div>

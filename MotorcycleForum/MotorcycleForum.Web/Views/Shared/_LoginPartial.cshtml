@@ -2,26 +2,34 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item px-lg-4">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-        <li class="nav-item px-lg-4">
-            <a class="nav-link text-uppercase" href="javascript:document.getElementById('logout-form').submit()">Logout</a>
+<ul class="navbar-nav flex-column flex-lg-row align-items-center">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item px-2">
+            <a class="nav-link text-dark text-center" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                Hello @User.Identity?.Name!
+            </a>
+        </li>
+        <li class="nav-item px-2">
+            <a class="nav-link text-uppercase text-center" href="javascript:document.getElementById('logout-form').submit()">
+                Logout
+            </a>
         </li>
         <form id="logout-form" method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" style="display:none;">
             <button type="submit">Logout</button>
         </form>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+    }
+    else
+    {
+        <li class="nav-item px-2">
+            <a class="nav-link text-dark text-center" asp-area="Identity" asp-page="/Account/Register">
+                Register
+            </a>
+        </li>
+        <li class="nav-item px-2">
+            <a class="nav-link text-dark text-center" asp-area="Identity" asp-page="/Account/Login">
+                Login
+            </a>
+        </li>
+    }
 </ul>

@@ -423,3 +423,50 @@ body {
             border-right: none;
         }
 
+
+/* Login and Register Page Form Styles */
+.login-form-container, .register-form-container {
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+form h2 {
+    color: var(--light);
+    font-weight: 600;
+}
+
+.form-floating input {
+    background-color: #333; /* Darker background for inputs */
+    color: var(--light); /* Light text color for inputs */
+    border: 1px solid var(--primary);
+}
+
+.form-floating label {
+    color: var(--light); /* Light label color */
+}
+
+.form-floating input:focus,
+.form-floating textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 5px var(--primary);
+}
+
+button[type="submit"] {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+    button[type="submit"]:hover {
+        background-color: #a00b19;
+    }
+
+a {
+    color: var(--primary);
+}
+
+    a:hover {
+        color: #a00b19;
+    }
