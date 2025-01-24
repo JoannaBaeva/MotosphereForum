@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MotorcycleForum.Data;
 
@@ -11,9 +12,11 @@ using MotorcycleForum.Data;
 namespace MotorcycleForum.Data.Migrations
 {
     [DbContext(typeof(MotorcycleForumDbContext))]
-    partial class MotorcycleForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250124212756_Base")]
+    partial class Base
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -275,6 +278,9 @@ namespace MotorcycleForum.Data.Migrations
                     b.Property<Guid>("CategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
