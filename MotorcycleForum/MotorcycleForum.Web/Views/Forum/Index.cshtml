@@ -1,0 +1,60 @@
+﻿@model List<ForumTopicViewModel>
+
+@{
+    ViewData["Title"] = "Forum";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center" style="color:white">Forum</h2>
+
+    <!-- Search Bar and Topic Filter Section -->
+    <div class="row mb-4">
+        <!-- Topic Filter -->
+        <div class="col-md-4">
+            <select class="form-select" aria-label="Select Topic">
+                <option selected>Filter by Topic</option>
+                <option value="1">Motorcycles</option>
+                <option value="2">Events</option>
+                <option value="3">Accessories</option>
+                <option value="4">Rides</option>
+            </select>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="col-md-8">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search for a post..." aria-label="Search" aria-describedby="search-button">
+                <button class="btn btn-primary" type="button" id="search-button">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forum Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Creator</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var topic in Model)
+                    {
+                        <tr>
+                            <td>@topic.Title</td>
+                            <td>@topic.CreatorName</td>
+                            <td>@topic.CreatedDate.ToShortDateString()</td>
+                            <td>
+                                <a href="@Url.Action("Details", "Forum", new { id = topic.TopicId })" class="btn btn-outline-primary btn-sm">View</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MotorcycleForum.Data;
 
@@ -11,9 +12,11 @@ using MotorcycleForum.Data;
 namespace MotorcycleForum.Data.Migrations
 {
     [DbContext(typeof(MotorcycleForumDbContext))]
-    partial class MotorcycleForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250225101845_Forum")]
+    partial class Forum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -326,15 +329,12 @@ namespace MotorcycleForum.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VoteId"));
 
                     b.Property<Guid?>("CommentId")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("PostId")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UserId")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("VoteType")
@@ -595,34 +595,28 @@ namespace MotorcycleForum.Data.Migrations
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumTopic", b =>
                 {
-                    b.HasOne("MotorcycleForum.Data.Entities.User", "Creator")
+                    b.HasOne("MotorcycleForum.Data.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Creator");
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumVote", b =>
                 {
                     b.HasOne("MotorcycleForum.Data.Entities.Forum.Comment", "Comment")
                         .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CommentId");
 
                     b.HasOne("MotorcycleForum.Data.Entities.Forum.ForumPost", "Post")
                         .WithMany()
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PostId");
 
                     b.HasOne("MotorcycleForum.Data.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Comment");
 

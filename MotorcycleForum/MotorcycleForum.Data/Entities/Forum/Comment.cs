@@ -12,20 +12,30 @@ namespace MotorcycleForum.Data.Entities.Forum
     {
         [Key]
         public Guid CommentId { get; init; }
+        
+        [Required]
         public string Content { get; set; } = null!;
+
+        [Required]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        // Foreign Key
         public Guid? AuthorId { get; set; }
 
         [ForeignKey(nameof(AuthorId))]
         public User Author { get; set; } = null!;
 
-
         public Guid? ForumPostId { get; set; }
 
         [ForeignKey(nameof(ForumPostId))]
         public ForumPost ForumPost { get; set; } = null!;
+
+        [Required]
+        public int Upvotes { get; set; } = 0;
+
+        [Required]
+        public int Downvotes { get; set; } = 0;
+        public ICollection<Comment> Replies { get; set; } = new List<Comment>();
+
 
     }
 }

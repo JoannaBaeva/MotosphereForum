@@ -1,4 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using MotorcycleForum.Data.Entities
 @using MotorcycleForum.Web.Areas.Identity
 @using MotorcycleForum.Web.Areas.Identity.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+

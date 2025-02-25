@@ -12,14 +12,14 @@ namespace MotorcycleForum.Data.Entities
 {
     public class User : IdentityUser<Guid>
     {
-        public string FullName { get; set; } = null!;
-        public string ProfilePictureUrl { get; set; } = null!;
-        public string Bio { get; set; } = null!;
+        public string? FullName { get; set; } = null!;
+        public string? ProfilePictureUrl { get; set; } = null!;
+        public string? Bio { get; set; } = null!;
         public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
 
         public ICollection<Event>? OrganizedEvents { get; set; } = new List<Event>();
-        public ICollection<MarketplaceListing> MarketplaceListings { get; set; } = new List<MarketplaceListing>();
-        public ICollection<ForumPost> ForumPosts { get; set; } = new List<ForumPost>();
-        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<MarketplaceListing>? MarketplaceListings { get; set; } = new List<MarketplaceListing>();
+        public ICollection<ForumPost>? ForumPosts { get; set; } = new List<ForumPost>();
+        public ICollection<Comment>? Comments { get; set; } = new List<Comment>();
     }
 }
