@@ -132,8 +132,65 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                    string emailBody =
+                    $@"
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                color: #333;
+                background-color: #f9f9f9;
+                margin: 0;
+                padding: 0;
+            }}
+            .email-container {{
+                width: 100%;
+                max-width: 600px;
+                margin: auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            }}
+            .btn {{
+                padding: 12px 25px;
+                background-color: #ff4500;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+            }}
+            .footer {{
+                font-size: 12px;
+                color: #666;
+                margin-top: 20px;
+                text-align: center;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class='email-container'>
+            <h2>Welcome to MotorcycleForum!</h2>
+            <p>Hello {HtmlEncoder.Default.Encode(user.UserName)},</p>
+            <p>Thank you for registering! To confirm your email and complete your registration, please click the button below:</p>
+            <p style='text-align: center;'>
+                <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' class='btn'>Confirm Email</a>
+            </p>
+            <p>If the button does not work, copy and paste the following link into your browser:</p>
+            <p>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
+            <p>If you did not sign up, please ignore this email.</p>
+            <p class='footer'>Ride safe,<br>Motosphere Team</p>
+        </div>
+    </body>
+    </html>";
+
+
+                    // Send the email with the HTML body
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email - Motosphere", emailBody);
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

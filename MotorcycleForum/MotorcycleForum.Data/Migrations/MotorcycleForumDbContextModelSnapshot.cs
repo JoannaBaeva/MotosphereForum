@@ -184,7 +184,7 @@ namespace MotorcycleForum.Data.Migrations
 
                     b.HasIndex("OrganizerId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.EventParticipant", b =>
@@ -208,7 +208,7 @@ namespace MotorcycleForum.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventParticipants");
+                    b.ToTable("EventParticipants", (string)null);
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.Comment", b =>
@@ -247,7 +247,7 @@ namespace MotorcycleForum.Data.Migrations
 
                     b.HasIndex("ForumPostId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumPost", b =>
@@ -285,7 +285,7 @@ namespace MotorcycleForum.Data.Migrations
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("ForumPosts");
+                    b.ToTable("ForumPosts", (string)null);
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumTopic", b =>
@@ -314,7 +314,7 @@ namespace MotorcycleForum.Data.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("ForumTopics");
+                    b.ToTable("ForumTopics", (string)null);
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumVote", b =>
@@ -348,7 +348,7 @@ namespace MotorcycleForum.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ForumVotes");
+                    b.ToTable("ForumVotes", (string)null);
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.Category", b =>
@@ -362,7 +362,7 @@ namespace MotorcycleForum.Data.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.MarketplaceListing", b =>
@@ -401,7 +401,7 @@ namespace MotorcycleForum.Data.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("MarketplaceListings");
+                    b.ToTable("MarketplaceListings", (string)null);
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.User", b =>
