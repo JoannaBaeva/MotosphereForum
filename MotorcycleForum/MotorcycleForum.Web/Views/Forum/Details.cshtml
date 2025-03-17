@@ -1,0 +1,64 @@
+﻿@model MotorcycleForum.Web.Models.ForumPostDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container my-5">
+    <div class="card shadow border-0">
+        <!-- Card Header -->
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h2 class="mb-1 mb-md-0">@Model.Title</h2>
+                <div class="text-md-end">
+                    <small>
+                        <i class="bi bi-person-fill"></i> @Model.CreatorName
+                        &nbsp;&nbsp;
+                        <i class="bi bi-calendar-event"></i> @Model.CreatedDate.ToString("MMMM dd, yyyy")
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+            <p class="card-text lead">@Model.Content</p>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-success me-2 fs-6">Upvotes: @Model.Upvotes</span>
+                <span class="badge bg-danger fs-6">Downvotes: @Model.Downvotes</span>
+            </div>
+            <a href="#comments" class="btn btn-outline-secondary">View Comments</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Optional: Custom styles for Post Details */
+    .card-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .card-header small {
+        font-size: 0.9rem;
+        opacity: 0.85;
+    }
+
+    .card-body .card-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-text.lead {
+        font-size: 1.125rem;
+        line-height: 1.6;
+    }
+
+    .card-footer .badge {
+        font-size: 1rem;
+    }
+</style>

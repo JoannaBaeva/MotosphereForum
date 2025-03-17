@@ -1,11 +1,11 @@
-﻿@model List<ForumTopicViewModel>
+﻿@model List<ForumPostViewModel>
 
 @{
     ViewData["Title"] = "Forum";
 }
 
 <div class="container mt-5">
-    <h2 class="mb-4 text-center" style="color:white">Forum</h2>
+    <h2 class="mb-4 text-center text-white">Forum</h2>
 
     <!-- Search Bar and Topic Filter Section -->
     <div class="row mb-4">
@@ -38,18 +38,22 @@
                         <th>Title</th>
                         <th>Creator</th>
                         <th>Created Date</th>
+                        <th>Upvotes</th>
+                        <th>Downvotes</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var topic in Model)
+                    @foreach (var post in Model)
                     {
                         <tr>
-                            <td>@topic.Title</td>
-                            <td>@topic.CreatorName</td>
-                            <td>@topic.CreatedDate.ToShortDateString()</td>
+                            <td>@post.Title</td>
+                            <td>@post.CreatorName</td>
+                            <td>@post.CreatedDate.ToShortDateString()</td>
+                            <td>@post.Upvotes</td>
+                            <td>@post.Downvotes</td>
                             <td>
-                                <a href="@Url.Action("Details", "Forum", new { id = topic.TopicId })" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="@Url.Action("Details", "Forum", new { id = post.ForumPostId })" class="btn btn-outline-primary btn-sm">View</a>
                             </td>
                         </tr>
                     }

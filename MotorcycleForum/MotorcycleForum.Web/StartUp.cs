@@ -8,14 +8,12 @@ using MotorcycleForum.Data.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Database connection
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<MotorcycleForumDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// ✅ Correct Identity configuration
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 {
     options.Password.RequireDigit = true;
@@ -29,20 +27,18 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 .AddDefaultTokenProviders()
 .AddDefaultUI();
 
-// ✅ Add MVC support
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
-// ✅ Ensure database and seed roles
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        SeedData.Initialize(services).Wait(); // Ensure roles and admin user are created
+        RoleSeeding.Initialize(services).Wait();
     }
     catch (Exception ex)
     {
@@ -51,7 +47,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ✅ Configure HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -67,13 +62,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();  // ✅ Required for Identity
+app.UseAuthentication();
 app.UseAuthorization();
 
-// ✅ Configure endpoints
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages(); // ✅ Required for Identity UI
+app.MapRazorPages();
 
 app.Run();

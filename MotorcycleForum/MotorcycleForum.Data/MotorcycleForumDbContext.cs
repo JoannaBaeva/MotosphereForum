@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MotorcycleForum.Data.Entities.Forum;
 using MotorcycleForum.Data.Entities.Marketplace;
 using MotorcycleForum.Data.Entities;
+using MotorcycleForum.Web;
 
 namespace MotorcycleForum.Data
 {
@@ -29,7 +30,7 @@ namespace MotorcycleForum.Data
         {
             base.OnModelCreating(modelBuilder);
 
-
+            DataSeeding.Seed(modelBuilder);
         }
 
     }

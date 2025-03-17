@@ -4,7 +4,7 @@ using MotorcycleForum.Data.Entities;
 using System;
 using System.Threading.Tasks;
 
-public static class SeedData
+public static class RoleSeeding
 {
     public static async Task Initialize(IServiceProvider serviceProvider)
     {
@@ -26,13 +26,21 @@ public static class SeedData
         }
 
         // Seed Admin User
+        Guid adminId = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8");
         string adminEmail = "motosphere.site@gmail.com";
-        string adminPassword = "X;W0Q6^Ej0Xc";  // Change this in production
+        string adminPassword = "X;W0Q6^Ej0Xc";
 
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
         {
-            adminUser = new User { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+            adminUser = new User
+            {
+                Id = adminId,
+                UserName = adminEmail,
+                Email = adminEmail,
+                EmailConfirmed = true
+            };
+
             var createAdmin = await userManager.CreateAsync(adminUser, adminPassword);
             if (createAdmin.Succeeded)
             {
