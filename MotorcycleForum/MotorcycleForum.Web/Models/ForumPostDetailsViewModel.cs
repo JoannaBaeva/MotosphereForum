@@ -1,4 +1,6 @@
-﻿namespace MotorcycleForum.Web.Models
+﻿using MotorcycleForum.Data.Enums;
+
+namespace MotorcycleForum.Web.Models
 {
     public class ForumPostDetailsViewModel
     {
@@ -9,6 +11,9 @@
         public string CreatorName { get; set; } = null!;
         public int Upvotes { get; set; }
         public int Downvotes { get; set; }
+        public bool HasVoted { get; set; }
+        public VoteType? UserVoteType { get; set; }
+        public List<CommentViewModel> Comments { get; set; } = new List<CommentViewModel>();
 
 
 

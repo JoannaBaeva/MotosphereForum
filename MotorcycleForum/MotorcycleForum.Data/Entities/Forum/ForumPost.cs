@@ -30,5 +30,6 @@ namespace MotorcycleForum.Data.Entities.Forum
         public int Upvotes { get; set; } = 0;
         public int Downvotes { get; set; } = 0;
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<Vote> Votes { get; set; } = new List<Vote>();
     }
 }

@@ -23,6 +23,7 @@ namespace MotorcycleForum.Data
         public DbSet<Comment>? Comments { get; set; }
         public DbSet<Category>? Categories { get; set; }
         public DbSet<EventParticipant>? EventParticipants { get; set; }
+        public DbSet<Vote>? Votes { get; set; }
 
 
 
