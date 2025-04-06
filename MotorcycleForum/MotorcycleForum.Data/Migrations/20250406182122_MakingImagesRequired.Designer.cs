@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MotorcycleForum.Data;
 
@@ -11,9 +12,11 @@ using MotorcycleForum.Data;
 namespace MotorcycleForum.Data.Migrations
 {
     [DbContext(typeof(MotorcycleForumDbContext))]
-    partial class MotorcycleForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250406182122_MakingImagesRequired")]
+    partial class MakingImagesRequired
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -276,7 +279,7 @@ namespace MotorcycleForum.Data.Migrations
                             CommentId = new Guid("be4ccd71-8576-4378-8b7f-d943f17d19bb"),
                             AuthorId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
                             Content = "<3",
-                            CreatedDate = new DateTime(2025, 4, 6, 19, 26, 37, 415, DateTimeKind.Utc).AddTicks(826),
+                            CreatedDate = new DateTime(2025, 4, 6, 18, 21, 21, 942, DateTimeKind.Utc).AddTicks(5322),
                             ForumPostId = new Guid("c6e5b16e-53f5-41c9-87cd-66da7a096b4a")
                         });
                 });
@@ -324,7 +327,7 @@ namespace MotorcycleForum.Data.Migrations
                             ForumPostId = new Guid("c6e5b16e-53f5-41c9-87cd-66da7a096b4a"),
                             AuthorId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
                             Content = "Hello and welcome to our vibrant community of motorcycle enthusiasts! Whether you're a seasoned rider or just starting out, this is the place to connect, share, and learn from one another.\r\n\r\nHere, you can:\r\n\r\nDiscuss your favorite rides and events 🌍\r\nGet advice on bike builds, maintenance, and repairs 🔧\r\nShare your passion for gear, accessories, and everything in between 🧰\r\nBuy, sell, or trade motorcycles and gear in the Marketplace 🏷️\r\nWe encourage respectful and engaging conversations, so please follow the forum guidelines to ensure a positive experience for everyone.\r\n\r\nWe're excited to have you here! Feel free to introduce yourself, ask questions, and dive into the discussions. Let’s keep the wheels rolling and make this the best community for motorcyclists!\r\n\r\nRide safe,\r\nThe Motosphere Team",
-                            CreatedDate = new DateTime(2025, 4, 6, 19, 26, 37, 415, DateTimeKind.Utc).AddTicks(807),
+                            CreatedDate = new DateTime(2025, 4, 6, 18, 21, 21, 942, DateTimeKind.Utc).AddTicks(5305),
                             Downvotes = 0,
                             Title = "Welcome to the Motosphere Forum! 🏍️",
                             TopicId = 1,
@@ -365,7 +368,7 @@ namespace MotorcycleForum.Data.Migrations
                         {
                             TopicId = 1,
                             CreatedById = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
-                            CreatedDate = new DateTime(2025, 4, 6, 19, 26, 37, 415, DateTimeKind.Utc).AddTicks(789),
+                            CreatedDate = new DateTime(2025, 4, 6, 18, 21, 21, 942, DateTimeKind.Utc).AddTicks(5290),
                             IsApproved = true,
                             Title = "General Discussion"
                         });
@@ -504,25 +507,13 @@ namespace MotorcycleForum.Data.Migrations
                         {
                             ListingId = new Guid("efcc8a05-65a5-4cb3-859c-ccfc3e6a23bc"),
                             CategoryId = new Guid("d5b06706-b7ed-4252-a257-57b6c4117968"),
-                            CreatedDate = new DateTime(2025, 4, 6, 19, 26, 37, 415, DateTimeKind.Utc).AddTicks(869),
+                            CreatedDate = new DateTime(2025, 4, 6, 18, 21, 21, 942, DateTimeKind.Utc).AddTicks(5408),
                             Description = "High-quality road tires for sport-touring motorcycles, excellent grip and durability.",
                             IsActive = true,
                             Location = "Varna",
                             Price = 300.00m,
                             SellerId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
                             Title = "Michelin Road 6 Tires Set"
-                        },
-                        new
-                        {
-                            ListingId = new Guid("7998740b-406d-4504-b9df-5f8aef508054"),
-                            CategoryId = new Guid("34080d33-7073-48ae-87ee-03c8990ff696"),
-                            CreatedDate = new DateTime(2025, 4, 6, 19, 26, 37, 415, DateTimeKind.Utc).AddTicks(873),
-                            Description = "Lightweight, performance-enhancing titanium slip-on exhaust. Fits most sport bikes. Used but in excellent condition. That signature growl? Yeah, it's got it.",
-                            IsActive = true,
-                            Location = "Sofia",
-                            Price = 780.00m,
-                            SellerId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
-                            Title = "Akrapovič Titanium Slip-On Exhaust"
                         });
                 });
 
@@ -548,21 +539,15 @@ namespace MotorcycleForum.Data.Migrations
                     b.HasData(
                         new
                         {
-                            ImageId = new Guid("5b6a314d-d38e-4709-ad7c-72f6cdfcc19a"),
+                            ImageId = new Guid("fc90e9f8-8f1f-464e-9883-dc3d0297e288"),
                             ImageUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/marketplace/seed-images/michelin-tires-6.png",
                             ListingId = new Guid("efcc8a05-65a5-4cb3-859c-ccfc3e6a23bc")
                         },
                         new
                         {
-                            ImageId = new Guid("c8740c2c-470b-4b86-bbf8-59f1f9374ade"),
+                            ImageId = new Guid("7cf612ea-5400-4bef-9af9-a7f4291433fe"),
                             ImageUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/marketplace/seed-images/michelin-tires-6-2.png",
                             ListingId = new Guid("efcc8a05-65a5-4cb3-859c-ccfc3e6a23bc")
-                        },
-                        new
-                        {
-                            ImageId = new Guid("e327d48a-0898-4678-9a75-acad93204464"),
-                            ImageUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/marketplace/seed-images/Exaust.png",
-                            ListingId = new Guid("7998740b-406d-4504-b9df-5f8aef508054")
                         });
                 });
 
@@ -657,7 +642,7 @@ namespace MotorcycleForum.Data.Migrations
                             NormalizedUserName = "MOTOSPHERE.SITE@GMAIL.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEKuWYIdgIxkUUCt5csGiqPiHyIdCSkLWUYZapZJt4A3oHJvIU5ZL/uc7MDB5DXs4Mg==",
                             PhoneNumberConfirmed = false,
-                            RegistrationDate = new DateTime(2025, 4, 6, 19, 26, 37, 415, DateTimeKind.Utc).AddTicks(472),
+                            RegistrationDate = new DateTime(2025, 4, 6, 18, 21, 21, 942, DateTimeKind.Utc).AddTicks(5042),
                             SecurityStamp = "2f3c8b65-12af-4b6d-bda9-8ec3d8651d3a",
                             TwoFactorEnabled = false,
                             UserName = "motosphere.site@gmail.com"

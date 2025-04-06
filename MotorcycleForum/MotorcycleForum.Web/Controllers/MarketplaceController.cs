@@ -113,6 +113,21 @@ namespace MotorcycleForum.Web.Controllers
             return View(listing);
         }
 
+        [Authorize]
+        public async Task<IActionResult> MyListings()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var listings = await _context.MarketplaceListings
+                .Include(l => l.Images)
+                .Include(l => l.Category)
+                .Where(l => l.SellerId == userId)
+                .OrderByDescending(l => l.CreatedDate)
+                .ToListAsync();
+
+            return View(listings);
+        }
+
 
         // GET: MarketplaceListings/Create
         [Authorize]
@@ -136,6 +151,11 @@ namespace MotorcycleForum.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MarketplaceListingViewModel model)
         {
+            if (model.ImageFiles == null || !model.ImageFiles.Any(f => f.Length > 0))
+            {
+                ModelState.AddModelError("ImageFiles", "Please upload at least one image.");
+            }
+
             if (!ModelState.IsValid)
             {
                 model.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
@@ -182,10 +202,11 @@ namespace MotorcycleForum.Web.Controllers
                 }
             }
 
+
             _context.MarketplaceListings.Add(listing);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(MyListings));
         }
 
         // GET: MarketplaceListings/Edit/{id}
@@ -273,6 +294,7 @@ namespace MotorcycleForum.Web.Controllers
 
                     }
                 }
+
             }
 
             // Save the changes to the database
@@ -335,7 +357,7 @@ namespace MotorcycleForum.Web.Controllers
             _context.MarketplaceListings.Remove(listing);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(MyListings));
         }
 
 

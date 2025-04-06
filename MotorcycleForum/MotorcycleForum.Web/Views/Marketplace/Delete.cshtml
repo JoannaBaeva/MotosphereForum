@@ -1,24 +1,48 @@
 ﻿@model MarketplaceListing
+@{
+    ViewData["Title"] = "Delete Listing";
+    var imageUrl = Model.Images?.FirstOrDefault()?.ImageUrl;
+    var fallbackImage = Url.Content("~/assets/img/no-image.png");
+}
 
-<h2>Delete Listing</h2>
+<div class="container py-5">
+    <div class="bg-white rounded shadow p-5">
+        <h2 class="text-danger fw-bold mb-4">
+            <i class="bi bi-trash-fill me-2"></i> Delete Listing
+        </h2>
 
-<div class="alert alert-warning">
-    Are you sure you want to delete the listing <strong>@Model.Title</strong>?
+        <div class="alert alert-warning border-start border-4 border-danger">
+            <h5 class="mb-2 fw-semibold">Are you sure you want to delete this listing?</h5>
+            <p class="mb-0">This action cannot be undone.</p>
+        </div>
+
+        <div class="card my-4 shadow-sm border-0">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="@(string.IsNullOrEmpty(imageUrl) ? fallbackImage : imageUrl)"
+                         class="img-fluid rounded-start w-100 h-100"
+                         style="object-fit: cover;"
+                         alt="Listing image" />
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h4 class="card-title fw-bold text-dark">@Model.Title</h4>
+                        <p class="mb-2"><strong>Price:</strong> @Model.Price.ToString("C")</p>
+                        <p class="mb-2"><strong>Location:</strong> @Model.Location</p>
+                        <p class="mb-0"><strong>Category:</strong> @Model.Category?.Name</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post" class="d-flex justify-content-end gap-2">
+            <input type="hidden" asp-for="ListingId" />
+            <button type="submit" class="btn btn-danger px-4 fw-bold">
+                <i class="bi bi-trash-fill me-1"></i> Yes, Delete
+            </button>
+            <a asp-action="Details" asp-route-id="@Model.ListingId" class="btn btn-outline-secondary px-4 fw-bold">
+                <i class="bi bi-x-circle me-1"></i> Cancel
+            </a>
+        </form>
+    </div>
 </div>
-
-<dl class="row">
-    <dt class="col-sm-2">Price:</dt>
-    <dd class="col-sm-10">$@Model.Price</dd>
-
-    <dt class="col-sm-2">Location:</dt>
-    <dd class="col-sm-10">@Model.Location</dd>
-
-    <dt class="col-sm-2">Category:</dt>
-    <dd class="col-sm-10">@Model.Category.Name</dd>
-</dl>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="ListingId" />
-    <button type="submit" class="btn btn-danger">Yes, delete</button>
-    <a asp-action="Details" asp-route-id="@Model.ListingId" class="btn btn-secondary">Cancel</a>
-</form>
