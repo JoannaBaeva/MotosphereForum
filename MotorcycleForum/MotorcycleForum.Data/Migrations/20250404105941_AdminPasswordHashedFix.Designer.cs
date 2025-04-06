@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MotorcycleForum.Data;
 
@@ -11,9 +12,11 @@ using MotorcycleForum.Data;
 namespace MotorcycleForum.Data.Migrations
 {
     [DbContext(typeof(MotorcycleForumDbContext))]
-    partial class MotorcycleForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250404105941_AdminPasswordHashedFix")]
+    partial class AdminPasswordHashedFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -276,7 +279,7 @@ namespace MotorcycleForum.Data.Migrations
                             CommentId = new Guid("be4ccd71-8576-4378-8b7f-d943f17d19bb"),
                             AuthorId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
                             Content = "<3",
-                            CreatedDate = new DateTime(2025, 4, 6, 14, 7, 50, 353, DateTimeKind.Utc).AddTicks(6398),
+                            CreatedDate = new DateTime(2025, 4, 4, 10, 59, 41, 383, DateTimeKind.Utc).AddTicks(6106),
                             ForumPostId = new Guid("c6e5b16e-53f5-41c9-87cd-66da7a096b4a")
                         });
                 });
@@ -324,7 +327,7 @@ namespace MotorcycleForum.Data.Migrations
                             ForumPostId = new Guid("c6e5b16e-53f5-41c9-87cd-66da7a096b4a"),
                             AuthorId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
                             Content = "Hello and welcome to our vibrant community of motorcycle enthusiasts! Whether you're a seasoned rider or just starting out, this is the place to connect, share, and learn from one another.\r\n\r\nHere, you can:\r\n\r\nDiscuss your favorite rides and events 🌍\r\nGet advice on bike builds, maintenance, and repairs 🔧\r\nShare your passion for gear, accessories, and everything in between 🧰\r\nBuy, sell, or trade motorcycles and gear in the Marketplace 🏷️\r\nWe encourage respectful and engaging conversations, so please follow the forum guidelines to ensure a positive experience for everyone.\r\n\r\nWe're excited to have you here! Feel free to introduce yourself, ask questions, and dive into the discussions. Let’s keep the wheels rolling and make this the best community for motorcyclists!\r\n\r\nRide safe,\r\nThe Motosphere Team",
-                            CreatedDate = new DateTime(2025, 4, 6, 14, 7, 50, 353, DateTimeKind.Utc).AddTicks(6374),
+                            CreatedDate = new DateTime(2025, 4, 4, 10, 59, 41, 383, DateTimeKind.Utc).AddTicks(6085),
                             Downvotes = 0,
                             Title = "Welcome to the Motosphere Forum! 🏍️",
                             TopicId = 1,
@@ -365,7 +368,7 @@ namespace MotorcycleForum.Data.Migrations
                         {
                             TopicId = 1,
                             CreatedById = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
-                            CreatedDate = new DateTime(2025, 4, 6, 14, 7, 50, 353, DateTimeKind.Utc).AddTicks(6351),
+                            CreatedDate = new DateTime(2025, 4, 4, 10, 59, 41, 383, DateTimeKind.Utc).AddTicks(6068),
                             IsApproved = true,
                             Title = "General Discussion"
                         });
@@ -480,6 +483,9 @@ namespace MotorcycleForum.Data.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
 
                     b.HasKey("ListingId");
 
@@ -599,9 +605,9 @@ namespace MotorcycleForum.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "MOTOSPHERE.SITE@GMAIL.COM",
                             NormalizedUserName = "MOTOSPHERE.SITE@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKuWYIdgIxkUUCt5csGiqPiHyIdCSkLWUYZapZJt4A3oHJvIU5ZL/uc7MDB5DXs4Mg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEE3gPzXxHcxTe7u7VOiKtKFc9kg4vhToJkFVz8PGVJPGW26T52YbKmjaDE5ZljzPuw==",
                             PhoneNumberConfirmed = false,
-                            RegistrationDate = new DateTime(2025, 4, 6, 14, 7, 50, 353, DateTimeKind.Utc).AddTicks(5945),
+                            RegistrationDate = new DateTime(2025, 4, 4, 10, 59, 41, 383, DateTimeKind.Utc).AddTicks(5761),
                             SecurityStamp = "2f3c8b65-12af-4b6d-bda9-8ec3d8651d3a",
                             TwoFactorEnabled = false,
                             UserName = "motosphere.site@gmail.com"

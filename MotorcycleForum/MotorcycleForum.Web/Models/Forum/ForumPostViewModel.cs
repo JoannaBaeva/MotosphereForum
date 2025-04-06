@@ -1,4 +1,4 @@
-﻿namespace MotorcycleForum.Web.Models
+﻿namespace MotorcycleForum.Web.Models.Forum
 {
     public class ForumPostViewModel
     {

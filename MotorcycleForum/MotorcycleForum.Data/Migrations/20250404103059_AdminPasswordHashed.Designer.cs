@@ -12,8 +12,8 @@ using MotorcycleForum.Data;
 namespace MotorcycleForum.Data.Migrations
 {
     [DbContext(typeof(MotorcycleForumDbContext))]
-    [Migration("20250225101845_Forum")]
-    partial class Forum
+    [Migration("20250404103059_AdminPasswordHashed")]
+    partial class AdminPasswordHashed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,6 +51,26 @@ namespace MotorcycleForum.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("711392e6-c020-463d-8a42-01ef90dd6273"),
+                            Name = "User",
+                            NormalizedName = "USER"
+                        },
+                        new
+                        {
+                            Id = new Guid("39727667-1f7b-488f-8560-1e2942777b94"),
+                            Name = "Moderator",
+                            NormalizedName = "MODERATOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("f15bf949-9c6b-4b98-a6f8-6c4a1c7607b5"),
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -135,6 +155,13 @@ namespace MotorcycleForum.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                            RoleId = new Guid("f15bf949-9c6b-4b98-a6f8-6c4a1c7607b5")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -220,10 +247,7 @@ namespace MotorcycleForum.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("AuthorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CommentId1")
+                    b.Property<Guid>("AuthorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
@@ -233,24 +257,31 @@ namespace MotorcycleForum.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Downvotes")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("ForumPostId")
+                    b.Property<Guid>("ForumPostId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Upvotes")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("ParentCommentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CommentId");
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("CommentId1");
-
                     b.HasIndex("ForumPostId");
 
+                    b.HasIndex("ParentCommentId");
+
                     b.ToTable("Comments");
+
+                    b.HasData(
+                        new
+                        {
+                            CommentId = new Guid("be4ccd71-8576-4378-8b7f-d943f17d19bb"),
+                            AuthorId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                            Content = "<3",
+                            CreatedDate = new DateTime(2025, 4, 4, 10, 30, 58, 872, DateTimeKind.Utc).AddTicks(1923),
+                            ForumPostId = new Guid("c6e5b16e-53f5-41c9-87cd-66da7a096b4a")
+                        });
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumPost", b =>
@@ -289,6 +320,19 @@ namespace MotorcycleForum.Data.Migrations
                     b.HasIndex("TopicId");
 
                     b.ToTable("ForumPosts");
+
+                    b.HasData(
+                        new
+                        {
+                            ForumPostId = new Guid("c6e5b16e-53f5-41c9-87cd-66da7a096b4a"),
+                            AuthorId = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                            Content = "Hello and welcome to our vibrant community of motorcycle enthusiasts! Whether you're a seasoned rider or just starting out, this is the place to connect, share, and learn from one another.\r\n\r\nHere, you can:\r\n\r\nDiscuss your favorite rides and events 🌍\r\nGet advice on bike builds, maintenance, and repairs 🔧\r\nShare your passion for gear, accessories, and everything in between 🧰\r\nBuy, sell, or trade motorcycles and gear in the Marketplace 🏷️\r\nWe encourage respectful and engaging conversations, so please follow the forum guidelines to ensure a positive experience for everyone.\r\n\r\nWe're excited to have you here! Feel free to introduce yourself, ask questions, and dive into the discussions. Let’s keep the wheels rolling and make this the best community for motorcyclists!\r\n\r\nRide safe,\r\nThe Motosphere Team",
+                            CreatedDate = new DateTime(2025, 4, 4, 10, 30, 58, 872, DateTimeKind.Utc).AddTicks(1906),
+                            Downvotes = 0,
+                            Title = "Welcome to the Motosphere Forum! 🏍️",
+                            TopicId = 1,
+                            Upvotes = 0
+                        });
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumTopic", b =>
@@ -318,6 +362,16 @@ namespace MotorcycleForum.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("ForumTopics");
+
+                    b.HasData(
+                        new
+                        {
+                            TopicId = 1,
+                            CreatedById = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                            CreatedDate = new DateTime(2025, 4, 4, 10, 30, 58, 872, DateTimeKind.Utc).AddTicks(1886),
+                            IsApproved = true,
+                            Title = "General Discussion"
+                        });
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumVote", b =>
@@ -351,6 +405,30 @@ namespace MotorcycleForum.Data.Migrations
                     b.ToTable("ForumVotes");
                 });
 
+            modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.Vote", b =>
+                {
+                    b.Property<Guid>("VoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ForumPostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("VoteType")
+                        .HasColumnType("int");
+
+                    b.HasKey("VoteId");
+
+                    b.HasIndex("ForumPostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Votes");
+                });
+
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.Category", b =>
                 {
                     b.Property<Guid>("CategoryId")
@@ -358,11 +436,19 @@ namespace MotorcycleForum.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = new Guid("d5b06706-b7ed-4252-a257-57b6c4117968"),
+                            Name = "Tires"
+                        });
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.MarketplaceListing", b =>
@@ -381,7 +467,10 @@ namespace MotorcycleForum.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -395,6 +484,9 @@ namespace MotorcycleForum.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
+
                     b.HasKey("ListingId");
 
                     b.HasIndex("CategoryId");
@@ -402,6 +494,26 @@ namespace MotorcycleForum.Data.Migrations
                     b.HasIndex("SellerId");
 
                     b.ToTable("MarketplaceListings");
+                });
+
+            modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.MarketplaceListingImage", b =>
+                {
+                    b.Property<Guid>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ImageId");
+
+                    b.HasIndex("ListingId");
+
+                    b.ToTable("MarketplaceListingImages");
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.User", b =>
@@ -480,6 +592,25 @@ namespace MotorcycleForum.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "ddf98934-8845-4bbb-a1ab-ac8ed402c436",
+                            Email = "motosphere.site@gmail.com",
+                            EmailConfirmed = true,
+                            FullName = "MotosphereAdmin",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MOTOSPHERE.SITE@GMAIL.COM",
+                            NormalizedUserName = "MOTOSPHERE.SITE@GMAIL.COM",
+                            PasswordHash = "X;W0Q6^Ej0Xc",
+                            PhoneNumberConfirmed = false,
+                            RegistrationDate = new DateTime(2025, 4, 4, 10, 30, 58, 872, DateTimeKind.Utc).AddTicks(1626),
+                            TwoFactorEnabled = false,
+                            UserName = "motosphere.site@gmail.com"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -563,19 +694,25 @@ namespace MotorcycleForum.Data.Migrations
                 {
                     b.HasOne("MotorcycleForum.Data.Entities.User", "Author")
                         .WithMany("Comments")
-                        .HasForeignKey("AuthorId");
-
-                    b.HasOne("MotorcycleForum.Data.Entities.Forum.Comment", null)
-                        .WithMany("Replies")
-                        .HasForeignKey("CommentId1");
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MotorcycleForum.Data.Entities.Forum.ForumPost", "ForumPost")
                         .WithMany("Comments")
-                        .HasForeignKey("ForumPostId");
+                        .HasForeignKey("ForumPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MotorcycleForum.Data.Entities.Forum.Comment", "ParentComment")
+                        .WithMany("Replies")
+                        .HasForeignKey("ParentCommentId");
 
                     b.Navigation("Author");
 
                     b.Navigation("ForumPost");
+
+                    b.Navigation("ParentComment");
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumPost", b =>
@@ -595,13 +732,13 @@ namespace MotorcycleForum.Data.Migrations
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumTopic", b =>
                 {
-                    b.HasOne("MotorcycleForum.Data.Entities.User", "CreatedBy")
+                    b.HasOne("MotorcycleForum.Data.Entities.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedBy");
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumVote", b =>
@@ -625,6 +762,25 @@ namespace MotorcycleForum.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.Vote", b =>
+                {
+                    b.HasOne("MotorcycleForum.Data.Entities.Forum.ForumPost", "ForumPost")
+                        .WithMany("Votes")
+                        .HasForeignKey("ForumPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MotorcycleForum.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ForumPost");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.MarketplaceListing", b =>
                 {
                     b.HasOne("MotorcycleForum.Data.Entities.Marketplace.Category", "Category")
@@ -644,6 +800,17 @@ namespace MotorcycleForum.Data.Migrations
                     b.Navigation("Seller");
                 });
 
+            modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.MarketplaceListingImage", b =>
+                {
+                    b.HasOne("MotorcycleForum.Data.Entities.Marketplace.MarketplaceListing", "Listing")
+                        .WithMany("Images")
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Event", b =>
                 {
                     b.Navigation("EventParticipants");
@@ -657,6 +824,8 @@ namespace MotorcycleForum.Data.Migrations
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumPost", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Votes");
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Forum.ForumTopic", b =>
@@ -667,6 +836,11 @@ namespace MotorcycleForum.Data.Migrations
             modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.Category", b =>
                 {
                     b.Navigation("MarketplaceListings");
+                });
+
+            modelBuilder.Entity("MotorcycleForum.Data.Entities.Marketplace.MarketplaceListing", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("MotorcycleForum.Data.Entities.User", b =>

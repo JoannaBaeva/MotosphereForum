@@ -15,19 +15,16 @@ namespace MotorcycleForum.Data.Entities.Forum
         public int VoteId { get; set; }
         public Guid? UserId { get; set; }
 
-        [Required]
         [ForeignKey(nameof(UserId))]
-        public User User { get; set; } = null!;
+        public User? User { get; set; } = null!;
         public Guid? PostId { get; set; }
         public Guid? CommentId { get; set; }
 
-        [Required]
         [ForeignKey(nameof(PostId))]
-        public ForumPost Post { get; set; } = null!;
+        public ForumPost? Post { get; set; } = null!;
 
-        [Required]
         [ForeignKey(nameof(CommentId))]
-        public Comment Comment { get; set; } = null!;
+        public Comment? Comment { get; set; } = null!;
 
         [Required]
         public VoteType VoteType { get; set; }

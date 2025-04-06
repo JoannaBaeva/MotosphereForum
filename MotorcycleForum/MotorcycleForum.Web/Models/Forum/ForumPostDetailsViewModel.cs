@@ -1,6 +1,6 @@
 ﻿using MotorcycleForum.Data.Enums;
 
-namespace MotorcycleForum.Web.Models
+namespace MotorcycleForum.Web.Models.Forum
 {
     public class ForumPostDetailsViewModel
     {

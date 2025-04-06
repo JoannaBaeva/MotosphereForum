@@ -21,5 +21,7 @@ namespace MotorcycleForum.Data.Entities
         public ICollection<MarketplaceListing>? MarketplaceListings { get; set; } = new List<MarketplaceListing>();
         public ICollection<ForumPost>? ForumPosts { get; set; } = new List<ForumPost>();
         public ICollection<Comment>? Comments { get; set; } = new List<Comment>();
+
+
     }
 }

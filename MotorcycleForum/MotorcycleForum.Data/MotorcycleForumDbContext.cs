@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using MotorcycleForum.Data.Entities.Forum;
 using MotorcycleForum.Data.Entities.Marketplace;
 using MotorcycleForum.Data.Entities;
-using MotorcycleForum.Web;
 
 namespace MotorcycleForum.Data
 {
@@ -15,15 +14,16 @@ namespace MotorcycleForum.Data
         {
         }
 
-        public DbSet<Event>? Events { get; set; }
-        public DbSet<MarketplaceListing>? MarketplaceListings { get; set; }
-        public DbSet<ForumPost>? ForumPosts { get; set; }
-        public DbSet<ForumTopic>? ForumTopics { get; set; }
-        public DbSet<ForumVote>? ForumVotes { get; set; }
-        public DbSet<Comment>? Comments { get; set; }
-        public DbSet<Category>? Categories { get; set; }
-        public DbSet<EventParticipant>? EventParticipants { get; set; }
-        public DbSet<Vote>? Votes { get; set; }
+        public DbSet<Event> Events { get; set; } = null!;
+        public DbSet<MarketplaceListing> MarketplaceListings { get; set; } = null!;
+        public DbSet<MarketplaceListingImage> MarketplaceListingImages { get; set; } = null!;
+        public DbSet<ForumPost> ForumPosts { get; set; } = null!;
+        public DbSet<ForumTopic> ForumTopics { get; set; } = null!;
+        public DbSet<ForumVote> ForumVotes { get; set; } = null!;
+        public DbSet<Comment> Comments { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
+        public DbSet<EventParticipant> EventParticipants { get; set; } = null!;
+        public DbSet<Vote> Votes { get; set; } = null!; 
 
 
 

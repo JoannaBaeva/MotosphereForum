@@ -6,7 +6,7 @@ using MotorcycleForum.Data;
 using MotorcycleForum.Data.Entities;
 using MotorcycleForum.Data.Entities.Forum;
 using MotorcycleForum.Data.Enums;
-using MotorcycleForum.Web.Models;
+using MotorcycleForum.Web.Models.Forum;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -52,13 +52,32 @@ namespace MotorcycleForum.Web.Controllers
                 .AsNoTracking()
                 .Include(p => p.Author)
                 .Include(p => p.Comments)
-                .ThenInclude(c => c.Author)
+                    .ThenInclude(c => c.Author)
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.Replies) // ✅ Ensure replies are included
                 .FirstOrDefaultAsync(p => p.ForumPostId == id);
 
             if (post == null)
             {
                 TempData["ErrorMessage"] = "The requested post does not exist.";
                 return RedirectToAction("Index");
+            }
+
+            // Convert comments and properly nest replies
+            List<CommentViewModel> ConvertComments(IEnumerable<Comment> comments, Guid? parentId = null)
+            {
+                return comments
+                    .Where(c => c.ParentCommentId == parentId) // ✅ Only get root comments or replies for a parent
+                    .Select(c => new CommentViewModel
+                    {
+                        Id = c.CommentId,
+                        Content = c.Content,
+                        CreatorName = c.Author?.FullName ?? "Unknown",
+                        CreatedDate = c.CreatedDate,
+                        IsOwner = c.AuthorId == userId,
+                        Replies = ConvertComments(comments, c.CommentId) // ✅ Recursively build reply tree
+                    })
+                    .ToList();
             }
 
             var viewModel = new ForumPostDetailsViewModel
@@ -70,14 +89,7 @@ namespace MotorcycleForum.Web.Controllers
                 CreatorName = post.Author?.FullName ?? "Unknown",
                 Upvotes = post.Upvotes,
                 Downvotes = post.Downvotes,
-                Comments = post.Comments.Select(c => new CommentViewModel
-                {
-                    Id = c.CommentId,
-                    Content = c.Content,
-                    CreatorName = c.Author?.FullName ?? "Unknown",
-                    CreatedDate = c.CreatedDate,
-                    IsOwner = c.AuthorId == userId
-                }).ToList()
+                Comments = ConvertComments(post.Comments) // ✅ Pass all comments but only root ones will be top-level
             };
 
             return View(viewModel);
@@ -153,6 +165,7 @@ namespace MotorcycleForum.Web.Controllers
 
             return Json(new { success = true, message = "Comment deleted!" });
         }
+
 
         [HttpPost]
         [Authorize]
@@ -249,6 +262,44 @@ namespace MotorcycleForum.Web.Controllers
                 downvotes = post.Downvotes
             });
         }
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReplyToComment([FromBody] ReplyCommentRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Content))
+            {
+                return Json(new { success = false, message = "Reply cannot be empty!" });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "You must be logged in to reply." });
+            }
+
+            var parentComment = await _context.Comments.FindAsync(request.ParentCommentId);
+            if (parentComment == null)
+            {
+                return Json(new { success = false, message = "Parent comment not found." });
+            }
+
+            var reply = new Comment
+            {
+                CommentId = Guid.NewGuid(),
+                Content = request.Content,
+                AuthorId = user.Id,
+                CreatedDate = DateTime.UtcNow,
+                ForumPostId = parentComment.ForumPostId,
+                ParentCommentId = request.ParentCommentId
+            };
+
+            _context.Comments.Add(reply);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Reply added!", replyId = reply.CommentId });
+        }
+
 
     }
 }
@@ -262,5 +313,11 @@ namespace MotorcycleForum.Web.Controllers
     {
         public Guid CommentId { get; set; }
     }
+    public class ReplyCommentRequest
+    {
+        public Guid ParentCommentId { get; set; }
+        public string Content { get; set; } = null!;
+    }
+
 
 

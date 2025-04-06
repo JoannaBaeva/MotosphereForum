@@ -26,6 +26,7 @@ body {
     background-attachment: fixed;
     background-position: center;
     background-size: cover;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 /*** Spinner ***/
@@ -200,8 +201,8 @@ body {
 
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-    width: 3rem;
-    height: 3rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
 }
 
 @media (max-width: 768px) {
@@ -466,6 +467,43 @@ a {
     color: var(--primary);
 }
 
-    a:hover {
-        color: #a00b19;
-    }
+a:hover {
+    color: #a00b19;
+}
+
+
+.card {
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.02);
+    border-color: #d81324 !important;
+}
+
+/* Customize noUiSlider colors */
+#priceSlider .noUi-connect {
+    background: #d81324; /* Red for selected range */
+}
+
+#priceSlider .noUi-target {
+    background: #dee2e6; /* Light gray background */
+    border: none;
+    box-shadow: none;
+}
+
+#priceSlider .noUi-handle {
+    background-color: white;
+    border: 2px solid #d81324;
+    box-shadow: 0 0 6px rgba(216, 19, 36, 0.4);
+    cursor: grab;
+}
+
+#priceSlider .noUi-tooltip {
+    background: #000;
+    color: white;
+    border: none;
+    font-size: 0.85rem;
+    border-radius: 0.25rem;
+    padding: 2px 6px;
+}

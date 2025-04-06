@@ -1,0 +1,132 @@
+﻿@model MarketplaceListing
+@using System.Security.Claims
+@{
+    ViewData["Title"] = Model.Title;
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var isOwner = userId == Model.SellerId.ToString();
+    var firstImage = Model.Images?.FirstOrDefault()?.ImageUrl;
+}
+
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Left Column: Images & Description -->
+        <div class="col-lg-8">
+            <div class="bg-white rounded shadow-sm p-4">
+                <!-- Main Image -->
+                <div class="mb-4 text-center">
+                    <img id="mainImage" src="@firstImage" class="img-fluid rounded w-100" style="max-height: 350px; max-width: 340px; object-fit: contain;" alt="Main image" />
+                </div>
+
+                <!-- Thumbnails -->
+                @if (Model.Images?.Count > 1)
+                {
+                    <div class="row g-2 mb-4">
+                        @foreach (var img in Model.Images)
+                        {
+                            <div class="col-4 col-md-3">
+                                <img src="@img.ImageUrl"
+                                     class="img-fluid rounded border listing-thumbnail"
+                                     style="cursor: pointer;"
+                                     data-src="@img.ImageUrl"
+                                     alt="Thumbnail" />
+                            </div>
+                        }
+                    </div>
+                }
+
+                <!-- Title and Price -->
+                <div class="mb-4">
+                    <h2 class="fw-bold text-dark">@Model.Title</h2>
+                    <h4 class="fw-semibold" style="color: #d81324;">@Model.Price.ToString("C")</h4>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="row g-3 text-muted">
+                    <div class="col-sm-6">
+                        <strong class="text-dark">Category:</strong> @Model.Category?.Name
+                    </div>
+                </div>
+
+                <hr />
+
+                <!-- Description -->
+                <div>
+                    <h5 class="text-dark fw-bold mb-2">Description</h5>
+                    <p class="text-muted">@Model.Description</p>
+                </div>
+
+                @if (isOwner)
+                {
+                    <div class="mt-4 d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.ListingId" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.ListingId" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right Column: Seller Info -->
+        <div class="col-lg-4">
+            <div class="bg-white rounded shadow-sm p-4">
+                <h5 class="text-dark fw-bold mb-3">Seller Info</h5>
+
+                <p class="mb-1">
+                    <i class="bi bi-person-circle me-2"></i>
+                    <strong>@Model.Seller.UserName</strong>
+                </p>
+                <p class="mb-3">
+                    <i class="bi bi-envelope me-2"></i>
+                    @Model.Seller.Email
+                </p>
+
+                <hr />
+
+                <p class="mb-1 text-muted">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    <strong>Location:</strong> @Model.Location
+                </p>
+                <p class="mb-0 text-muted">
+                    <i class="bi bi-clock me-2"></i>
+                    <strong>Posted On:</strong> @Model.CreatedDate.ToString("f")
+                </p>
+            </div>
+        </div>
+
+
+
+    <!-- Back -->
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Back to Listings
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const mainImage = document.getElementById("mainImage");
+            const thumbnails = document.querySelectorAll(".listing-thumbnail");
+
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener("click", function () {
+                    const newSrc = this.getAttribute("data-src");
+                    if (newSrc) {
+                        mainImage.setAttribute("src", newSrc);
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    img.img-fluid.rounded.border.listing-thumbnail {
+        height: 120px;
+        width: 150px;
+    }
+</style>
