@@ -13,6 +13,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
             <div class="form-floating mb-3">
+                <input asp-for="Input.FullName" class="form-control bg-dark text-light border-0 shadow-sm rounded-3" placeholder="John Smith" />
+                <label asp-for="Input.FullName" class="text-light">Username</label>
+                <span asp-validation-for="Input.FullName" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control bg-dark text-light border-0 shadow-sm rounded-3" placeholder="name@example.com" />
                 <label asp-for="Input.Email" class="text-light">Email</label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>

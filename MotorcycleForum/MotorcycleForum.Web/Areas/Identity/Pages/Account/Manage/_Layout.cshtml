@@ -9,22 +9,24 @@
     }
 }
 
-<div class="container vh-100 d-flex justify-content-center align-items-center">
-    <div class="card p-5 rounded-5 shadow-lg" style="background: rgba(0, 0, 0, 0.8); max-width: 900px; width: 100%; border: none;">
-        <h1 class="text-center text-light display-4 font-weight-bold">Manage Your Account</h1>
-        <hr class="text-light mb-4" />
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="card p-5 rounded-5 shadow-lg" style="background: rgba(0, 0, 0, 0.85); border: none;">
+            <h1 class="text-center text-light display-4 font-weight-bold">Manage Your Account</h1>
+            <hr class="text-light mb-5" />
 
-        <div class="row">
-            <!-- Navigation Sidebar -->
-            <div class="col-md-3">
-                <partial name="_ManageNav" />
-            </div>
+            <div class="row">
+                <!-- Navigation Sidebar -->
+                <div class="col-lg-3 mb-4 mb-lg-0">
+                    <partial name="_ManageNav" />
+                </div>
 
-            <!-- Main Content -->
-            <div class="col-md-9">
-                <h2 class="text-light mb-4" style="margin: 5px;">Change Your Account Settings</h2>
-                <hr class="text-light mb-4" />
-                @RenderBody()
+                <!-- Main Content -->
+                <div class="col-lg-9">
+                    <h2 class="text-light mb-4" style="margin: 5px;">Change Your Account Settings</h2>
+                    <hr class="text-light mb-4" />
+                    @RenderBody()
+                </div>
             </div>
         </div>
     </div>
@@ -36,6 +38,7 @@
         opacity: 1;
     }
 </style>
+
 @section Scripts {
     @RenderSection("Scripts", required: false)
 }

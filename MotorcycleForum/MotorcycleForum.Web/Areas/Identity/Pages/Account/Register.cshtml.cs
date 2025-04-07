@@ -17,11 +17,13 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MotorcycleForum.Data.Entities;
 
 namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
 {
+
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<User> _signInManager;
@@ -46,60 +48,36 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            [Required]
+            [Display(Name = "Username")]
+            [StringLength(100, ErrorMessage = "Name must be between {2} and {1} characters.", MinimumLength = 2)]
+            public string FullName { get; set; }
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
         }
-
 
         public async Task OnGetAsync(string returnUrl = null)
         {
@@ -111,12 +89,33 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            // Check if FullName (display name) is already taken
+            var existingName = await _userManager.Users.AnyAsync(u => u.FullName == Input.FullName);
+            if (existingName)
+            {
+                ModelState.AddModelError("Input.FullName", "This username is already taken. Please choose another.");
+                return Page();
+            }
+
+            var existingEmail = await _userManager.Users.AnyAsync(u => u.UserName == Input.Email);
+            if (existingEmail)
+            {
+                ModelState.AddModelError("Input.Email", "This email is already taken. Please choose another.");
+                return Page();
+            }
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.FullName = Input.FullName;
+
+                user.ProfilePictureUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/profiles/default-user-profile.jpg";
+
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
@@ -132,64 +131,82 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-
                     string emailBody =
-                    $@"
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            body {{
-                font-family: Arial, sans-serif;
-                color: #333;
-                background-color: #f9f9f9;
-                margin: 0;
-                padding: 0;
-            }}
-            .email-container {{
-                width: 100%;
-                max-width: 600px;
-                margin: auto;
-                padding: 20px;
-                background-color: #ffffff;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            }}
-            .btn {{
-                padding: 12px 25px;
-                background-color: #ff4500;
-                color: #fff;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-            }}
-            .footer {{
-                font-size: 12px;
-                color: #666;
-                margin-top: 20px;
-                text-align: center;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class='email-container'>
-            <h2>Welcome to MotorcycleForum!</h2>
-            <p>Hello {HtmlEncoder.Default.Encode(user.UserName)},</p>
-            <p>Thank you for registering! To confirm your email and complete your registration, please click the button below:</p>
-            <p style='text-align: center;'>
-                <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' class='btn'>Confirm Email</a>
-            </p>
-            <p>If the button does not work, copy and paste the following link into your browser:</p>
-            <p>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
-            <p>If you did not sign up, please ignore this email.</p>
-            <p class='footer'>Ride safe,<br>Motosphere Team</p>
-        </div>
-    </body>
-    </html>";
+$@"
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1c1c1c;
+            margin: 0;
+            padding: 0;
+            color: #ffffff;
+        }}
+        .email-container {{
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #121212;
+            border-radius: 10px;
+            border: 1px solid #2e2e2e;
+            box-shadow: 0 0 20px rgba(216, 19, 36, 0.3);
+        }}
+        h2 {{
+            color: #d81324;
+            margin-top: 0;
+            font-weight: bold;
+        }}
+        p {{
+            font-size: 16px;
+            line-height: 1.6;
+            color: #f1f1f1;
+        }}
+        .btn {{
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #d81324;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 20px;
+        }}
+        .btn:hover {{
+            background-color: #b81220;
+        }}
+        .footer {{
+            font-size: 13px;
+            color: #999;
+            margin-top: 40px;
+            text-align: center;
+        }}
+        .link {{
+            word-break: break-word;
+            color: #bbb;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class='email-container'>
+        <h2>Welcome to Motosphere!</h2>
+        <p>Hey {HtmlEncoder.Default.Encode(user.FullName ?? user.UserName)},</p>
+        <p>Thanks for joining the ride! Before you can fully rev up, we need to verify your email address.</p>
+        <p style='text-align: center;'>
+            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' class='btn'>Confirm Email</a>
+        </p>
+        <p>If that button doesn't work, copy and paste this link into your browser:</p>
+        <p class='link'>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
+        <p>If you didn’t register, no worries — just ignore this message.</p>
+        <p class='footer'>🏍️ Ride safe,<br />— The Motosphere Team</p>
+    </div>
+</body>
+</html>";
 
 
-                    // Send the email with the HTML body
+
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email - Motosphere", emailBody);
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
@@ -208,7 +225,6 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
 
@@ -220,9 +236,7 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(User)}'. " +
-                    $"Ensure that '{nameof(User)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(User)}'. Ensure that it is not abstract and has a parameterless constructor.");
             }
         }
 

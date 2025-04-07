@@ -23,10 +23,26 @@ namespace MotorcycleForum.Data
                     NormalizedEmail = "MOTOSPHERE.SITE@GMAIL.COM",
                     PasswordHash = "AQAAAAIAAYagAAAAEKuWYIdgIxkUUCt5csGiqPiHyIdCSkLWUYZapZJt4A3oHJvIU5ZL/uc7MDB5DXs4Mg==",
                     SecurityStamp = "2f3c8b65-12af-4b6d-bda9-8ec3d8651d3a",
-                    ConcurrencyStamp = "e1cb31c4-fcd4-47d7-b1cb-9c7e9edcdd70"
+                    ConcurrencyStamp = "e1cb31c4-fcd4-47d7-b1cb-9c7e9edcdd70",
+                    ProfilePictureUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/marketplace/seed-images/logo.png"
                     // password for admin - X;W0Q6^Ej0Xc 
+                },
+                new User
+                {
+                    Id = Guid.Parse("0ab81baf-1cdd-42cd-8d11-391f5118558e"),
+                    FullName = "JoannaMod",
+                    UserName = "joannasofia7@gmail.com",
+                    Email = "joannasofia7@gmail.com",
+                    EmailConfirmed = true,
+                    NormalizedUserName = "JOANNASOFIA7@GMAIL.COM",
+                    NormalizedEmail = "JOANNASOFIA7@GMAIL.COM",
+                    PasswordHash = "AQAAAAIAAYagAAAAEL48ILOb5KeNvfj9rFc1Zaj5+r1ZaA8/gvyxtik5bWH4JZ5us+YaW3nWwSEGdRnxQA==",
+                    SecurityStamp = "17dd75f7-5070-4fca-b271-d481b06ada44",
+                    ConcurrencyStamp = "e182eb5b-2197-4216-87f3-6be9ba6bddc1",
+                    ProfilePictureUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/profiles/cat-profile-pic.jpg"
+                    // password - i7;DFK2,aVY1
                 }
-         
+
             );
 
             // Seed Roles
@@ -39,7 +55,13 @@ namespace MotorcycleForum.Data
             modelBuilder.Entity<IdentityUserRole<Guid>>().HasData(
                 new IdentityUserRole<Guid> { 
                     UserId = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"), 
-                    RoleId = Guid.Parse("f15bf949-9c6b-4b98-a6f8-6c4a1c7607b5") }
+                    RoleId = Guid.Parse("f15bf949-9c6b-4b98-a6f8-6c4a1c7607b5") 
+                },
+                new IdentityUserRole<Guid>
+                {
+                    UserId = Guid.Parse("0ab81baf-1cdd-42cd-8d11-391f5118558e"),
+                    RoleId = Guid.Parse("39727667-1f7b-488f-8560-1e2942777b94")
+                }
             );
 
         //Forum

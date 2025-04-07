@@ -6,33 +6,47 @@
 }
 
 <div class="container vh-100 d-flex justify-content-center align-items-start py-5">
-    <div class="card p-5 rounded-5 shadow-lg" style="background: rgba(0, 0, 0, 0.8); max-width: 900px; width: 100%; border: none;">
-        <h3 class="text-center text-light mb-4 font-weight-bold">@ViewData["Title"]</h3>
+    <div class="card p-5 rounded-5 shadow-lg" style="background: rgba(0, 0, 0, 0.85); max-width: 900px; width: 100%; border: none;">
+        <h3 class="text-center text-light mb-4 fw-bold display-6">@ViewData["Title"]</h3>
         <hr class="text-light mb-4" />
 
-        <div class="text-light">
-            <!-- User Details -->
-            <div class="mb-3">
-                <strong>Username:</strong> @Model.Username
-            </div>
-            <div class="mb-3">
-                <strong>First Name:</strong> FirstName
-            </div>
-            <div class="mb-3">
-                <strong>Last Name:</strong> LastName
-            </div>
-            <div class="mb-3">
-                <strong>Email:</strong> Email
-            </div>
-            <div class="mb-3">
-                <strong>Phone Number:</strong> PhoneNumber
-            </div>
-            <div class="mb-3">
-                <strong>Motorcycle Model:</strong> MotorcycleModel
-            </div>
-            <div class="mb-3">
-                <strong>Location:</strong> Location
-            </div>
+        <div class="text-light text-center">
+            <!-- Profile Picture -->
+            <img src="@Model.ProfilePictureUrl" alt="Profile Picture" class="rounded-circle mb-3 border border-light" style="width: 140px; height: 140px; object-fit: cover;">
+
+            <!-- Update Form -->
+            <form method="post" enctype="multipart/form-data" action="/Identity/Account/Manage/Index">
+                @Html.AntiForgeryToken()
+
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label text-light" for="FullName">Username</label>
+                            <input class="form-control bg-dark text-light border-secondary" type="text" id="FullName" name="FullName" value= "@Model.FullName"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-light" for="ProfilePicture">Upload New Picture</label>
+                            <input type="file" class="form-control bg-dark text-light border-secondary" id="ProfilePicture" name="ProfilePicture" />
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-outline-light rounded-pill px-4 j">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.StatusMessage))
+            {
+                <div class="alert alert-success mt-4 w-75 mx-auto">
+                    @Model.StatusMessage
+                </div>
+            }
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

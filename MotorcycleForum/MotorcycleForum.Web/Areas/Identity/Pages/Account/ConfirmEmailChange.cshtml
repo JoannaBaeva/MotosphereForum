@@ -4,5 +4,17 @@
     ViewData["Title"] = "Confirm email change";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="card p-5 rounded-5 shadow-lg" style="background: rgba(0, 0, 0, 0.8); max-width: 600px; width: 100%; border: none;">
+        <h1 class="text-center text-light display-4 font-weight-bold">@ViewData["Title"]</h1>
+        <hr class="text-light mb-4" />
+
+        <div class="text-light mb-4">
+            <partial name="_StatusMessage" model="Model.StatusMessage" />
+        </div>
+
+        <div class="d-flex justify-content-center mt-4">
+            <a href="/" class="btn btn-light text-dark rounded-pill py-2 px-4">Continue</a>
+        </div>
+    </div>
+</div>

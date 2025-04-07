@@ -5,48 +5,34 @@
     ViewData["ActivePage"] = ManageNavPages.Email;
 }
 
-<h3 class="text-light">@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
-<div class="row mt-4">
-    <div class="col-md-6">
+<div class="container vh-100 d-flex justify-content-center">
+    <div class="card p-5 rounded-5 shadow-lg" style="background: rgba(0, 0, 0, 0.85); max-width: 600px; width: 100%; border: none;">
+        <h3 class="text-center text-white mb-4">@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+
         <form id="email-form" method="post">
-            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
-            
-            @if (Model.IsEmailConfirmed)
-            {
-                <div class="form-floating mb-3 input-group">
-                    <input asp-for="Email" class="form-control bg-dark text-light border-secondary" 
-                           placeholder="Please enter your email." disabled />
-                    <div class="input-group-append">
-                        <span class="h-100 input-group-text bg-dark text-success font-weight-bold border-secondary">✓</span>
-                    </div>
-                    <label asp-for="Email" class="text-secondary">Confirmed Email</label>
-                </div>
-            }
-            else
-            {
-                <div class="form-floating mb-3">
-                    <input asp-for="Email" class="form-control bg-dark text-light border-secondary" 
-                           placeholder="Please enter your email." disabled />
-                    <label asp-for="Email" class="text-secondary">Unconfirmed Email</label>
-                    <button id="email-verification" type="submit" 
-                            asp-page-handler="SendVerificationEmail" 
-                            class="btn btn-link text-warning p-0">Send verification email</button>
-                </div>
-            }
+            <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
 
             <div class="form-floating mb-3">
-                <input asp-for="Input.NewEmail" 
-                       class="form-control bg-dark text-light border-secondary" 
-                       autocomplete="email" aria-required="true" 
-                       placeholder="Please enter new email." />
+                <input asp-for="Email" class="form-control bg-dark text-light border-secondary" disabled />
+                <label asp-for="Email" class="text-secondary">Current Email</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" type="password" class="form-control bg-dark text-light border-secondary" placeholder="Password" autocomplete="current-password" required />
+                <label asp-for="Input.Password" class="text-secondary">Confirm Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.NewEmail" class="form-control bg-dark text-light border-secondary" placeholder="New Email" autocomplete="email" required />
                 <label asp-for="Input.NewEmail" class="text-secondary">New Email</label>
                 <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
             </div>
 
-            <button id="change-email-button" type="submit" 
-                    asp-page-handler="ChangeEmail" 
-                    class="w-100 btn btn-lg">Change Email</button>
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-gradient w-100 py-2 rounded-pill shadow">
+                Request Email Change
+            </button>
         </form>
     </div>
 </div>
@@ -54,3 +40,21 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<style>
+    .btn-gradient {
+        background: linear-gradient(135deg, #d81324 0%, #ff6a00 100%);
+        color: white;
+        font-weight: bold;
+        border: none;
+    }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #ff6a00 0%, #d81324 100%);
+        }
+
+    .form-control:disabled {
+        background-color: #333;
+        opacity: 1;
+    }
+</style>
