@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotorcycleForum.Web.Models;
 using System.Diagnostics;
@@ -13,20 +14,24 @@ namespace MotorcycleForum.Web.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index() => View();
+        public IActionResult About() => View();
+        public IActionResult Privacy() => View();
+
+        public IActionResult Error(int statusCode)
+        {
+            if (statusCode == 400 || statusCode == 404)
+                return View("Error400");
+
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult Secret()
         {
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }

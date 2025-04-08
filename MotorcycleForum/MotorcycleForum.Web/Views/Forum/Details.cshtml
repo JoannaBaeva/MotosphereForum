@@ -26,7 +26,7 @@
 
         <!-- Card Body -->
         <div class="card-body p-4">
-            <div class="bg-gradient bg-dark text-light rounded-4 p-4 border border-secondary-subtle shadow">
+            <div class="bg-gradient bg-opacity-50 bg-dark text-light rounded-4 p-4 border border-secondary-subtle shadow">
                 <p class="fs-5 lh-lg mb-0">@Model.Content</p>
             </div>
         </div>
@@ -81,7 +81,7 @@
                                         </button>
                                         @if (comment.IsOwner)
                                         {
-                                            <button class="btn btn-sm btn-outline-danger delete-comment-btn" data-comment-id="@comment.Id">
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-comment-btn" data-comment-id="@comment.Id">
                                                 <i class="bi bi-trash3"></i>
                                             </button>
                                         }
@@ -278,7 +278,7 @@
                                 <small class="text-muted"><strong>You</strong> · Just now</small>
                             </div>
                         </div>
-                        <button class="btn btn-sm btn-outline-danger ms-3 delete-comment-btn" data-comment-id="${replyId}">
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-3 delete-comment-btn" data-comment-id="${replyId}">
                             <i class="bi bi-trash3"></i>
                         </button>
                     </div>
@@ -309,20 +309,40 @@
             const parentCard = btn.closest(".comment-card");
 
                 if (btn.classList.contains("delete-comment-btn")) {
-                    if (!confirm("Are you sure you want to delete this comment?")) return;
+                    Swal.fire({
+                        title: 'Delete this comment?',
+                        text: "This action can't be undone.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, delete it',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#d81324',
+                        cancelButtonColor: '#6c757d',
+                        background: '#fff',
+                        customClass: {
+                            popup: 'shadow-lg rounded',
+                            confirmButton: 'btn btn-danger fw-bold',
+                            cancelButton: 'btn btn-secondary ms-2'
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetchWithCsrf("/Forum/DeleteComment", "POST", { commentId })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (!data.success) {
+                                        Swal.fire("Error", data.message, "error");
+                                        return;
+                                    }
 
-                    fetchWithCsrf("/Forum/DeleteComment", "POST", { commentId })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (!data.success) return alert("Error: " + data.message);
-
-                            // Match any card (comment or reply) with the ID
-                            const card = commentsList.querySelector(`.card[data-comment-id="${commentId}"]`);
-                            if (card) {
-                                card.classList.add("fade-out"); // add animation
-                                setTimeout(() => card.remove(), 300); // remove after animation
-                            }
-                        });
+                                    const card = commentsList.querySelector(`.card[data-comment-id="${commentId}"]`);
+                                    if (card) {
+                                        card.classList.add("fade-out");
+                                        setTimeout(() => card.remove(), 300);
+                                    }
+                                });
+                        }
+                    });
                 }
 
                 if (btn.classList.contains("reply-btn")) {

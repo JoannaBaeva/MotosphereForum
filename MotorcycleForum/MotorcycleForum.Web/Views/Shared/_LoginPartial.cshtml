@@ -2,55 +2,108 @@
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
-<ul class="navbar-nav flex-column flex-lg-row align-items-center">
-    @{
-        var currentUser = UserManager.GetUserAsync(User).Result;
-        var fullName = currentUser != null ? currentUser.FullName : null;
-        var profilePic = currentUser?.ProfilePictureUrl ?? "";
-    }
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var profilePic = currentUser?.ProfilePictureUrl ?? "/assets/img/no-image-found.png";
+    var fullName = currentUser?.FullName ?? "Guest";
+}
 
-    @if (SignInManager.IsSignedIn(User) && currentUser != null)
-    {
-        <li class="nav-item dropdown px-2">
-            <a class="nav-link dropdown-toggle d-flex align-items-center text-dark"
-               href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="@profilePic"
-                     alt="Avatar"
-                     class="rounded-circle me-2"
-                     style="width: 32px; height: 32px; object-fit: cover; border: 2px solid #d81324;" />
-                <span class="fw-semibold">@fullName</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userDropdown">
-                <li>
-                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
-                        <i class="bi bi-person-circle me-2"></i> Profile
-                    </a>
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                    <a class="dropdown-item text-danger" href="javascript:document.getElementById('logout-form').submit()">
-                        <i class="bi bi-box-arrow-right me-2"></i> Logout
-                    </a>
-                </li>
-            </ul>
-        </li>
+@if (SignInManager.IsSignedIn(User) && currentUser != null)
+{
+    <li class="nav-item dropdown px-2">
+        <a class="nav-link dropdown-toggle d-flex align-items-center text-dark"
+           href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="@profilePic"
+                 alt="Avatar"
+                 class="rounded-circle me-2"
+                 style="width: 32px; height: 32px; object-fit: cover; border: 2px solid #d81324;" />
+            <span class="fw-semibold">@fullName</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userDropdown">
+            <li>
+                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <i class="bi bi-person-circle me-2"></i> Profile
+                </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+                <a id="logoutLink" class="dropdown-item text-danger" href="#">
+                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </li>
 
-        <form id="logout-form" method="post" asp-area="Identity" asp-page="/Account/Logout"
-              asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" style="display:none;">
-            <button type="submit">Logout</button>
-        </form>
-    }
-    else
-    {
-        <li class="nav-item px-2">
-            <a class="nav-link text-dark text-center" asp-area="Identity" asp-page="/Account/Register">
-                <i class="bi bi-person-plus me-1"></i> Register
-            </a>
-        </li>
-        <li class="nav-item px-2">
-            <a class="nav-link text-dark text-center" asp-area="Identity" asp-page="/Account/Login">
-                <i class="bi bi-box-arrow-in-right me-1"></i> Login
-            </a>
-        </li>
-    }
-</ul>
+    <form id="logout-form" method="post" asp-area="Identity" asp-page="/Account/Logout"
+          asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" style="display:none;">
+        <button type="submit">Logout</button>
+    </form>
+}
+else
+{
+    <li class="nav-item px-2">
+        <a class="nav-link text-dark text-center" asp-area="Identity" asp-page="/Account/Register">
+            <i class="bi bi-person-plus me-1"></i> Register
+        </a>
+    </li>
+    <li class="nav-item px-2">
+        <a class="nav-link text-dark text-center" asp-area="Identity" asp-page="/Account/Login">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Login
+        </a>
+    </li>
+}
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const logoutLink = document.getElementById("logoutLink");
+
+        if (logoutLink) {
+            logoutLink.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You'll be logged out of your account.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d81324',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, log me out',
+                    background: '#fff',
+                    backdrop: `rgba(0,0,0,0.4)`,
+                    customClass: {
+                        popup: 'shadow-lg rounded',
+                        confirmButton: 'btn btn-danger fw-bold',
+                        cancelButton: 'btn btn-secondary ms-2'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Goodbye! Logging you out...',
+                            showConfirmButton: false,
+                            timer: 1700,
+                            timerProgressBar: true,
+                            background: '#fff',
+                            didClose: () => {
+                                document.getElementById("logout-form").submit();
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+
+

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - MotorcycleForum</title>
 
+    <!-- SEO Meta -->
+    <meta name="description" content="Motosphere — A social network and marketplace for motorcycle enthusiasts." />
+    <meta name="author" content="Yoanna-Sofia Baeva" />
+    <meta name="description" content="Diploma project" />
+    <link rel="icon" href="~/favicon.ico" type="image/x-icon" />
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -44,38 +50,44 @@
         </div>
     </div>
 
-    <div class="bg-warning text-dark text-center py-2 small fw-semibold shadow-sm">
-        This website is part of a diploma project and may use copyrighted images or content for educational purposes only.
+    <!-- Diploma Banner -->
+    <div class="bg-gradient p-2 text-white text-center small fw-semibold shadow-sm"
+         style="background: linear-gradient(to right, #f09819, #edde5d) !important;">
+        <i class="bi bi-mortarboard-fill me-1"></i> This website is part of a diploma project and may use copyrighted images or content for educational purposes only.
     </div>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-        <a asp-controller="Home" asp-action="Index" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <img src="~/assets/img/logo.png" alt="Logo" style="height: 60px; width: auto; margin-right: 5px;">
-            <h2 class="m-0 text-primary">Motosphere</h2>
-        </a>
-        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarResponsive">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ms-auto p-4 p-lg-0">
-                <li class="nav-item">
-                    <a asp-controller="Home" asp-action="Index" class="nav-item nav-link text-uppercase">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a asp-controller="#" asp-action="#" class="nav-item nav-link text-uppercase">About</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown">See more</a>
-                    <ul class="dropdown-menu fade-up m-0">
-                        <li><a asp-controller="Forum" asp-action="Index" class="dropdown-item">Forum</a></li>
-                        <li><a asp-controller="Marketplace" asp-action="Index" class="dropdown-item">Marketplace</a></li>
-                        <li><a asp-controller="Events" asp-action="Index" class="dropdown-item">Event Calendar</a></li>
-                    </ul>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg sticky-top custom-navbar shadow-sm">
+        <div class="container-fluid px-4">
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand d-flex align-items-center gap-2">
+                <img src="~/assets/img/logo.png" alt="Logo" style="height: 48px; width: auto;">
+                <span class="fs-4 fw-bold text-danger">Motosphere</span>
+            </a>
 
-            @await Html.PartialAsync("_LoginPartial")
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive">
+                <i class="bi bi-list fs-1 text-danger"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto align-items-center gap-lg-2 px-3">
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" href="/Home/About">About</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-uppercase" data-bs-toggle="dropdown" href="#">See more</a>
+                        <ul class="dropdown-menu fade-up">
+                            <li><a class="dropdown-item" href="/Forum">Forum</a></li>
+                            <li><a class="dropdown-item" href="/Marketplace">Marketplace</a></li>
+                            <li><a class="dropdown-item" href="/Events">Event Calendar</a></li>
+                        </ul>
+                    </li>
+
+                    @await Html.PartialAsync("_LoginPartial")
+                </ul>
+            </div>
         </div>
     </nav>
 
@@ -86,17 +98,72 @@
         </main>
     </div>
 
+    <!-- Logout confirmation -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="logoutModalLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Logout</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    Are you sure you want to log out?
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmLogoutBtn">Yes, Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
-    <footer class="footer bg-dark text-light py-3 mt-auto">
-        <div class="container text-center">
-            <p class="m-0"> &copy; 2024 MotorcycleForum | <a href="/Home/Privacy" class="text-light">Privacy</a></p>
+    <footer class="footer bg-dark text-light py-4 mt-auto">
+        <div class="container text-center small">
+            <div class="mb-2">&copy; 2024 Motosphere — A Diploma Project</div>
+            <a href="/Home/Privacy" class="text-light text-decoration-underline">Privacy Policy</a>
         </div>
     </footer>
+
+    <style>
+        /* Navbar Styling */
+        .custom-navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .navbar .nav-link {
+            font-weight: 600;
+            color: #333;
+            position: relative;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+        }
+
+            .navbar .nav-link:hover,
+            .navbar .nav-link.active {
+                color: #d81324 !important;
+            }
+
+            .navbar .nav-link.dropdown-toggle::after {
+                color: inherit !important;
+            }
+
+        .dropdown-menu {
+            border-radius: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            animation: fadeUp 0.25s ease-in-out;
+        }
+    </style>
+
 
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/nouislider@15.6.1/dist/nouislider.min.js"></script>
 
     <script>
@@ -104,10 +171,26 @@
             document.getElementById('spinner').classList.remove('show');
         });
 
+        document.addEventListener("scroll", function () {
+            const nav = document.querySelector(".navbar");
+            if (window.scrollY > 10) {
+                nav.classList.add("shadow-sm");
+            } else {
+                nav.classList.remove("shadow-sm");
+            }
+        });
+
         $(document).on({
             ajaxStart: function () { $('#spinner').addClass('show'); },
             ajaxStop: function () { $('#spinner').removeClass('show'); }
         });
+
+        function confirmLogout(e) {
+            e.preventDefault();
+            if (confirm("Are you sure you want to log out?")) {
+                document.getElementById('logout-form').submit();
+            }
+        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
