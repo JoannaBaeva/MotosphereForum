@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MotorcycleForum.Data;
 using MotorcycleForum.Data.Entities;
@@ -25,9 +26,17 @@ namespace MotorcycleForum.Web.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var posts = _context.ForumPosts?
+            var topics = await _context.ForumTopics
+                .Select(t => new SelectListItem
+                {
+                    Text = t.Title,
+                    Value = t.TopicId.ToString()
+                })
+                .ToListAsync();
+
+            var posts = await _context.ForumPosts
                 .AsNoTracking()
                 .Select(p => new ForumPostViewModel
                 {
@@ -35,10 +44,11 @@ namespace MotorcycleForum.Web.Controllers
                     Title = p.Title,
                     CreatorName = p.Author.FullName ?? "Unknown",
                     CreatedDate = p.CreatedDate,
+                    Topic = p.Topic,
                     Upvotes = p.Upvotes,
                     Downvotes = p.Downvotes
                 })
-                .ToList();
+                .ToListAsync();
 
             return View(posts);
         }
@@ -54,7 +64,7 @@ namespace MotorcycleForum.Web.Controllers
                 .Include(p => p.Comments)
                     .ThenInclude(c => c.Author)
                 .Include(p => p.Comments)
-                    .ThenInclude(c => c.Replies) // ✅ Ensure replies are included
+                    .ThenInclude(c => c.Replies)
                 .FirstOrDefaultAsync(p => p.ForumPostId == id);
 
             if (post == null)
@@ -63,21 +73,37 @@ namespace MotorcycleForum.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Convert comments and properly nest replies
             List<CommentViewModel> ConvertComments(IEnumerable<Comment> comments, Guid? parentId = null)
             {
                 return comments
-                    .Where(c => c.ParentCommentId == parentId) // ✅ Only get root comments or replies for a parent
+                    .Where(c => c.ParentCommentId == parentId)
                     .Select(c => new CommentViewModel
                     {
                         Id = c.CommentId,
                         Content = c.Content,
                         CreatorName = c.Author?.FullName ?? "Unknown",
+                        CreatorProfilePictureUrl = c.Author.ProfilePictureUrl,
                         CreatedDate = c.CreatedDate,
                         IsOwner = c.AuthorId == userId,
-                        Replies = ConvertComments(comments, c.CommentId) // ✅ Recursively build reply tree
+                        Replies = ConvertComments(comments, c.CommentId)
                     })
                     .ToList();
+            }
+
+            VoteType? userVoteType = null;
+            bool hasVoted = false;
+
+            if (user != null)
+            {
+                var userVote = await _context.Votes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(v => v.ForumPostId == post.ForumPostId && v.UserId == user.Id);
+
+                if (userVote != null)
+                {
+                    hasVoted = true;
+                    userVoteType = userVote.VoteType;
+                }
             }
 
             var viewModel = new ForumPostDetailsViewModel
@@ -87,10 +113,15 @@ namespace MotorcycleForum.Web.Controllers
                 Content = post.Content,
                 CreatedDate = post.CreatedDate,
                 CreatorName = post.Author?.FullName ?? "Unknown",
+                CreatorProfilePictureUrl = post.Author?.ProfilePictureUrl ?? "No image found",
                 Upvotes = post.Upvotes,
                 Downvotes = post.Downvotes,
-                Comments = ConvertComments(post.Comments) // ✅ Pass all comments but only root ones will be top-level
+                HasVoted = hasVoted,
+                UserVoteType = userVoteType,
+                Comments = ConvertComments(post.Comments)
             };
+            
+            ViewBag.CurrentUserAvatar = user?.ProfilePictureUrl ?? "/assets/img/no-image-found.png";
 
             return View(viewModel);
         }
@@ -299,8 +330,6 @@ namespace MotorcycleForum.Web.Controllers
 
             return Json(new { success = true, message = "Reply added!", replyId = reply.CommentId });
         }
-
-
     }
 }
     public class AddCommentRequest

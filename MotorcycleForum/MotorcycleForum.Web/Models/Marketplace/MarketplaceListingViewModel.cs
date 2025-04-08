@@ -37,6 +37,7 @@ namespace MotorcycleForum.Web.Models.Marketplace
 
         // Display uploaded image URLs (for Edit view or confirmation)
         public List<string> ExistingImageUrls { get; set; } = new();
+        public List<Guid> ImagesToDelete { get; set; } = new();
         public List<Guid> ImageIds { get; set; } = new();
 
         // Dropdown list
@@ -48,7 +49,7 @@ namespace MotorcycleForum.Web.Models.Marketplace
         public Guid? ListingId { get; set; }
         public Guid? SellerId { get; set; }
         public DateTime? CreatedDate { get; set; }
-
+        public string? PhoneNumber { get; set; }
         public bool IsActive { get; set; } = true;
     }
 

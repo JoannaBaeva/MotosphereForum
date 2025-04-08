@@ -23,16 +23,55 @@
             <div class="row g-4">
                 @foreach (var listing in Model)
                 {
+                    var carouselId = $"carousel-{listing.ListingId}";
+
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm">
-                            <img src="@listing.Images.FirstOrDefault()?.ImageUrl" alt="Listing Image" class="card-img-top rounded-top" style="object-fit: cover; height: 220px;" />                            <div class="card-body">
+                            <div class="position-relative">
+                                @if (listing.Images?.Any() == true)
+                                {
+                                    <div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner rounded-top">
+                                            @for (int i = 0; i < listing.Images.Count; i++)
+                                            {
+                                                var image = listing.Images[i];
+                                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                                    <img src="@image.ImageUrl"
+                                                         class="d-block w-100"
+                                                         style="height: 220px; object-fit: cover;"
+                                                         alt="Listing image" />
+                                                </div>
+                                            }
+                                        </div>
+
+                                        @if (listing.Images.Count > 1)
+                                        {
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            </button>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="bg-secondary text-white text-center p-5 rounded-top">
+                                        No Image
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="card-body">
                                 <h5 class="card-title fw-bold text-dark">@listing.Title</h5>
                                 <p class="card-text fw-semibold text-muted">@listing.Price.ToString("C")</p>
                                 <p class="card-text text-muted small">
-                                    @listing.Category.Name • @listing.Location<br />
+                                    @listing.Category?.Name • @listing.Location<br />
                                     Posted on @listing.CreatedDate.ToString("d")
                                 </p>
                             </div>
+
                             <div class="card-footer bg-white border-top-0 d-flex justify-content-between flex-wrap gap-2 px-3 pb-3">
                                 <a asp-action="Details" asp-route-id="@listing.ListingId" class="btn btn-outline-dark btn-sm">
                                     <i class="bi bi-eye"></i> Details

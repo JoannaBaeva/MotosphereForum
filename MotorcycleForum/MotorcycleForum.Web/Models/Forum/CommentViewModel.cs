@@ -10,6 +10,7 @@ namespace MotorcycleForum.Web.Models.Forum
         public string CreatorName { get; set; } = null!;
         public DateTime CreatedDate { get; set; }
         public bool IsOwner { get; set; }
-        public List<CommentViewModel> Replies { get; set; } = new List<CommentViewModel>(); // ✅ FIXED
+        public string CreatorProfilePictureUrl { get; set; } = null!;
+        public List<CommentViewModel> Replies { get; set; } = new List<CommentViewModel>();
     }
 }

@@ -29,6 +29,7 @@ namespace MotorcycleForum.Data.Entities.Marketplace
 
         public bool IsActive { get; set; } = true;
         public string Location { get; set; } = null!;
+        public string? SellerPhoneNumber { get; set; }
         public List<MarketplaceListingImage> Images { get; set; } = new List<MarketplaceListingImage>();
 
         public MarketplaceListing(Guid sellerId)

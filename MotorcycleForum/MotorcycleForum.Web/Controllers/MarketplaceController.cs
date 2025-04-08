@@ -23,6 +23,7 @@ namespace MotorcycleForum.Web.Controllers
         }
 
         // GET: MarketplaceListings
+        [Authorize]
         public async Task<IActionResult> Index(
             string? searchTerm,
             Guid? categoryId,
@@ -104,6 +105,7 @@ namespace MotorcycleForum.Web.Controllers
             var listing = await _context.MarketplaceListings
                 .Include(l => l.Category)
                 .Include(l => l.Seller)
+                    .ThenInclude(s => s.MarketplaceListings.Where(m => m.IsActive))
                 .Include(l => l.Images)
                 .FirstOrDefaultAsync(l => l.ListingId == id);
 
@@ -112,6 +114,7 @@ namespace MotorcycleForum.Web.Controllers
 
             return View(listing);
         }
+
 
         [Authorize]
         public async Task<IActionResult> MyListings()
@@ -174,7 +177,8 @@ namespace MotorcycleForum.Web.Controllers
                 Location = model.Location,
                 CategoryId = model.CategoryId,
                 CreatedDate = DateTime.UtcNow,
-                IsActive = model.IsActive
+                IsActive = model.IsActive,
+                SellerPhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? "No phone number given" : model.PhoneNumber
             };
 
             // Upload images to S3
@@ -210,15 +214,20 @@ namespace MotorcycleForum.Web.Controllers
         }
 
         // GET: MarketplaceListings/Edit/{id}
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             var listing = await _context.MarketplaceListings
                 .Include(l => l.Images)
                 .FirstOrDefaultAsync(l => l.ListingId == id);
 
             if (listing == null)
                 return NotFound();
+            if (listing.SellerId != userId)
+                return Forbid();
 
             var model = new MarketplaceListingViewModel
             {
@@ -229,6 +238,7 @@ namespace MotorcycleForum.Web.Controllers
                 Location = listing.Location,
                 CategoryId = listing.CategoryId,
                 IsActive = listing.IsActive,
+                PhoneNumber = listing.SellerPhoneNumber,
                 Categories = new SelectList(_context.Categories, "CategoryId", "Name", listing.CategoryId),
                 ExistingImageUrls = listing.Images.Select(i => i.ImageUrl).ToList(),
                 ImageIds = listing.Images.Select(i => i.ImageId).ToList()
@@ -237,29 +247,39 @@ namespace MotorcycleForum.Web.Controllers
             return View(model);
         }
 
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(MarketplaceListingViewModel model)
         {
-            // Make sure the ModelState is valid
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             if (!ModelState.IsValid)
             {
-                // If validation fails, reload the category list and return the view
                 model.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
                 return View(model);
             }
 
-            // Fetch the listing by the ListingId included in the form data
             var listing = await _context.MarketplaceListings
                 .Include(l => l.Images)
                 .FirstOrDefaultAsync(l => l.ListingId == model.ListingId);
 
-
-            // If the listing doesn’t exist, return 404
             if (listing == null)
-            {
                 return NotFound();
+            if (listing.SellerId != userId)
+                return Forbid();
+
+            // Count how many images are already present and will remain
+            int existingImagesCount = listing.Images.Count;
+            int toDeleteCount = model.ImagesToDelete?.Count ?? 0;
+            int remainingImages = existingImagesCount - toDeleteCount;
+            int newUploads = model.ImageFiles?.Count ?? 0;
+
+            if ((remainingImages + newUploads) < 1)
+            {
+                ModelState.AddModelError("", "You must have at least one image in your listing.");
+                model.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
+                return View(model);
             }
 
             // Update the listing fields
@@ -269,6 +289,7 @@ namespace MotorcycleForum.Web.Controllers
             listing.Location = model.Location;
             listing.CategoryId = model.CategoryId;
             listing.IsActive = model.IsActive;
+            listing.SellerPhoneNumber = model.PhoneNumber;
 
             // Update images if new ones were uploaded
             if (model.ImageFiles != null && model.ImageFiles.Any())
@@ -320,6 +341,8 @@ namespace MotorcycleForum.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             var listing = await _context.MarketplaceListings
                 .Include(l => l.Category)
                 .Include(l => l.Seller)
@@ -328,6 +351,8 @@ namespace MotorcycleForum.Web.Controllers
 
             if (listing == null)
                 return NotFound();
+            if (listing.SellerId != userId)
+                return Forbid();
 
             return View(listing);
         }

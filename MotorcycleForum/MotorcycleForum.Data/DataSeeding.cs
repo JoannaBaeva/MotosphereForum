@@ -132,7 +132,8 @@ namespace MotorcycleForum.Data
                     Location = "Varna",
                     CreatedDate = DateTime.UtcNow,
                     CategoryId = Guid.Parse("d5b06706-b7ed-4252-a257-57b6c4117968"),
-                    IsActive = true
+                    IsActive = true,
+                    SellerPhoneNumber = "1111111111"
                 },
                 new MarketplaceListing(Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"))
                 {
@@ -143,7 +144,8 @@ namespace MotorcycleForum.Data
                     Location = "Sofia",
                     CreatedDate = DateTime.UtcNow,
                     CategoryId = Guid.Parse("34080d33-7073-48ae-87ee-03c8990ff696"),
-                    IsActive = true
+                    IsActive = true,
+                    SellerPhoneNumber = "1111111111"
                 }
             );
 

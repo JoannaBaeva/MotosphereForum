@@ -471,16 +471,6 @@ a:hover {
     color: #a00b19;
 }
 
-
-.card {
-    transition: transform 0.2s ease;
-}
-
-.card:hover {
-    transform: scale(1.02);
-    border-color: #d81324 !important;
-}
-
 /* Customize noUiSlider colors */
 #priceSlider .noUi-connect {
     background: #d81324; /* Red for selected range */

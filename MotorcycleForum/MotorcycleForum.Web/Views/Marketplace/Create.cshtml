@@ -40,6 +40,12 @@
                     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
+
+                <div class="col-md-6">
+                    <label asp-for="PhoneNumber" class="form-label fw-semibold text-dark">Phone Number (optional)</label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="e.g. +359123456789" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
             </div>
 
             <hr class="my-4" />
@@ -65,7 +71,6 @@
         </form>
     </div>
 </div>
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>

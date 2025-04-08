@@ -41,6 +41,12 @@
                     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
+
+                <div class="col-md-6">
+                    <label asp-for="PhoneNumber" class="form-label fw-semibold text-dark">Phone Number (optional)</label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="e.g. +359123456789" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
             </div>
 
             <hr class="my-4" />
@@ -78,10 +84,11 @@
 
                         <div class="col-md-3 mb-3 text-center animate__animated animate__fadeInUp">
                             <img src="@imgUrl" class="img-fluid rounded mb-2" />
-                            <form asp-action="DeleteImage" method="post">
+                            <form asp-action="DeleteImage" method="post" onsubmit="return confirmDeleteImage(this);">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="imageId" value="@imgId" />
                                 <input type="hidden" name="listingId" value="@Model.ListingId" />
+                                <input type="hidden" name="deleteFlag" value="true" />
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i class="bi bi-trash"></i> Remove
                                 </button>

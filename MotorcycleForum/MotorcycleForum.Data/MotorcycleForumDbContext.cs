@@ -32,6 +32,7 @@ namespace MotorcycleForum.Data
             base.OnModelCreating(modelBuilder);
 
             DataSeeding.Seed(modelBuilder);
+
         }
 
     }
