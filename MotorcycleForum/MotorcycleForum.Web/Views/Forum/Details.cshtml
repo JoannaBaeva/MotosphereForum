@@ -3,132 +3,115 @@
 
 @{
     ViewData["Title"] = Model.Title;
+    var isUpvoted = Model.UserVoteType == VoteType.Upvote;
+    var isDownvoted = Model.UserVoteType == VoteType.Downvote;
 }
 
-<div class="container">
-    <div class="card shadow-lg border-0 rounded-4">
-        <!-- Card Header -->
-        <div class="card-header bg-dark text-white rounded-top-4 py-3 border-bottom border-danger">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <h2 class="fw-bold mb-0 flex-grow-1">@Model.Title</h2>
+<!-- Structure -->
+<div class="my-5 container">
+    <a asp-action="Index" class="btn btn-outline-secondary mb-3 d-inline-flex align-items-center">
+        <i class="bi bi-arrow-left me-2"></i> Back to Forum
+    </a>
+    <div class="card rounded-4 border-0 shadow-lg">
+        <!-- Header -->
+        <div class="card-header bg-dark text-white py-4 px-4 rounded-top-4 border-bottom border-danger">
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                <h2 class="fw-bold mb-0">@Model.Title</h2>
                 <div class="d-flex align-items-center">
-                    <img src="@Model.CreatorProfilePictureUrl"
-                         alt="Author profile"
-                         class="rounded-circle me-3"
-                         style="width: 48px; height: 48px; object-fit: cover; border: 2px solid #d81324;" />
-                    <div class="d-flex flex-column text-end">
-                        <span class="fw-semibold">@Model.CreatorName</span>
-                        <small class="text-secondary"><i class="bi bi-calendar-event me-1"></i>@Model.CreatedDate.ToString("MMM dd, yyyy")</small>
+                    <img src="@Model.CreatorProfilePictureUrl" class="rounded-circle me-3 border-danger border"
+                         style="width: 48px; height: 48px; object-fit: cover;" alt="Author avatar" />
+                    <div class="text-end">
+                        <div class="fw-semibold">@Model.CreatorName</div>
+                        <small class="text-light"><i class="bi bi-calendar-event me-1"></i>@Model.CreatedDate.ToString("MMM dd, yyyy")</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Card Body -->
-        <div class="card-body p-4">
-            <div class="bg-gradient bg-opacity-50 bg-dark text-light rounded-4 p-4 border border-secondary-subtle shadow">
-                <p class="fs-5 lh-lg mb-0">@Model.Content</p>
+        <!-- Body -->
+        <div class="card-body bg-dark text-light bg-opacity-75">
+            <p class="fs-5 lh-lg">@Model.Content</p>
+
+            <!-- Images -->
+            @if (Model.ImageUrls.Any())
+            {
+                <div class="row g-3 mt-4">
+                    @foreach (var imageUrl in Model.ImageUrls)
+                    {
+                        <div class="col-md-4 col-sm-6">
+                            <a href="@imageUrl" target="_blank">
+                                <img src="@imageUrl" class="img-fluid forum-image w-100 rounded shadow-sm"
+                                     style="height: 200px; object-fit: cover;" alt="Forum Post Image" />
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Admin Tools -->
+            @if ((User.IsInRole("Moderator") || User.IsInRole("Admin")) && !Model.IsOwner)
+            {
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="text-white-50" title="Delete Post">
+                        <i class="bi bi-trash3 fs-5"></i>
+                    </a>
+                </div>
+            }
+            @if (Model.IsOwner)
+            {
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="text-white-50" title="Edit Post">
+                        <i class="bi bi-pencil-square fs-5"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="text-white-50" title="Delete Post">
+                        <i class="bi bi-trash3 fs-5"></i>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <!-- Footer / Voting -->
+        <div class="card-footer bg-dark text-light px-3 py-3 border-top border-secondary">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                <!-- Voting Buttons -->
+                <div class="d-flex align-items-center gap-3">
+                    <button id="upvote-btn"
+                            class="btn btn-sm px-3 d-flex align-items-center gap-1 @(isUpvoted ? "btn-success text-white active" : "btn-outline-success")"
+                            data-post-id="@Model.Id"
+                            data-current-vote="@Model.UserVoteType.ToString().ToLower()">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                    </button>
+                    <span id="upvotes-count" class="badge bg-success">@Model.Upvotes</span>
+
+                    <button id="downvote-btn"
+                            class="btn btn-sm px-3 d-flex align-items-center gap-1 @(isDownvoted ? "btn-danger text-white active" : "btn-outline-danger")"
+                            data-post-id="@Model.Id">
+                        <i class="bi bi-hand-thumbs-down"></i>
+                    </button>
+                    <span id="downvotes-count" class="badge bg-danger">@Model.Downvotes</span>
+                </div>
+
+                <!-- Toggle Comments -->
+                <div class="text-md-end w-100 w-md-auto">
+                    <button id="toggle-comments-btn" class="btn btn-outline-light btn-sm fw-bold w-100 w-md-auto mt-2 mt-md-0">
+                        💬 Show Comments
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Card Footer (Voting & Comments) -->
-        <div class="card-footer bg-dark text-light d-flex justify-content-between align-items-center px-5 py-3 border-top border-secondary-subtle">
-            <div class="d-flex align-items-center gap-2">
-                <!-- Upvote Button -->
-                <button id="upvote-btn" class="btn btn-sm px-3 shadow-sm d-flex align-items-center gap-1 btn-outline-success">
-                    <i class="bi bi-hand-thumbs-up"></i>
-                </button>
-                <span id="upvotes-count" class="badge bg-success px-3 fs-6">@Model.Upvotes</span>
-
-                <!-- Downvote Button -->
-                <button id="downvote-btn" class="btn btn-sm px-3 shadow-sm d-flex align-items-center gap-1 btn-outline-danger">
-                    <i class="bi bi-hand-thumbs-down"></i>
-                </button>
-                <span id="downvotes-count" class="badge bg-danger px-3 fs-6">@Model.Downvotes</span>
-            </div>
-            <button id="toggle-comments-btn" class="btn btn-outline-light btn-sm fw-bold shadow-sm px-4">
-                💬 Show Comments
-            </button>
-        </div>
 
         <!-- Comments Section -->
-        <div id="comments-section" class="container my-4 p-4 rounded-4 shadow-lg" style="display: none; background-color: #fff;">
-            <h3 class="mb-4 fw-bold text-dark border-bottom border-danger pb-2">Comments</h3>
+        <div id="comments-section" class="bg-light p-4 rounded-bottom container" style="display: none;"
+             data-post-id="@Model.Id" data-current-user-avatar="@ViewBag.CurrentUserAvatar">
+            <h4 class="fw-bold border-bottom border-danger pb-2 mb-4 text-dark">Comments</h4>
 
             <div id="comments-list">
                 @if (Model.Comments?.Any() ?? false)
                 {
                     @foreach (var comment in Model.Comments)
                     {
-                        <div class="card my-3 border-0 shadow-sm" data-comment-id="@comment.Id">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div class="d-flex align-items-start">
-                                        <img src="@comment.CreatorProfilePictureUrl" alt="Avatar"
-                                             class="rounded-circle me-3 border border-secondary"
-                                             style="width: 40px; height: 40px; object-fit: cover;" />
-                                        <div>
-                                            <p class="mb-1 text-dark">@comment.Content</p>
-                                            <small class="text-muted">
-                                                <strong>@comment.CreatorName</strong> &middot; @comment.CreatedDate.ToString("MMMM dd, yyyy")
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-secondary reply-btn" data-comment-id="@comment.Id">
-                                            <i class="bi bi-reply"></i>
-                                        </button>
-                                        @if (comment.IsOwner)
-                                        {
-                                            <button type="button" class="btn btn-sm btn-outline-danger delete-comment-btn" data-comment-id="@comment.Id">
-                                                <i class="bi bi-trash3"></i>
-                                            </button>
-                                        }
-                                    </div>
-                                </div>
-
-                                <!-- Reply Form -->
-                                <form class="reply-form d-none mt-3" data-parent-id="@comment.Id">
-                                    @Html.AntiForgeryToken()
-                                    <textarea class="form-control mb-2 reply-content" rows="2" placeholder="Write a reply..." required></textarea>
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-send"></i> Submit Reply
-                                    </button>
-                                </form>
-
-                                <!-- Replies -->
-                                @if (comment.Replies.Any())
-                                {
-                                    <div class="mt-3 ps-4 border-start border-2 border-danger">
-                                        @foreach (var reply in comment.Replies)
-                                        {
-                                            <div class="card my-2 border-0 bg-light reply-card" data-comment-id="@reply.Id">
-                                                <div class="card-body d-flex justify-content-between align-items-start">
-                                                    <div class="d-flex align-items-start">
-                                                        <img src="@reply.CreatorProfilePictureUrl" alt="Avatar"
-                                                             class="rounded-circle me-3 border border-secondary"
-                                                             style="width: 36px; height: 36px; object-fit: cover;" />
-                                                        <div>
-                                                            <p class="mb-1 text-dark">@reply.Content</p>
-                                                            <small class="text-muted">
-                                                                <strong>@reply.CreatorName</strong> &middot; @reply.CreatedDate.ToString("MMMM dd, yyyy")
-                                                            </small>
-                                                        </div>
-                                                    </div>
-                                                    @if (reply.IsOwner)
-                                                    {
-                                                        <button class="btn btn-sm btn-outline-danger ms-3 delete-comment-btn" data-comment-id="@reply.Id">
-                                                            <i class="bi bi-trash3"></i>
-                                                        </button>
-                                                    }
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <partial name="_CommentPartial" model="comment" />
                     }
                 }
                 else
@@ -137,269 +120,26 @@
                 }
             </div>
 
-            <!-- Add New Comment -->
-            <form id="comment-form" class="mt-4">
+            <!-- New Comment Form -->
+            <form id="comment-form" class="mt-4" data-post-id="@Model.Id" data-current-user-avatar="@ViewBag.CurrentUserAvatar">
                 @Html.AntiForgeryToken()
                 <div class="mb-3">
-                    <label for="comment-content" class="form-label fw-bold text-dark">Your Comment</label>
+                    <label for="comment-content" class="form-label text-dark fw-bold">Your Comment</label>
                     <textarea class="form-control" id="comment-content" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-chat-right-dots"></i> Add Comment
-                </button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-chat-right-dots"></i> Add Comment</button>
             </form>
         </div>
     </div>
 </div>
 
 <!-- JavaScript -->
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const postId = "@Model.Id";
-        const currentUserAvatar = "@ViewBag.CurrentUserAvatar";
+@section Scripts {
+    <script src="~/js/Forum/forum-voting.js"></script>
+    <script src="~/js/Forum/forum-comments.js"></script>
+}
 
-        const commentForm = document.getElementById("comment-form");
-        const commentInput = document.getElementById("comment-content");
-        const commentsList = document.getElementById("comments-list");
-        const commentsSection = document.getElementById("comments-section");
-        const toggleCommentsBtn = document.getElementById("toggle-comments-btn");
-
-        const upvoteBtn = document.getElementById("upvote-btn");
-        const downvoteBtn = document.getElementById("downvote-btn");
-        const upvotesCount = document.getElementById("upvotes-count");
-        const downvotesCount = document.getElementById("downvotes-count");
-
-        let userVote = "@Model.UserVoteType".toLowerCase();
-
-        // === Utility: CSRF Fetch ===
-        function fetchWithCsrf(url, method, body = null) {
-            const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
-            return fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                    "RequestVerificationToken": csrfToken
-                },
-                body: body ? JSON.stringify(body) : null
-            });
-        }
-
-        // === Voting ===
-        function setVoteState(voteType) {
-            // Remove all vote classes
-            upvoteBtn.classList.remove("btn-success", "text-white", "active");
-            downvoteBtn.classList.remove("btn-danger", "text-white", "active");
-
-            upvoteBtn.classList.add("btn-outline-success");
-            downvoteBtn.classList.add("btn-outline-danger");
-
-            if (voteType === "upvote") {
-                upvoteBtn.classList.remove("btn-outline-success");
-                upvoteBtn.classList.add("btn-success", "text-white", "active");
-            } else if (voteType === "downvote") {
-                downvoteBtn.classList.remove("btn-outline-danger");
-                downvoteBtn.classList.add("btn-danger", "text-white", "active");
-            }
-
-            userVote = voteType;
-        }
-
-        function handleVote(action) {
-            fetchWithCsrf(`/Forum/${action}/${postId}`, "POST")
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success) return alert("Error: " + data.message);
-                    upvotesCount.textContent = data.upvotes;
-                    downvotesCount.textContent = data.downvotes;
-
-                    const toggledVote = (userVote === action.toLowerCase()) ? null : action.toLowerCase();
-                    setVoteState(toggledVote);
-                });
-        }
-
-        // Initial vote state
-        setVoteState(userVote.toLowerCase());
-
-        // Bind vote actions
-        upvoteBtn.addEventListener("click", () => handleVote("Upvote"));
-        downvoteBtn.addEventListener("click", () => handleVote("Downvote"));
-
-
-        // === Toggle Comments Visibility ===
-        toggleCommentsBtn.addEventListener("click", () => {
-            const isVisible = commentsSection.style.display !== "none";
-            commentsSection.style.display = isVisible ? "none" : "block";
-            toggleCommentsBtn.textContent = isVisible ? "💬 Show Comments" : "Hide Comments";
-        });
-
-        // === HTML Builders ===
-        function buildCommentHtml(commentId, content) {
-            return `
-                <div class="card my-3 border-0 shadow-sm comment-card" data-comment-id="${commentId}">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div class="d-flex align-items-start">
-                                <img src="${currentUserAvatar}" class="rounded-circle me-3 border border-secondary"
-                                     style="width: 40px; height: 40px; object-fit: cover;" />
-                                <div>
-                                    <p class="mb-1 text-dark">${content}</p>
-                                    <small class="text-muted"><strong>You</strong> · Just now</small>
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-secondary reply-btn" data-comment-id="${commentId}">
-                                    <i class="bi bi-reply"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger delete-comment-btn" data-comment-id="${commentId}">
-                                    <i class="bi bi-trash3"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <form class="reply-form d-none mt-3" data-parent-id="${commentId}">
-                            <textarea class="form-control mb-2 reply-content" rows="2" placeholder="Write a reply..." required></textarea>
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                <i class="bi bi-send"></i> Submit Reply
-                            </button>
-                        </form>
-                        <div class="replies mt-2"></div>
-                    </div>
-                </div>`;
-        }
-
-        function buildReplyHtml(replyId, content) {
-            return `
-                <div class="card my-2 reply-card" data-comment-id="${replyId}">
-                    <div class="card-body d-flex justify-content-between align-items-start">
-                        <div class="d-flex align-items-start">
-                            <img src="${currentUserAvatar}" class="rounded-circle me-3 border border-secondary"
-                                 style="width: 36px; height: 36px; object-fit: cover;" />
-                            <div>
-                                <p class="mb-1 text-dark">${content}</p>
-                                <small class="text-muted"><strong>You</strong> · Just now</small>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-outline-danger ms-3 delete-comment-btn" data-comment-id="${replyId}">
-                            <i class="bi bi-trash3"></i>
-                        </button>
-                    </div>
-                </div>`;
-        }
-
-        // === New Comment ===
-        commentForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-            const content = commentInput.value.trim();
-            if (!content) return alert("Comment cannot be empty!");
-
-            fetchWithCsrf("/Forum/AddComment", "POST", { postId, content })
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success) return alert("Error: " + data.message);
-                    commentsList.insertAdjacentHTML("beforeend", buildCommentHtml(data.commentId, content));
-                    commentInput.value = "";
-                });
-        });
-
-        // === Delegated Comment Actions ===
-        commentsList.addEventListener("click", function (e) {
-            const btn = e.target.closest("button");
-            if (!btn) return;
-
-            const commentId = btn.getAttribute("data-comment-id");
-            const parentCard = btn.closest(".comment-card");
-
-                if (btn.classList.contains("delete-comment-btn")) {
-                    Swal.fire({
-                        title: 'Delete this comment?',
-                        text: "This action can't be undone.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Yes, delete it',
-                        cancelButtonText: 'Cancel',
-                        confirmButtonColor: '#d81324',
-                        cancelButtonColor: '#6c757d',
-                        background: '#fff',
-                        customClass: {
-                            popup: 'shadow-lg rounded',
-                            confirmButton: 'btn btn-danger fw-bold',
-                            cancelButton: 'btn btn-secondary ms-2'
-                        },
-                        buttonsStyling: false
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetchWithCsrf("/Forum/DeleteComment", "POST", { commentId })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if (!data.success) {
-                                        Swal.fire("Error", data.message, "error");
-                                        return;
-                                    }
-
-                                    const card = commentsList.querySelector(`.card[data-comment-id="${commentId}"]`);
-                                    if (card) {
-                                        card.classList.add("fade-out");
-                                        setTimeout(() => card.remove(), 300);
-                                    }
-                                });
-                        }
-                    });
-                }
-
-                if (btn.classList.contains("reply-btn")) {
-                    const commentId = btn.getAttribute("data-comment-id");
-                    const form = document.querySelector(`form.reply-form[data-parent-id="${commentId}"]`);
-                    if (form) {
-                        form.classList.toggle("d-none");
-                        if (!form.classList.contains("d-none")) {
-                            form.querySelector("textarea")?.focus();
-                        }
-                    }
-                }
-
-
-        });
-
-        // === Reply Submission ===
-        commentsList.addEventListener("submit", function (e) {
-            if (!e.target.classList.contains("reply-form")) return;
-            e.preventDefault();
-
-            const form = e.target;
-            const parentId = form.getAttribute("data-parent-id");
-            const content = form.querySelector(".reply-content").value.trim();
-            if (!content) return alert("Reply cannot be empty!");
-
-            fetchWithCsrf("/Forum/ReplyToComment", "POST", {
-                postId,
-                parentCommentId: parentId,
-                content
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success) return;
-
-                    const commentCard = document.querySelector(`.card[data-comment-id="${parentId}"]`);
-                    if (!commentCard) return;
-
-                    let repliesContainer = commentCard.querySelector(".replies");
-
-                    if (!repliesContainer) {
-                        repliesContainer = document.createElement("div");
-                        repliesContainer.className = "replies mt-2 ps-4 border-start border-2 border-danger";
-                        commentCard.querySelector(".card-body").appendChild(repliesContainer);
-                    }
-
-                    // Add the new reply
-                    repliesContainer.insertAdjacentHTML("beforeend", buildReplyHtml(data.replyId, content));
-
-                    form.reset();
-                    form.classList.add("d-none");
-                });
-        });
-        });
-</script>
-
-
+<!-- Styling -->
 <style>
     /* === GENERAL STYLING === */
     textarea:focus,
@@ -492,4 +232,19 @@
         transition: opacity 300ms ease-out;
     }
 
+    .forum-image:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
+
+    .btn-outline-secondary {
+        background-color: rgba(255, 255, 255, 0.69);
+        color: white;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #d81324;
+        color: white;
+        border-color: #d81324;
+    }
 </style>

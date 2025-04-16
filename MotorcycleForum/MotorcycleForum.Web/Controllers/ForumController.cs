@@ -26,18 +26,37 @@ namespace MotorcycleForum.Web.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? topicId, string search)
         {
-            var topics = await _context.ForumTopics
+            // Fetch topics for dropdown
+            ViewBag.Topics = await _context.ForumTopics
+                .OrderBy(t => t.Title)
                 .Select(t => new SelectListItem
                 {
                     Text = t.Title,
-                    Value = t.TopicId.ToString()
+                    Value = t.TopicId.ToString(),
+                    Selected = t.TopicId == topicId
                 })
                 .ToListAsync();
 
-            var posts = await _context.ForumPosts
+            // Base query for posts
+            var postsQuery = _context.ForumPosts
+                .Include(p => p.Author)
+                .Include(p => p.Topic)
+                .AsQueryable();
+
+            // Apply topic filter if selected
+            if (topicId.HasValue)
+                postsQuery = postsQuery.Where(p => p.TopicId == topicId.Value);
+
+            // Apply search filter if provided
+            if (!string.IsNullOrWhiteSpace(search))
+                postsQuery = postsQuery.Where(p => p.Title.Contains(search));
+
+            // Fetch and map to ViewModel
+            var posts = await postsQuery
                 .AsNoTracking()
+                .OrderByDescending(p => p.CreatedDate)
                 .Select(p => new ForumPostViewModel
                 {
                     ForumPostId = p.ForumPostId,
@@ -50,61 +69,152 @@ namespace MotorcycleForum.Web.Controllers
                 })
                 .ToListAsync();
 
+            // Preserve selected filter values
+            ViewBag.SelectedTopicId = topicId;
+            ViewBag.SearchTerm = search;
+
             return View(posts);
         }
 
-        public async Task<IActionResult> Details(Guid id)
+        [HttpGet]
+        [Authorize]
+        public IActionResult Create()
         {
-            var user = await _userManager.GetUserAsync(User);
-            var userId = user?.Id;
+            var viewModel = new ForumPostCreateViewModel
+            {
+                Topics = new SelectList(_context.ForumTopics.OrderBy(t => t.Title), "TopicId", "Title")
+            };
 
+            return View(viewModel);
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ForumPostCreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Topics = new SelectList(_context.ForumTopics, "TopicId", "Title", model.TopicId);
+                return View(model);
+            }
+
+            var authorId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var postId = Guid.NewGuid();
+
+            var post = new ForumPost
+            {
+                ForumPostId = postId,
+                Title = model.Title,
+                Content = model.Content,
+                AuthorId = authorId,
+                TopicId = model.TopicId,
+                CreatedDate = DateTime.UtcNow,
+                Images = new List<ForumPostImage>()
+            };
+
+
+            if (model.ImageFiles is not null && model.ImageFiles.Any())
+            {
+                var s3 = new S3Service();
+
+                foreach (var formFile in model.ImageFiles.Take(10)) // max 10
+                {
+                    if (formFile.Length > 0)
+                    {
+                        var fileExt = Path.GetExtension(formFile.FileName);
+                        var s3FileName = $"forumPosts/{postId}/{Guid.NewGuid()}{fileExt}";
+
+                        using var stream = formFile.OpenReadStream();
+                        var imageUrl = await s3.UploadFileAsync(stream, s3FileName);
+
+                        post.Images.Add(new ForumPostImage
+                        {
+                            ImageId = Guid.NewGuid(),
+                            ForumPostId = postId,
+                            ImageUrl = imageUrl
+                        });
+                    }
+                }
+            }
+
+            _context.ForumPosts.Add(post);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = postId });
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
             var post = await _context.ForumPosts
                 .AsNoTracking()
-                .Include(p => p.Author)
-                .Include(p => p.Comments)
-                    .ThenInclude(c => c.Author)
-                .Include(p => p.Comments)
-                    .ThenInclude(c => c.Replies)
                 .FirstOrDefaultAsync(p => p.ForumPostId == id);
 
             if (post == null)
+                return NotFound();
+
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (post.AuthorId != userId)
+                return Forbid();
+
+            var viewModel = new ForumPostCreateViewModel
             {
-                TempData["ErrorMessage"] = "The requested post does not exist.";
-                return RedirectToAction("Index");
+                Title = post.Title,
+                Content = post.Content,
+                TopicId = post.TopicId,
+                Topics = new SelectList(_context.ForumTopics.OrderBy(t => t.Title), "TopicId", "Title", post.TopicId)
+            };
+
+            ViewBag.PostId = post.ForumPostId;
+            return View(viewModel);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid id, ForumPostCreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Topics = new SelectList(_context.ForumTopics.OrderBy(t => t.Title), "TopicId", "Title", model.TopicId);
+                ViewBag.PostId = id;
+                return View(model);
             }
 
-            List<CommentViewModel> ConvertComments(IEnumerable<Comment> comments, Guid? parentId = null)
-            {
-                return comments
-                    .Where(c => c.ParentCommentId == parentId)
-                    .Select(c => new CommentViewModel
-                    {
-                        Id = c.CommentId,
-                        Content = c.Content,
-                        CreatorName = c.Author?.FullName ?? "Unknown",
-                        CreatorProfilePictureUrl = c.Author.ProfilePictureUrl,
-                        CreatedDate = c.CreatedDate,
-                        IsOwner = c.AuthorId == userId,
-                        Replies = ConvertComments(comments, c.CommentId)
-                    })
-                    .ToList();
-            }
+            var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.ForumPostId == id);
+            if (post == null)
+                return NotFound();
 
-            VoteType? userVoteType = null;
-            bool hasVoted = false;
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (post.AuthorId != userId)
+                return Forbid();
 
-            if (user != null)
-            {
-                var userVote = await _context.Votes
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(v => v.ForumPostId == post.ForumPostId && v.UserId == user.Id);
+            post.Title = model.Title;
+            post.Content = model.Content;
+            post.TopicId = model.TopicId;
 
-                if (userVote != null)
-                {
-                    hasVoted = true;
-                    userVoteType = userVote.VoteType;
-                }
-            }
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = post.ForumPostId });
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var post = await _context.ForumPosts
+                .Include(p => p.Topic)
+                .FirstOrDefaultAsync(p => p.ForumPostId == id);
+
+            if (post == null)
+                return NotFound();
+
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (post.AuthorId != userId && !User.IsInRole("Moderator") && !User.IsInRole("Admin"))
+                return Forbid();
 
             var viewModel = new ForumPostDetailsViewModel
             {
@@ -112,16 +222,94 @@ namespace MotorcycleForum.Web.Controllers
                 Title = post.Title,
                 Content = post.Content,
                 CreatedDate = post.CreatedDate,
-                CreatorName = post.Author?.FullName ?? "Unknown",
-                CreatorProfilePictureUrl = post.Author?.ProfilePictureUrl ?? "No image found",
+                Topic = post.Topic
+            };
+
+            return View(viewModel);
+        }
+
+        [Authorize]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        {
+            var post = await _context.ForumPosts.FindAsync(id);
+
+            if (post == null)
+                return NotFound();
+
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (post.AuthorId != userId && !User.IsInRole("Moderator") && !User.IsInRole("Admin"))
+                return Forbid();
+
+            _context.ForumPosts.Remove(post);
+            await _context.SaveChangesAsync();
+
+            TempData["ForumDeleteSuccess"] = "The post was successfully deleted.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var post = await _context.ForumPosts
+                .Include(p => p.Author)
+                .Include(p => p.Topic)
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.Author)
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.Replies)
+                        .ThenInclude(r => r.Author)
+                .Include(p => p.Images)
+                .Include(p => p.Votes)
+                .FirstOrDefaultAsync(p => p.ForumPostId == id);
+
+            if (post == null)
+                return NotFound();
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Guid? userId = Guid.TryParse(userIdString, out var parsedId) ? parsedId : null;
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            var viewModel = new ForumPostDetailsViewModel
+            {
+                Id = post.ForumPostId,
+                Title = post.Title,
+                Content = post.Content,
+                CreatedDate = post.CreatedDate,
+                CreatorName = post.Author.FullName,
+                CreatorProfilePictureUrl = post.Author.ProfilePictureUrl,
+                Topic = post.Topic,
                 Upvotes = post.Upvotes,
                 Downvotes = post.Downvotes,
-                HasVoted = hasVoted,
-                UserVoteType = userVoteType,
-                Comments = ConvertComments(post.Comments)
+                HasVoted = post.Votes.Any(v => v.UserId == userId),
+                UserVoteType = post.Votes.FirstOrDefault(v => v.UserId == userId)?.VoteType,
+                IsOwner = userId.HasValue && post.AuthorId == userId.Value,
+                ImageUrls = post.Images?.Select(img => img.ImageUrl).ToList() ?? new List<string>(),
+
+                Comments = post.Comments
+                    .Where(c => c.ParentCommentId == null)
+                    .Select(c => new CommentViewModel
+                    {
+                        Id = c.CommentId,
+                        Content = c.Content,
+                        CreatedDate = c.CreatedDate,
+                        CreatorName = c.Author.FullName,
+                        CreatorProfilePictureUrl = c.Author.ProfilePictureUrl,
+                        IsOwner = c.AuthorId == userId,
+                        Replies = c.Replies.Select(r => new CommentViewModel
+                        {
+                            Id = r.CommentId,
+                            Content = r.Content,
+                            CreatedDate = r.CreatedDate,
+                            CreatorName = r.Author.FullName,
+                            CreatorProfilePictureUrl = r.Author.ProfilePictureUrl,
+                            IsOwner = userId.HasValue && r.AuthorId == userId.Value, 
+                        }).ToList()
+                    }).ToList()
             };
-            
-            ViewBag.CurrentUserAvatar = user?.ProfilePictureUrl ?? "/assets/img/no-image-found.png";
+
+            ViewBag.CurrentUserAvatar = currentUser?.ProfilePictureUrl ?? "/assets/img/no-image-found.png";
 
             return View(viewModel);
         }
@@ -169,34 +357,31 @@ namespace MotorcycleForum.Web.Controllers
         public async Task<IActionResult> DeleteComment([FromBody] DeleteCommentRequest request)
         {
             if (request == null || request.CommentId == Guid.Empty)
-            {
                 return Json(new { success = false, message = "Invalid request." });
-            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 return Json(new { success = false, message = "You must be logged in to delete a comment." });
-            }
 
-            var comment = await _context.Comments.FindAsync(request.CommentId);
+            var comment = await _context.Comments
+                .Include(c => c.Replies)
+                .FirstOrDefaultAsync(c => c.CommentId == request.CommentId);
+
             if (comment == null)
-            {
                 return Json(new { success = false, message = "Comment not found." });
-            }
 
-            // Ensure the logged-in user is the owner of the comment
             if (comment.AuthorId != user.Id)
-            {
                 return Json(new { success = false, message = "You can only delete your own comments." });
-            }
+
+            // Delete replies first
+            if (comment.Replies.Any())
+                _context.Comments.RemoveRange(comment.Replies);
 
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
 
             return Json(new { success = true, message = "Comment deleted!" });
         }
-
 
         [HttpPost]
         [Authorize]
@@ -337,7 +522,6 @@ namespace MotorcycleForum.Web.Controllers
         public Guid PostId { get; set; }
         public string? Content { get; set; }
     } 
-
     public class DeleteCommentRequest
     {
         public Guid CommentId { get; set; }

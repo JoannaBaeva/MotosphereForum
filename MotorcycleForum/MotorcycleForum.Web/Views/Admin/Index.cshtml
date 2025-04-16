@@ -1,0 +1,71 @@
+﻿@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<div class="container py-5">
+    <h1 class="text-white fw-bold mb-4">⚙️ Admin Dashboard</h1>
+
+    <!-- Overview Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card text-center border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title text-dark">Users</h5>
+                    <p class="fs-4 fw-bold text-danger">1,204</p>
+                    <a href="/Admin/Users" class="btn btn-outline-danger btn-sm">Manage Users</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title text-dark">Forum Posts</h5>
+                    <p class="fs-4 fw-bold text-danger">312</p>
+                    <a href="/Forum" class="btn btn-outline-danger btn-sm">Go to Forum</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title text-dark">Marketplace</h5>
+                    <p class="fs-4 fw-bold text-danger">188</p>
+                    <a href="/Marketplace" class="btn btn-outline-danger btn-sm">View Listings</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title text-dark">Events</h5>
+                    <p class="fs-4 fw-bold text-danger">14</p>
+                    <a href="/Events" class="btn btn-outline-danger btn-sm">Manage Events</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Quick Tools -->
+    <div class="card border-0 shadow-lg bg-light rounded-4">
+        <div class="card-body p-4">
+            <h4 class="fw-bold mb-3 text-dark">🔧 Quick Tools</h4>
+            <div class="row row-cols-1 row-cols-md-3 g-3">
+                <div class="col">
+                    <a href="/Admin/CreateModerator" class="btn btn-danger w-100 text-start">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Add Moderator
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="/Forum/CreateTopic" class="btn btn-outline-dark w-100 text-start">
+                        <i class="bi bi-plus-circle me-2"></i> Create Forum Topic
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="/Admin/BannedUsers" class="btn btn-outline-dark w-100 text-start">
+                        <i class="bi bi-person-x me-2"></i> View Banned Users
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

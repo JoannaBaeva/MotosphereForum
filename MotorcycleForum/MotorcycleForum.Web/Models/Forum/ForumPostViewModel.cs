@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using MotorcycleForum.Data.Entities.Forum;
+using MotorcycleForum.Data.Entities.Marketplace;
 
 namespace MotorcycleForum.Web.Models.Forum
 {
@@ -14,5 +15,6 @@ namespace MotorcycleForum.Web.Models.Forum
         public int Upvotes { get; set; }
         public int Downvotes { get; set; }
         public IEnumerable<SelectListItem>? Topics { get; set; }
+        public List<MarketplaceListing>? Posts { get; set; }
     }
 }

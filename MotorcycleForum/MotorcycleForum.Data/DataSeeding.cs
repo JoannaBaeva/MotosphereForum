@@ -53,9 +53,10 @@ namespace MotorcycleForum.Data
             );
 
             modelBuilder.Entity<IdentityUserRole<Guid>>().HasData(
-                new IdentityUserRole<Guid> { 
-                    UserId = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"), 
-                    RoleId = Guid.Parse("f15bf949-9c6b-4b98-a6f8-6c4a1c7607b5") 
+                new IdentityUserRole<Guid>
+                {
+                    UserId = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                    RoleId = Guid.Parse("f15bf949-9c6b-4b98-a6f8-6c4a1c7607b5")
                 },
                 new IdentityUserRole<Guid>
                 {
@@ -64,7 +65,7 @@ namespace MotorcycleForum.Data
                 }
             );
 
-        //Forum
+            //Forum
             // Seed Forum Topics after Users and Roles are inserted
             modelBuilder.Entity<ForumTopic>().HasData(
                 new ForumTopic
@@ -74,6 +75,22 @@ namespace MotorcycleForum.Data
                     CreatedDate = DateTime.UtcNow,
                     IsApproved = true,
                     Title = "General Discussion"
+                },
+                new ForumTopic
+                {
+                    TopicId = 2,
+                    CreatedById = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                    CreatedDate = DateTime.UtcNow,
+                    IsApproved = true,
+                    Title = "Motorcycle Maintenance & Repair"
+                },
+                new ForumTopic
+                {
+                    TopicId = 3,
+                    CreatedById = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                    CreatedDate = DateTime.UtcNow,
+                    IsApproved = true,
+                    Title = "Gear & Accessories"
                 }
             );
 
@@ -100,7 +117,7 @@ namespace MotorcycleForum.Data
                 }
             );
 
-        //Marketplace
+            //Marketplace
             // Seed Categories
             modelBuilder.Entity<Category>().HasData(
                 new Category
@@ -118,7 +135,7 @@ namespace MotorcycleForum.Data
                     CategoryId = Guid.Parse("f816c9f1-8132-4a1d-b78d-7370b79500b8"),
                     Name = "Motorcycles for Sale"
                 }
-                
+
             );
 
             // Seed Marketplace Listings

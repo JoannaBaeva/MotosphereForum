@@ -4,31 +4,38 @@
 }
 
 <div class="container py-5">
-    <div class="bg-white rounded shadow p-4">
-        <h1 class="text-dark mb-4 border-bottom pb-2 text-center">Forum</h1>
+    <div class="bg-white rounded-4 shadow-lg p-5 animate__animated animate__fadeIn">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h1 class="display-5 fw-bold border-bottom border-danger pb-2 mb-0 text-dark">
+                <i class="bi bi-chat-left-text me-2"></i> Forum
+            </h1>
+            <a asp-action="Create" class="btn btn-danger btn-lg fw-bold rounded-pill shadow">
+                <i class="bi bi-plus-circle me-2"></i> New Post
+            </a>
+        </div>
 
         <!-- Filter & Search -->
-        <form method="get" class="mb-4">
+        <form method="get" class="mb-5">
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold text-dark">Filter by Topic</label>
-                    <select class="form-select" id="TopicId" name="TopicId">
+                    <label class="form-label fw-semibold text-dark"><i class="bi bi-funnel me-1"></i>Filter by Topic</label>
+                    <select class="form-select shadow-sm rounded-pill" id="TopicId" name="topicId">
                         <option value="">-- Select a topic --</option>
                         @foreach (var topic in (ViewBag.Topics as List<SelectListItem> ?? new()))
                         {
-                            var isSelected = topic.Value == ViewBag.TopicId?.ToString() ? "selected" : "";
-
-                            <option value="@topic.Value" selected="@isSelected">@topic.Text</option>
+                            <option value="@topic.Value" selected="@(topic.Selected ? "selected" : null)">
+                                @topic.Text
+                            </option>
                         }
                     </select>
-
                 </div>
                 <div class="col-md-8">
-                    <label class="form-label fw-semibold text-dark">Search Posts</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for a post...">
-                        <button class="btn btn-outline-dark" type="submit">
-                            <i class="bi bi-search"></i> Search
+                    <label class="form-label fw-semibold text-dark"><i class="bi bi-search me-1"></i>Search Posts</label>
+                    <div class="input-group shadow-sm">
+                        <input type="text" class="form-control rounded-start-pill" name="search" placeholder="Search for a post..."
+                               value="@ViewBag.SearchTerm">
+                        <button class="btn btn-dark rounded-end-pill" type="submit">
+                            Search
                         </button>
                     </div>
                 </div>
@@ -37,38 +44,95 @@
 
         <!-- Forum Post Cards -->
         <div class="row g-4">
-            @foreach (var post in Model)
+            @if (Model != null && Model.Any())
             {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold text-dark">@post.Title</h5>
-                            <p class="card-text text-muted">
-                                <i class="bi bi-person-circle"></i> <strong>@post.CreatorName</strong><br />
-                                <small><i class="bi bi-clock"></i> @post.CreatedDate.ToShortDateString()</small>
-                            </p>
-                            <div class="d-flex justify-content-between mt-3">
-                                <span class="badge bg-success"><i class="bi bi-hand-thumbs-up-fill me-1"></i>@post.Upvotes</span>
-                                <span class="badge bg-danger"><i class="bi bi-hand-thumbs-down-fill me-1"></i>@post.Downvotes</span>
+                @foreach (var post in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm hover-shadow animate__animated animate__fadeInUp">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-dark">@post.Title</h5>
+                                <p class="card-text text-muted">
+                                    <i class="bi bi-person-circle"></i> <strong>@post.CreatorName</strong><br />
+                                    <small><i class="bi bi-clock"></i> @post.CreatedDate.ToShortDateString()</small>
+                                </p>
+                                @if (!string.IsNullOrWhiteSpace(post.Topic.Title))
+                                {
+                                    <span class="badge bg-dark-subtle text-dark border border-dark">
+                                        <i class="bi bi-tag-fill me-1"></i> @post.Topic.Title
+                                    </span>
+                                }
+                                <div class="d-flex justify-content-between mt-3">
+                                    <span class="badge bg-success rounded-pill"><i class="bi bi-hand-thumbs-up-fill me-1"></i>@post.Upvotes</span>
+                                    <span class="badge bg-danger rounded-pill"><i class="bi bi-hand-thumbs-down-fill me-1"></i>@post.Downvotes</span>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 text-center pb-3">
+                                <a href="@Url.Action("Details", "Forum", new { id = post.ForumPostId })" class="btn btn-outline-danger btn-sm rounded-pill px-4">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
                             </div>
                         </div>
-                        <div class="card-footer bg-white border-top-0 text-center">
-                            <a href="@Url.Action("Details", "Forum", new { id = post.ForumPostId })" class="btn btn-outline-dark btn-sm px-4">
-                                <i class="bi bi-eye"></i> View
-                            </a>
-                        </div>
                     </div>
-                </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted fs-5 text-center w-100">No posts found matching your criteria. Try adjusting your filters!</p>
             }
         </div>
     </div>
 </div>
 
 <style>
-    .btn:hover {
-        opacity: 0.9;
-        transform: scale(1.02);
-        transition: all 0.2s ease-in-out;
+    .btn:hover, .btn-lg:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(216,19,36,0.3);
+        transition: all 0.3s ease;
+    }
+
+    select.form-select,
+    input.form-control {
+        transition: box-shadow 0.3s ease-in-out;
+        border-radius: 50px;
+    }
+
+    select:focus,
+    input:focus {
+        border-color: #d81324;
+        box-shadow: 0 0 0 0.25rem rgba(216, 19, 36, 0.2);
+    }
+
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .animate__animated {
+        animation-duration: 1s;
     }
 </style>
-    
+
+
+<script>
+    @if (TempData["ForumDeleteSuccess"] != null)
+    {
+        <text>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: '@TempData["ForumDeleteSuccess"]',
+                            confirmButtonColor: '#d81324',
+                            background: '#fff',
+                            customClass: {
+                                popup: 'shadow rounded',
+                                confirmButton: 'btn btn-danger fw-bold'
+                            },
+                            buttonsStyling: false
+                        });
+                    });
+        </text>
+    }
+</script>

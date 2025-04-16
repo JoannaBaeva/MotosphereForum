@@ -1,0 +1,121 @@
+﻿@model ForumPostCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Post";
+}
+
+<div class="container py-5">
+    <div class="bg-white rounded shadow-lg p-5 animate__animated animate__fadeInUp">
+        <h2 class="text-dark fw-bold mb-4 border-bottom border-danger pb-3">📝 Create New Forum Post</h2>
+
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label fw-semibold text-dark">Title</label>
+                <input asp-for="Title" class="form-control shadow-sm" placeholder="Enter your post title" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label fw-semibold text-dark">Content</label>
+                <textarea asp-for="Content" class="form-control shadow-sm" rows="6" placeholder="Write your post content..."></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="TopicId" class="form-label fw-semibold text-dark">Topic</label>
+                <select asp-for="TopicId" class="form-select shadow-sm" asp-items="Model.Topics">
+                    <option value="">-- Select Topic --</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label fw-semibold text-dark">Upload Images (Max 10)</label>
+                <div id="dropZone" class="border border-2 border-dashed p-5 text-center bg-light rounded mb-3 position-relative" style="cursor:pointer;">
+                    <p><i class="bi bi-cloud-arrow-up fs-1 text-muted"></i></p>
+                    <p class="text-muted">Drag & drop images here, or click to select</p>
+                    <input id="imageInput" asp-for="ImageFiles" type="file" class="form-control d-none" multiple accept="image/*" />
+                </div>
+                <div id="previewContainer" class="row"></div>
+                <span asp-validation-for="ImageFiles" class="text-danger d-block mt-2"></span>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn fw-bold shadow" style="background-color: #d81324; color: white;">
+                    <i class="bi bi-plus-circle"></i> Create Post
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const dropZone = document.getElementById("dropZone");
+    const imageInput = document.getElementById("imageInput");
+    const previewContainer = document.getElementById("previewContainer");
+
+    dropZone.onclick = () => imageInput.click();
+
+    dropZone.addEventListener("dragover", e => {
+        e.preventDefault();
+        dropZone.classList.add("bg-secondary", "text-white");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("bg-secondary", "text-white");
+    });
+
+    dropZone.addEventListener("drop", e => {
+        e.preventDefault();
+        dropZone.classList.remove("bg-secondary", "text-white");
+
+        const files = [...e.dataTransfer.files];
+        handleFiles(files);
+    });
+
+    imageInput.addEventListener("change", () => {
+        const files = [...imageInput.files];
+        handleFiles(files);
+    });
+
+    function handleFiles(files) {
+        if (files.length > 10) {
+            Swal.fire('Oops!', 'You can upload a maximum of 10 images.', 'warning');
+            imageInput.value = '';
+            return;
+        }
+        updatePreviews(files);
+    }
+
+    function updatePreviews(files) {
+        previewContainer.innerHTML = '';
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-3 position-relative animate__animated animate__zoomIn';
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-fluid rounded border shadow-sm';
+
+                col.appendChild(img);
+                previewContainer.appendChild(col);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+
+<style>
+    #previewContainer img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    #dropZone:hover {
+        background-color: rgba(216,19,36,0.1);
+        transition: background-color 0.3s ease;
+    }
+</style>

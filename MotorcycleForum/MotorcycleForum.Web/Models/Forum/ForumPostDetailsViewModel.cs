@@ -1,4 +1,5 @@
-﻿using MotorcycleForum.Data.Enums;
+﻿using MotorcycleForum.Data.Entities.Forum;
+using MotorcycleForum.Data.Enums;
 
 namespace MotorcycleForum.Web.Models.Forum
 {
@@ -12,8 +13,11 @@ namespace MotorcycleForum.Web.Models.Forum
         public string CreatorProfilePictureUrl { get; set; } = null!;
         public int Upvotes { get; set; }
         public int Downvotes { get; set; }
+        public ForumTopic Topic { get; set; } = null!;
         public bool HasVoted { get; set; }
+        public bool IsOwner { get; set; }
         public VoteType? UserVoteType { get; set; }
         public List<CommentViewModel> Comments { get; set; } = new List<CommentViewModel>();
+        public List<string> ImageUrls { get; set; } = new();
     }
 }

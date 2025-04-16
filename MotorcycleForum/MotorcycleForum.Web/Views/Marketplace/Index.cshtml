@@ -4,42 +4,35 @@
     ViewData["Title"] = "Marketplace";
 }
 
-<div class="container py-5">
-    <div class="bg-white rounded shadow p-4 ">
-        <h1 class="text-dark mb-4 border-bottom pb-2" style="text-align: center">
-            Marketplace Listings
-        </h1>
-
-        <div class="mb-4 d-flex justify-content-center">
-            <a href="@Url.Action("MyListings")" class="btn btn-outline-dark fw-bold px-4 py-2" style="font-size: 1.1rem;">
+<div class="py-5 container">
+    <div class="bg-white p-4 rounded shadow-lg">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-dark border-bottom border-danger pb-2 mb-0 fw-bold">Marketplace Listings</h1>
+            <a href="@Url.Action("MyListings")" class="btn btn-danger fw-bold">
                 <i class="bi bi-card-list me-2"></i> My Listings
             </a>
         </div>
 
-
-
         <form asp-action="Index" method="get" class="mb-4">
-            <div class="row g-3 align-items-end mb-2">
-                <!-- Search stays visible -->
+            <div class="row g-3 align-items-end">
                 <div class="col-md-10">
-                    <label class="form-label text-dark fw-semibold">Search</label>
-                    <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control" placeholder="Title or description..." />
+                    <label class="form-label fw-semibold">Search Listings</label>
+                    <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control shadow-sm" placeholder="Title or description..." />
                 </div>
-                <div class="col-md-2 d-flex justify-content-end align-items-end">
-                    <button class="btn btn-outline-dark w-100" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilters" aria-expanded="false" aria-controls="advancedFilters">
+                <div class="col-md-2">
+                    <button class="btn btn-outline-dark w-100 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilters">
                         <i class="bi bi-sliders"></i> Filters
                     </button>
                 </div>
             </div>
 
-            <!-- Collapsible advanced filters -->
-            <div class="collapse" id="advancedFilters">
+            <div class="mt-3 collapse" id="advancedFilters">
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label text-dark fw-semibold">Category</label>
-                                <select name="categoryId" class="form-select">
+                                <label class="form-label fw-semibold">Category</label>
+                                <select name="categoryId" class="form-select shadow-sm">
                                     <option value="">-- All Categories --</option>
                                     @foreach (var cat in Model.Categories ?? Enumerable.Empty<SelectListItem>())
                                     {
@@ -49,8 +42,8 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label text-dark fw-semibold">Sort By</label>
-                                <select name="sortOption" class="form-select">
+                                <label class="form-label fw-semibold">Sort By</label>
+                                <select name="sortOption" class="form-select shadow-sm">
                                     <option value="" selected="@(string.IsNullOrEmpty(Model.SortOption))">Newest First</option>
                                     <option value="price-asc" selected="@(Model.SortOption == "price-asc")">Price: Low to High</option>
                                     <option value="price-desc" selected="@(Model.SortOption == "price-desc")">Price: High to Low</option>
@@ -58,30 +51,29 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label text-dark fw-semibold">Price Range</label>
+                                <label class="form-label fw-semibold">Price Range</label>
                                 <div class="row">
                                     <div class="col-6">
-                                        <input type="number" class="form-control" id="minPriceInput" placeholder="Min $" value="@Model.MinPrice" />
+                                        <input type="number" class="form-control shadow-sm" id="minPriceInput" placeholder="Min $" value="@Model.MinPrice" />
                                     </div>
                                     <div class="col-6">
-                                        <input type="number" class="form-control" id="maxPriceInput" placeholder="Max $" value="@Model.MaxPrice" />
+                                        <input type="number" class="form-control shadow-sm" id="maxPriceInput" placeholder="Max $" value="@Model.MaxPrice" />
                                     </div>
                                 </div>
 
                                 <!-- Slider -->
-                                <div class="mt-3" id="priceSlider"></div>
+                                <div class="mt-3 px-2" id="priceSlider"></div>
 
-                                <!-- Hidden fields for form submission -->
+                                <!-- Hidden fields -->
                                 <input type="hidden" id="minPrice" name="minPrice" value="@Model.MinPrice" />
                                 <input type="hidden" id="maxPrice" name="maxPrice" value="@Model.MaxPrice" />
-
                             </div>
 
-                            <div class="col-12 d-flex justify-content-end gap-2 mt-3">
-                                <button type="submit" class="btn fw-bold" style="background-color: #d81324; color: white;">
+                            <div class="col-12 d-flex justify-content-end gap-2">
+                                <button type="submit" class="btn btn-danger fw-bold shadow-sm">
                                     <i class="bi bi-funnel-fill"></i> Apply
                                 </button>
-                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary shadow-sm">
                                     <i class="bi bi-x-lg"></i> Clear
                                 </a>
                             </div>
@@ -91,66 +83,47 @@
             </div>
         </form>
 
-
-
-
         <div class="row g-4">
             @if (Model.Listings != null && Model.Listings.Any())
             {
                 @foreach (var listing in Model.Listings)
                 {
                     var carouselId = $"carousel-{listing.ListingId}";
-
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm">
-                            <div class="position-relative">
-                                @if (listing.Images?.Any() == true)
-                                {
-                                    <div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
-                                        <div class="carousel-inner rounded-top">
-                                            @for (int i = 0; i < listing.Images.Count; i++)
-                                            {
-                                                var image = listing.Images[i];
-                                                <div class="carousel-item @(i == 0 ? "active" : "")">
-                                                    <img src="@image.ImageUrl"
-                                                         class="d-block w-100"
-                                                         style="max-height: 200px; object-fit: cover;"
-                                                         alt="Listing image" />
-                                                </div>
-                                            }
-                                        </div>
-
-                                        @if (listing.Images.Count > 1)
+                            @if (listing.Images?.Any() == true)
+                            {
+                                <div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner rounded-top">
+                                        @for (int i = 0; i < listing.Images.Count; i++)
                                         {
-                                            <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
-                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                            </button>
-                                            <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
-                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                            </button>
+                                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                                <img src="@listing.Images[i].ImageUrl" class="d-block w-100" style="max-height: 200px; object-fit: cover;" />
+                                            </div>
                                         }
                                     </div>
-                                }
-                                else
-                                {
-                                    <div class="bg-secondary text-white text-center p-5">
-                                        No Image
-                                    </div>
-                                }
-                            </div>
-
+                                    @if (listing.Images.Count > 1)
+                                    {
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon"></span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon"></span>
+                                        </button>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="bg-secondary text-white p-5 text-center">No Image</div>
+                            }
                             <div class="card-body">
-                                <h5 class="card-title fw-bold text-dark">@listing.Title</h5>
-                                <p class="card-text mb-1 text-muted">
-                                    <strong>Category:</strong> @listing.Category?.Name
-                                </p>
-                                <p class="card-text text-muted">
-                                    <strong>Price:</strong> @listing.Price.ToString("C")
-                                </p>
+                                <h5 class="card-title fw-bold">@listing.Title</h5>
+                                <p class="text-muted mb-1"><strong>Category:</strong> @listing.Category?.Name</p>
+                                <p class="text-muted"><strong>Price:</strong> @listing.Price.ToString("C")</p>
                             </div>
-
-                            <div class="card-footer bg-white border-top-0 d-flex justify-content-center px-3 pb-3">
-                                <a href="@Url.Action("Details", new { id = listing.ListingId })" class="btn btn-outline-dark btn-sm">
+                            <div class="card-footer bg-white pb-3 border-0 text-center">
+                                <a href="@Url.Action("Details", new { id = listing.ListingId })" class="btn btn-outline-dark shadow-sm">
                                     <i class="bi bi-eye"></i> View
                                 </a>
                             </div>
@@ -162,67 +135,9 @@
             {
                 <p class="text-muted">No listings found matching your filters.</p>
             }
-
-            @if (Model.TotalPages > 1)
-            {
-                <nav class="mt-4 d-flex justify-content-center">
-                    <ul class="pagination">
-                        <!-- Previous -->
-                        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                            <a class="page-link" 
-                               href="@Url.Action("Index", new {
-                       pageNumber = Model.PageNumber - 1,
-                       searchTerm = Model.SearchTerm,
-                       categoryId = Model.CategoryId,
-                       minPrice = Model.MinPrice,
-                       maxPrice = Model.MaxPrice,
-                       sortOption = Model.SortOption
-                   })">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-
-                        <!-- Page Numbers -->
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                                <a class="page-link"
-                                   href="@Url.Action("Index", new {
-                           pageNumber = i,
-                           searchTerm = Model.SearchTerm,
-                           categoryId = Model.CategoryId,
-                           minPrice = Model.MinPrice,
-                           maxPrice = Model.MaxPrice,
-                           sortOption = Model.SortOption
-                       })">
-                                    @i
-                                </a>
-                            </li>
-                        }
-
-                        <!-- Next -->
-                        <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link"
-                               href="@Url.Action("Index", new {
-                       pageNumber = Model.PageNumber + 1,
-                       searchTerm = Model.SearchTerm,
-                       categoryId = Model.CategoryId,
-                       minPrice = Model.MinPrice,
-                       maxPrice = Model.MaxPrice,
-                       sortOption = Model.SortOption
-                   })">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            }
-
-
         </div>
     </div>
 </div>
-
 
 @section Scripts {
     <script>
@@ -250,24 +165,17 @@
                 }
             });
 
-            // Update inputs on slider change
             slider.noUiSlider.on('update', function (values) {
-                const [min, max] = values.map(Number);
-                minInput.value = min;
-                maxInput.value = max;
-                minHidden.value = min;
-                maxHidden.value = max;
+                minInput.value = minHidden.value = values[0];
+                maxInput.value = maxHidden.value = values[1];
             });
 
-            // Update slider when typing in inputs
-            function setSliderFromInputs() {
-                const min = parseFloat(minInput.value) || 0;
-                const max = parseFloat(maxInput.value) || 10000;
-                slider.noUiSlider.set([min, max]);
+            function updateSlider() {
+                slider.noUiSlider.set([minInput.value, maxInput.value]);
             }
 
-            minInput.addEventListener('change', setSliderFromInputs);
-            maxInput.addEventListener('change', setSliderFromInputs);
+            minInput.addEventListener('change', updateSlider);
+            maxInput.addEventListener('change', updateSlider);
         });
     </script>
 }
@@ -279,7 +187,7 @@
         transition: all 0.2s ease-in-out;
     }
 
-    .page-link{
+    .page-link {
         background-color: #B0B0B0 !important;
         color: white !important;
         border-color: white !important;

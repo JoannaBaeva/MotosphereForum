@@ -26,12 +26,6 @@ namespace MotorcycleForum.Web.Controllers
             return View();
         }
 
-        [Authorize]
-        public IActionResult Secret()
-        {
-            return View();
-        }
-
 
     }
 }
