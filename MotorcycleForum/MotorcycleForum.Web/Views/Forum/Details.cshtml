@@ -1,4 +1,9 @@
-﻿@using MotorcycleForum.Data.Enums
+﻿<!-- Styles -->
+@section Styles {
+    <link rel="stylesheet" href="~/css/forum.css">
+}
+
+@using MotorcycleForum.Data.Enums
 @model ForumPostDetailsViewModel
 
 @{
@@ -7,14 +12,14 @@
     var isDownvoted = Model.UserVoteType == VoteType.Downvote;
 }
 
-<!-- Structure -->
-<div class="my-5 container">
+<div class="my-4 container-fluid px-3 px-md-4 px-lg-5">
     <a asp-action="Index" class="btn btn-outline-secondary mb-3 d-inline-flex align-items-center">
         <i class="bi bi-arrow-left me-2"></i> Back to Forum
     </a>
+
     <div class="card rounded-4 border-0 shadow-lg">
         <!-- Header -->
-        <div class="card-header bg-dark text-white py-4 px-4 rounded-top-4 border-bottom border-danger">
+        <div class="card-header bg-dark text-white py-3 px-3 px-md-4 border-bottom border-danger rounded-top-4">
             <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                 <h2 class="fw-bold mb-0">@Model.Title</h2>
                 <div class="d-flex align-items-center">
@@ -29,24 +34,37 @@
         </div>
 
         <!-- Body -->
-        <div class="card-body bg-dark text-light bg-opacity-75">
+        <div class="card-body bg-dark text-light px-3 px-md-4 py-4 bg-opacity-75">
             <p class="fs-5 lh-lg">@Model.Content</p>
 
-            <!-- Images -->
+            <!-- Image Carousel -->
             @if (Model.ImageUrls.Any())
             {
-                <div class="row g-3 mt-4">
-                    @foreach (var imageUrl in Model.ImageUrls)
-                    {
-                        <div class="col-md-4 col-sm-6">
-                            <a href="@imageUrl" target="_blank">
-                                <img src="@imageUrl" class="img-fluid forum-image w-100 rounded shadow-sm"
-                                     style="height: 200px; object-fit: cover;" alt="Forum Post Image" />
-                            </a>
+                <div class="mt-4 d-flex justify-content-center">
+                    <div id="forumPostCarousel" class="carousel slide" style="max-width: 700px;" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded shadow-sm">
+                            @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                            {
+                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                    <img src="@Model.ImageUrls[i]"
+                                         class="d-block object-fit-cover zoomable"
+                                         style="height: 320px; object-fit: cover; cursor: zoom-in; border-radius: 8px;"
+                                         alt="Forum Image @(i + 1)" />
+                                </div>
+                            }
                         </div>
-                    }
+                        <button class="carousel-control-prev" type="button" data-bs-target="#forumPostCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon bg-dark rounded-circle p-2 bg-opacity-50" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#forumPostCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon bg-dark rounded-circle p-2 bg-opacity-50" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
                 </div>
             }
+
 
             <!-- Admin Tools -->
             @if ((User.IsInRole("Moderator") || User.IsInRole("Admin")) && !Model.IsOwner)
@@ -73,7 +91,6 @@
         <!-- Footer / Voting -->
         <div class="card-footer bg-dark text-light px-3 py-3 border-top border-secondary">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <!-- Voting Buttons -->
                 <div class="d-flex align-items-center gap-3">
                     <button id="upvote-btn"
                             class="btn btn-sm px-3 d-flex align-items-center gap-1 @(isUpvoted ? "btn-success text-white active" : "btn-outline-success")"
@@ -91,7 +108,6 @@
                     <span id="downvotes-count" class="badge bg-danger">@Model.Downvotes</span>
                 </div>
 
-                <!-- Toggle Comments -->
                 <div class="text-md-end w-100 w-md-auto">
                     <button id="toggle-comments-btn" class="btn btn-outline-light btn-sm fw-bold w-100 w-md-auto mt-2 mt-md-0">
                         💬 Show Comments
@@ -99,7 +115,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Comments Section -->
         <div id="comments-section" class="bg-light p-4 rounded-bottom container" style="display: none;"
@@ -120,7 +135,6 @@
                 }
             </div>
 
-            <!-- New Comment Form -->
             <form id="comment-form" class="mt-4" data-post-id="@Model.Id" data-current-user-avatar="@ViewBag.CurrentUserAvatar">
                 @Html.AntiForgeryToken()
                 <div class="mb-3">
@@ -133,118 +147,23 @@
     </div>
 </div>
 
+<div id="imageZoomModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark rounded-3 border-0">
+            <div class="modal-body p-0">
+                <img id="zoomedImage" src="" class="img-fluid w-100 rounded-3" style="object-fit: contain; max-height: 90vh;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- JavaScript -->
 @section Scripts {
     <script src="~/js/Forum/forum-voting.js"></script>
     <script src="~/js/Forum/forum-comments.js"></script>
+    <script src="~/js/Forum/post-image-view.js"></script>
 }
 
-<!-- Styling -->
-<style>
-    /* === GENERAL STYLING === */
-    textarea:focus,
-    input:focus {
-        border-color: #d81324 !important;
-        box-shadow: 0 0 0 0.2rem rgba(216, 19, 36, 0.25) !important;
-    }
 
-    .form-label {
-        color: #ddd;
-    }
 
-    /* === VOTING STYLING === */
-    .btn-vote {
-        transition: all 0.2s ease-in-out;
-        font-weight: 600;
-    }
-
-        .btn-vote:hover {
-            transform: scale(1.05);
-        }
-
-    #upvote-btn:hover,
-    #upvote-btn.active {
-        background-color: #198754 !important;
-        color: #fff !important;
-        border-color: #198754;
-    }
-
-    #downvote-btn:hover,
-    #downvote-btn.active {
-        background-color: #dc3545 !important;
-        color: #fff !important;
-        border-color: #dc3545;
-    }
-
-    /* === TOGGLE COMMENTS BUTTON === */
-    #toggle-comments-btn {
-        transition: all 0.2s ease-in-out;
-        font-weight: 600;
-    }
-
-        #toggle-comments-btn:hover {
-            background-color: #6c757d !important;
-            color: #fff !important;
-        }
-
-    /* === COMMENT SECTION === */
-    #comments-section {
-        background-color: #1e1e1e;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .comment-card,
-    .reply-card {
-        background-color: #ffffff;
-        color: #212529;
-        border: 1px solid #e0e0e0;
-        border-radius: 0.5rem;
-        transition: opacity 0.3s ease;
-    }
-
-        .comment-card:hover,
-        .reply-card:hover {
-            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
-        }
-
-    .replies {
-        margin-top: 1rem;
-        padding-left: 1rem;
-        border-left: 3px solid #d81324;
-    }
-
-    /* === COMMENT & REPLY ACTIONS === */
-    .btn-outline-danger:hover,
-    .btn-outline-primary:hover,
-    .btn-outline-secondary:hover {
-        background-color: #d81324;
-        color: white;
-        border-color: #d81324;
-    }
-
-    .btn-outline-light:hover {
-        background-color: #f8f9fa;
-        color: #000;
-    }
-
-    .fade-out {
-        opacity: 0;
-        transition: opacity 300ms ease-out;
-    }
-
-    .forum-image:hover {
-        transform: scale(1.05);
-        transition: transform 0.3s ease;
-    }
-
-    .btn-outline-secondary {
-        background-color: rgba(255, 255, 255, 0.69);
-        color: white;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #d81324;
-        color: white;
-        border-color: #d81324;
-    }
-</style>

@@ -124,7 +124,7 @@ namespace MotorcycleForum.Web.Controllers
                     if (formFile.Length > 0)
                     {
                         var fileExt = Path.GetExtension(formFile.FileName);
-                        var s3FileName = $"forumPosts/{postId}/{Guid.NewGuid()}{fileExt}";
+                        var s3FileName = $"forum/{postId}/{Guid.NewGuid()}{fileExt}";
 
                         using var stream = formFile.OpenReadStream();
                         var imageUrl = await s3.UploadFileAsync(stream, s3FileName);
@@ -149,42 +149,48 @@ namespace MotorcycleForum.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             var post = await _context.ForumPosts
-                .AsNoTracking()
+                .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.ForumPostId == id);
 
             if (post == null)
                 return NotFound();
 
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (post.AuthorId != userId)
                 return Forbid();
 
-            var viewModel = new ForumPostCreateViewModel
+            var model = new ForumPostEditViewModel
             {
+                PostId = post.ForumPostId,
                 Title = post.Title,
                 Content = post.Content,
                 TopicId = post.TopicId,
-                Topics = new SelectList(_context.ForumTopics.OrderBy(t => t.Title), "TopicId", "Title", post.TopicId)
+                ExistingImageUrls = post.Images.Select(i => i.ImageUrl).ToList(),
+                Topics = new SelectList(await _context.ForumTopics.OrderBy(t => t.Title).ToListAsync(), "TopicId", "Title", post.TopicId)
             };
 
-            ViewBag.PostId = post.ForumPostId;
-            return View(viewModel);
+            return View(model);
         }
+
+
 
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, ForumPostCreateViewModel model)
+        public async Task<IActionResult> Edit(Guid id, ForumPostEditViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                model.Topics = new SelectList(_context.ForumTopics.OrderBy(t => t.Title), "TopicId", "Title", model.TopicId);
-                ViewBag.PostId = id;
+                model.Topics = new SelectList(await _context.ForumTopics.OrderBy(t => t.Title).ToListAsync(), "TopicId", "Title", model.TopicId);
                 return View(model);
             }
 
-            var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.ForumPostId == id);
+            var post = await _context.ForumPosts
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.ForumPostId == id);
+
             if (post == null)
                 return NotFound();
 
@@ -196,10 +202,43 @@ namespace MotorcycleForum.Web.Controllers
             post.Content = model.Content;
             post.TopicId = model.TopicId;
 
-            await _context.SaveChangesAsync();
+            // Upload new images if any
+            if (model.ImageFiles != null && model.ImageFiles.Any())
+            {
+                var totalImages = post.Images.Count + model.ImageFiles.Count;
+                if (totalImages > 10)
+                {
+                    ModelState.AddModelError("", "You can have a maximum of 10 images total.");
+                    model.Topics = new SelectList(await _context.ForumTopics.OrderBy(t => t.Title).ToListAsync(), "TopicId", "Title", model.TopicId);
+                    return View(model);
+                }
 
+                var s3 = new S3Service();
+
+                foreach (var file in model.ImageFiles)
+                {
+                    if (file.Length > 0)
+                    {
+                        var ext = Path.GetExtension(file.FileName);
+                        var key = $"forum/{post.ForumPostId}/{Guid.NewGuid()}{ext}";
+                        using var stream = file.OpenReadStream();
+                        var url = await s3.UploadFileAsync(stream, key);
+
+                        await _context.ForumPostImages.AddAsync(new ForumPostImage
+                        {
+                            ImageId = Guid.NewGuid(),
+                            ForumPostId = post.ForumPostId,
+                            ImageUrl = url
+                        });
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Details), new { id = post.ForumPostId });
         }
+
+
 
         [Authorize]
         [HttpGet]
@@ -233,7 +272,11 @@ namespace MotorcycleForum.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var post = await _context.ForumPosts.FindAsync(id);
+            var post = await _context.ForumPosts
+                .Include(p => p.Images)
+                .Include(p => p.Comments)
+                .ThenInclude(c => c.Replies)
+                .FirstOrDefaultAsync(p => p.ForumPostId == id);
 
             if (post == null)
                 return NotFound();
@@ -242,12 +285,43 @@ namespace MotorcycleForum.Web.Controllers
             if (post.AuthorId != userId && !User.IsInRole("Moderator") && !User.IsInRole("Admin"))
                 return Forbid();
 
+            var s3 = new S3Service();
+
+            foreach (var image in post.Images)
+            {
+                if (!string.IsNullOrEmpty(image.ImageUrl))
+                {
+                    var uri = new Uri(image.ImageUrl);
+                    var key = uri.AbsolutePath.TrimStart('/');
+
+                    await s3.DeleteFileAsync(key);
+                }
+            }
+
+            foreach (var comment in post.Comments)
+            {
+                if (comment.Replies != null && comment.Replies.Any())
+                {
+                    _context.Comments.RemoveRange(comment.Replies);
+                }
+            }
+
+            // 3. Delete the top-level comments
+            _context.Comments.RemoveRange(post.Comments);
+
+            // 4. Delete images from database
+            _context.ForumPostImages.RemoveRange(post.Images);
+
+            // 5. Delete the forum post itself
             _context.ForumPosts.Remove(post);
+
             await _context.SaveChangesAsync();
 
-            TempData["ForumDeleteSuccess"] = "The post was successfully deleted.";
+            TempData["ForumDeleteSuccess"] = "The post and all related content were successfully deleted.";
             return RedirectToAction(nameof(Index));
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)

@@ -17,9 +17,7 @@ namespace MotorcycleForum.Web.Models.Forum
         [Required(ErrorMessage = "Please select a category.")]
         public int? TopicId { get; set; }
         public IFormFileCollection? ImageFiles { get; set; }
-        public List<string> ExistingImageUrls { get; set; } = new();
-        public List<Guid> ImageIds { get; set; } = new();
         public SelectList? Topics { get; set; }
-    }
+    }   
 
 }

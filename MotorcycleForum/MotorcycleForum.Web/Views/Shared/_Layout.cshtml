@@ -40,6 +40,7 @@
 
     <!-- noUiSlider -->
     <link href="https://cdn.jsdelivr.net/npm/nouislider@15.6.1/dist/nouislider.min.css" rel="stylesheet" />
+    
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -51,7 +52,7 @@
     </div>
 
     <!-- Diploma Banner -->
-    <div class="bg-gradient p-2 text-white text-center small fw-semibold shadow-sm"
+    <div class="bg-gradient p-2 text-white small fw-semibold text-center shadow-sm"
          style="background: linear-gradient(to right, #f09819, #edde5d) !important;">
         <i class="bi bi-mortarboard-fill me-1"></i> This website is part of a diploma project and may use copyrighted images or content for educational purposes only.
     </div>
@@ -68,8 +69,8 @@
                 <i class="bi bi-list fs-1 text-danger"></i>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto align-items-center gap-lg-2 px-3">
+            <div class="navbar-collapse collapse" id="navbarResponsive">
+                <ul class="navbar-nav align-items-center gap-lg-2 px-3 ms-auto">
                     <li class="nav-item">
                         <a class="nav-link text-uppercase active" href="/">Home</a>
                     </li>
@@ -92,7 +93,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container flex-grow-1 my-5">
+    <div class="flex-grow-1 my-5 container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -119,7 +120,7 @@
 
     <!-- Footer -->
     <footer class="footer bg-dark text-light py-4 mt-auto">
-        <div class="container text-center small">
+        <div class="small container text-center">
             <div class="mb-2">&copy; 2024 Motosphere — A Diploma Project</div>
             <a href="/Home/Privacy" class="text-light text-decoration-underline">Privacy Policy</a>
         </div>
@@ -194,5 +195,6 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("Styles", required: false)
 </body>
 </html>

@@ -18,6 +18,7 @@ namespace MotorcycleForum.Data
         public DbSet<MarketplaceListing> MarketplaceListings { get; set; } = null!;
         public DbSet<MarketplaceListingImage> MarketplaceListingImages { get; set; } = null!;
         public DbSet<ForumPost> ForumPosts { get; set; } = null!;
+        public DbSet<ForumPostImage> ForumPostImages { get; set; } = null!;
         public DbSet<ForumTopic> ForumTopics { get; set; } = null!;
         public DbSet<ForumVote> ForumVotes { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
