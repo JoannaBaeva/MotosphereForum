@@ -7,6 +7,11 @@
     var firstImage = Model.Images?.FirstOrDefault()?.ImageUrl;
 }
 
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/marketplace.css" />
+}
+
 <div class="py-5 container">
     <div class="row g-4">
         <!-- Left Column: Images & Description -->
@@ -122,11 +127,8 @@
             </div>
         </div>
 
-
-
-        <!-- Back -->
         <div class="mt-4 text-center">
-            <a asp-action="Index" class="btn btn-outline-dark">
+            <a asp-action="Index" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Listings
             </a>
         </div>
@@ -135,12 +137,6 @@
 
 @section Scripts
 {
-    <script src="~/js/Makrketplace/listing-details.js"></script>
+    <script src="~/js/Marketplace/listing-details.js"></script>
 }
 
-<style>
-    img.img-fluid.rounded.border.listing-thumbnail {
-        height: 120px;
-        width: 150px;
-    }
-</style>

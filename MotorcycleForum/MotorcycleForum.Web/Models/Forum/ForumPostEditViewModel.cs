@@ -21,9 +21,6 @@ namespace MotorcycleForum.Web.Models.Forum
         public List<IFormFile> ImageFiles { get; set; } = new();
 
         public List<string> ExistingImageUrls { get; set; } = new();
-        public List<Guid> ExistingImageIds { get; set; } = new();
-
-        public List<Guid> ImagesToDelete { get; set; } = new();
 
         [BindNever]
         [ValidateNever]

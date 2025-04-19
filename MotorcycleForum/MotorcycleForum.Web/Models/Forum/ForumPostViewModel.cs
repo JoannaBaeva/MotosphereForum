@@ -14,7 +14,5 @@ namespace MotorcycleForum.Web.Models.Forum
         public DateTime CreatedDate { get; set; }
         public int Upvotes { get; set; }
         public int Downvotes { get; set; }
-        public IEnumerable<SelectListItem>? Topics { get; set; }
-        public List<MarketplaceListing>? Posts { get; set; }
     }
 }

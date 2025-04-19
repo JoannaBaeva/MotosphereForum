@@ -18,8 +18,5 @@ namespace MotorcycleForum.Data.Entities.Forum
 
         [Required]
         public string ImageUrl { get; set; } = null!;
-
-        [ForeignKey(nameof(ForumPostId))]
-        public ForumPost ForumPost { get; set; } = null!;
     }
 }

@@ -57,7 +57,7 @@ function updatePreviews() {
 
             const img = document.createElement("img");
             img.src = e.target.result;
-            img.className = "img-fluid rounded border shadow-sm";
+            img.className = "img-create rounded border shadow-sm";
 
             const removeBtn = document.createElement("button");
             removeBtn.className = "btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded-circle";

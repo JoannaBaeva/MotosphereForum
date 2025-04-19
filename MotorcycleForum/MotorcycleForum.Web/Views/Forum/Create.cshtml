@@ -1,6 +1,6 @@
 ﻿@section Styles
 {
-    <link rel="stylesheet" href="css/forum.css"/>    
+    <link rel="stylesheet" href="~/css/forum.css"/>    
 }
 
 @model ForumPostCreateViewModel
@@ -45,11 +45,16 @@
                 <span asp-validation-for="ImageFiles" class="text-danger d-block mt-2"></span>
             </div>
 
-            <div class="text-end">
+            <div class="d-flex justify-content-between align-items-center mt-4 text-end">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+
                 <button type="submit" class="btn fw-bold shadow" style="background-color: #d81324; color: white;">
                     <i class="bi bi-plus-circle"></i> Create Post
                 </button>
             </div>
+
         </form>
     </div>
 </div>

@@ -6,7 +6,6 @@
 
     let newImages = [];
 
-    // 🔥 This is the correct fix
     dropZone.addEventListener("click", () => imageInput.click());
 
     dropZone.addEventListener("dragover", e => {

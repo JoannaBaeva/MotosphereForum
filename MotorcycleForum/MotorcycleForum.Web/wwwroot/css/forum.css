@@ -205,3 +205,8 @@ input:focus {
     max-width: 190px !important;
     height: 170px !important;
 }
+
+.img-create {
+    width: 150px;
+    height: 160px;
+}

@@ -28,7 +28,6 @@ namespace MotorcycleForum.Web.Controllers
 
         public async Task<IActionResult> Index(int? topicId, string search)
         {
-            // Fetch topics for dropdown
             ViewBag.Topics = await _context.ForumTopics
                 .OrderBy(t => t.Title)
                 .Select(t => new SelectListItem
@@ -38,22 +37,17 @@ namespace MotorcycleForum.Web.Controllers
                     Selected = t.TopicId == topicId
                 })
                 .ToListAsync();
-
-            // Base query for posts
             var postsQuery = _context.ForumPosts
                 .Include(p => p.Author)
                 .Include(p => p.Topic)
                 .AsQueryable();
 
-            // Apply topic filter if selected
             if (topicId.HasValue)
                 postsQuery = postsQuery.Where(p => p.TopicId == topicId.Value);
 
-            // Apply search filter if provided
             if (!string.IsNullOrWhiteSpace(search))
                 postsQuery = postsQuery.Where(p => p.Title.Contains(search));
 
-            // Fetch and map to ViewModel
             var posts = await postsQuery
                 .AsNoTracking()
                 .OrderByDescending(p => p.CreatedDate)
@@ -69,7 +63,6 @@ namespace MotorcycleForum.Web.Controllers
                 })
                 .ToListAsync();
 
-            // Preserve selected filter values
             ViewBag.SelectedTopicId = topicId;
             ViewBag.SearchTerm = search;
 
@@ -306,13 +299,10 @@ namespace MotorcycleForum.Web.Controllers
                 }
             }
 
-            // 3. Delete the top-level comments
             _context.Comments.RemoveRange(post.Comments);
 
-            // 4. Delete images from database
             _context.ForumPostImages.RemoveRange(post.Images);
 
-            // 5. Delete the forum post itself
             _context.ForumPosts.Remove(post);
 
             await _context.SaveChangesAsync();
@@ -447,7 +437,6 @@ namespace MotorcycleForum.Web.Controllers
             if (comment.AuthorId != user.Id)
                 return Json(new { success = false, message = "You can only delete your own comments." });
 
-            // Delete replies first
             if (comment.Replies.Any())
                 _context.Comments.RemoveRange(comment.Replies);
 
@@ -478,11 +467,11 @@ namespace MotorcycleForum.Web.Controllers
             {
                 if (existingVote.VoteType == VoteType.Upvote)
                 {
-                    _context.Votes.Remove(existingVote); // Remove upvote
+                    _context.Votes.Remove(existingVote);
                 }
                 else
                 {
-                    existingVote.VoteType = VoteType.Upvote; // Change to upvote
+                    existingVote.VoteType = VoteType.Upvote;
                     _context.Votes.Update(existingVote);
                 }
             }
@@ -491,7 +480,6 @@ namespace MotorcycleForum.Web.Controllers
                 post.Votes.Add(new Vote { UserId = userId, ForumPostId = id, VoteType = VoteType.Upvote });
             }
 
-            // Update post vote counts
             post.Upvotes = post.Votes.Count(v => v.VoteType == VoteType.Upvote);
             post.Downvotes = post.Votes.Count(v => v.VoteType == VoteType.Downvote);
 
@@ -526,11 +514,11 @@ namespace MotorcycleForum.Web.Controllers
             {
                 if (existingVote.VoteType == VoteType.Downvote)
                 {
-                    _context.Votes.Remove(existingVote); // Remove downvote
+                    _context.Votes.Remove(existingVote);
                 }
                 else
                 {
-                    existingVote.VoteType = VoteType.Downvote; // Change to downvote
+                    existingVote.VoteType = VoteType.Downvote;
                     _context.Votes.Update(existingVote);
                 }
             }
@@ -539,7 +527,6 @@ namespace MotorcycleForum.Web.Controllers
                 post.Votes.Add(new Vote { UserId = userId, ForumPostId = id, VoteType = VoteType.Downvote });
             }
 
-            // Update post vote counts
             post.Upvotes = post.Votes.Count(v => v.VoteType == VoteType.Upvote);
             post.Downvotes = post.Votes.Count(v => v.VoteType == VoteType.Downvote);
 
