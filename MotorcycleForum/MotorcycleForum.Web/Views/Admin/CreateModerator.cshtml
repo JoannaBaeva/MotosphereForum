@@ -1,0 +1,105 @@
+﻿@model CreateModeratorViewModel
+
+@{
+    ViewData["Title"] = "Add Moderator";
+}
+
+<div class="py-5 container">
+    <div class="bg-white p-5 animate__animated animate__fadeIn rounded shadow">
+        <h1 class="text-dark border-bottom border-danger pb-2 mb-3 fw-bold bi bi-shield-fill"> Manage Moderators</h1>
+        <div class="table-responsive">
+            <table class="table-hover table align-middle shadow-sm">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>Profile</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr class="animate__animated animate__fadeInUp">
+                            <td class="text-center">
+                                <img src="@user.ProfilePictureUrl" 
+                                     class="rounded-circle shadow-sm" 
+                                     style="width:50px; height:50px; object-fit:cover;" 
+                                     alt="Profile" />
+                            </td>
+                            <td class="fw-semibold text-dark">@user.Username</td>
+                            <td class="text-center">
+                                @if (user.IsModerator)
+                                {
+                                    <span class="badge bg-success p-2 rounded-pill">Moderator</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary p-2 rounded-pill">User</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (!user.IsModerator)
+                                {
+                                    <form asp-action="Promote" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm fw-semibold">
+                                            <i class="bi bi-shield-plus"></i> Promote
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Demote" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm fw-semibold">
+                                            <i class="bi bi-shield-slash"></i> Demote
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 text-end">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if (TempData["ModeratorCreated"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '@TempData["ModeratorCreated"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        </script>
+    }
+    @if (TempData["ModeratorDemoted"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '@TempData["ModeratorDemoted"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        </script>
+    }
+}

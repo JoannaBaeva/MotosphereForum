@@ -1,0 +1,113 @@
+﻿@model IEnumerable<Event>
+
+@{
+    ViewData["Title"] = "Approve Events";
+}
+
+<div class="py-5 container">
+    <div class="bg-white p-5 animate__animated animate__fadeInUp rounded shadow">
+        <h1 class="text-dark border-bottom border-danger pb-3 mb-4 fw-bold bi bi-calendar-check"> Approve Pending Events</h1>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info animate__animated animate__fadeIn text-center">
+                🎉 No events waiting for approval. Good job keeping things clean!
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive animate__animated animate__fadeInUp">
+                <table class="table-hover table align-middle shadow-sm">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Organizer</th>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Category</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@e.Title</td>
+                            <td>@e.Organizer.FullName</td>
+                            <td>@(e.EventDate?.ToString("dd/MM/yyyy HH:mm") ?? "Unknown")</td>
+                            <td>@e.Location</td>
+                            <td>@e.Category.Name</td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <form asp-action="Approve" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@e.EventId" />
+                                        <button type="submit" class="btn btn-success btn-sm fw-bold">
+                                            <i class="bi bi-check-circle"></i> Approve
+                                        </button>
+                                        @Html.AntiForgeryToken()
+                                    </form>
+
+                                    <form asp-action="Reject" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@e.EventId" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm fw-bold">
+                                            <i class="bi bi-x-circle"></i> Reject
+                                        </button>
+                                        @Html.AntiForgeryToken()
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+
+            </div>
+        }
+        <div class="d-flex justify-content-between mt-4">
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Admin Panel
+                </a>
+            }
+            @if (User.IsInRole("Moderator"))
+            {
+                <a asp-action="Mod" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Mod Panel
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["EventApproved"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Approved!',
+                text: '@TempData["EventApproved"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        </script>
+    }
+
+    @if (TempData["EventRejected"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Rejected!',
+                text: '@TempData["EventRejected"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        </script>
+    }
+}

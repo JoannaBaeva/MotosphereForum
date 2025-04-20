@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MotorcycleForum.Data;
 using MotorcycleForum.Data.Entities;
 
 namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
@@ -32,13 +33,15 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<User> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly MotorcycleForumDbContext _context;
 
         public RegisterModel(
             UserManager<User> userManager,
             IUserStore<User> userStore,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            MotorcycleForumDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -46,6 +49,7 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [BindProperty]
@@ -59,7 +63,7 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
         {
             [Required]
             [Display(Name = "Username")]
-            [StringLength(100, ErrorMessage = "Name must be between {2} and {1} characters.", MinimumLength = 2)]
+            [StringLength(100, ErrorMessage = "Username must be between {2} and {1} characters.", MinimumLength = 2)]
             public string FullName { get; set; }
 
             [Required]
@@ -95,6 +99,15 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
             if (existingName)
             {
                 ModelState.AddModelError("Input.FullName", "This username is already taken. Please choose another.");
+                return Page();
+            }
+
+            var isBanned = await _context.BannedEmails
+                .AnyAsync(b => b.Email.ToLower() == Input.Email.ToLower());
+
+            if (isBanned)
+            {
+                ModelState.AddModelError(string.Empty, "This email address has been banned and cannot be used to register.");
                 return Page();
             }
 

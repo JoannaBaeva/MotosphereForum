@@ -1,71 +1,145 @@
-﻿@{
-    ViewData["Title"] = "Admin Panel";
+﻿@model AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container py-5">
-    <h1 class="text-white fw-bold mb-4">⚙️ Admin Dashboard</h1>
+<div class="py-5 container">
+    <h1 class="text-light border-bottom border-danger pb-2 mb-4 fw-bold bi bi-tools"> Admin Control Panel</h1>
 
     <!-- Overview Cards -->
     <div class="row g-4 mb-5">
         <div class="col-md-3">
-            <div class="card text-center border-0 shadow-sm bg-light">
-                <div class="card-body">
-                    <h5 class="card-title text-dark">Users</h5>
-                    <p class="fs-4 fw-bold text-danger">1,204</p>
-                    <a href="/Admin/Users" class="btn btn-outline-danger btn-sm">Manage Users</a>
+            <div class="card bg-light animate__animated animate__fadeInUp h-100 border-0 text-center shadow">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h5 class="card-title text-dark mb-3 bi bi-people-fill"> Users</h5>
+                    <p class="fs-2 fw-bold text-danger">@Model.TotalUsers</p>
+                    <a href="/Admin/BanUsers" class="btn btn-outline-danger btn-sm">Manage Users</a>
                 </div>
             </div>
         </div>
+
         <div class="col-md-3">
-            <div class="card text-center border-0 shadow-sm bg-light">
-                <div class="card-body">
-                    <h5 class="card-title text-dark">Forum Posts</h5>
-                    <p class="fs-4 fw-bold text-danger">312</p>
-                    <a href="/Forum" class="btn btn-outline-danger btn-sm">Go to Forum</a>
+            <div class="card bg-light animate__animated animate__fadeInUp h-100 border-0 text-center shadow">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h5 class="card-title text-dark mb-3 bi-chat-fill"> Forum Posts</h5>
+                    <p class="fs-2 fw-bold text-danger">@Model.ForumPostsCount</p>
+                    <a href="/Forum" class="btn btn-outline-danger btn-sm bi"> Go to Forum</a>
                 </div>
             </div>
         </div>
+
         <div class="col-md-3">
-            <div class="card text-center border-0 shadow-sm bg-light">
-                <div class="card-body">
-                    <h5 class="card-title text-dark">Marketplace</h5>
-                    <p class="fs-4 fw-bold text-danger">188</p>
-                    <a href="/Marketplace" class="btn btn-outline-danger btn-sm">View Listings</a>
+            <div class="card bg-light animate__animated animate__fadeInUp h-100 border-0 text-center shadow">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h5 class="card-title text-dark mb-3 bi bi-shop"> Listings</h5>
+                    <p class="fs-2 fw-bold text-danger">@Model.MarketplaceListingsCount</p>
+                    <a href="/Marketplace" class="btn btn-outline-danger btn-sm"> View Listings</a>
                 </div>
             </div>
         </div>
+
         <div class="col-md-3">
-            <div class="card text-center border-0 shadow-sm bg-light">
-                <div class="card-body">
-                    <h5 class="card-title text-dark">Events</h5>
-                    <p class="fs-4 fw-bold text-danger">14</p>
+            <div class="card bg-light animate__animated animate__fadeInUp h-100 border-0 text-center shadow">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h5 class="card-title text-dark mb-3 bi bi-calendar"> Events</h5>
+                    <p class="fs-2 fw-bold text-danger">@Model.EventsCount</p>
                     <a href="/Events" class="btn btn-outline-danger btn-sm">Manage Events</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Admin Quick Tools -->
-    <div class="card border-0 shadow-lg bg-light rounded-4">
-        <div class="card-body p-4">
-            <h4 class="fw-bold mb-3 text-dark">🔧 Quick Tools</h4>
-            <div class="row row-cols-1 row-cols-md-3 g-3">
+    <!-- Quick Tools -->
+    <div class="card bg-light rounded-4 animate__animated animate__fadeIn shadow-lg">
+        <div class="card-body p-5">
+            <h4 class="fw-bold text-dark mb-4">🔧 Quick Admin Tools</h4>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 <div class="col">
                     <a href="/Admin/CreateModerator" class="btn btn-danger w-100 text-start">
-                        <i class="bi bi-shield-lock-fill me-2"></i> Add Moderator
+                        <i class="bi bi-shield-lock-fill me-2"></i> Manage Moderators
                     </a>
                 </div>
+
                 <div class="col">
-                    <a href="/Forum/CreateTopic" class="btn btn-outline-dark w-100 text-start">
+                    <a href="/Admin/BanUsers" class="btn btn-outline-dark w-100 text-start">
+                        <i class="bi bi-person-x-fill me-2"></i> Ban Users
+                    </a>
+                </div>
+
+                <div class="col">
+                    <a href="/Admin/ApproveEvents" class="btn btn-outline-dark w-100 text-start">
+                        <i class="bi bi-calendar-check me-2"></i> Approve Events
+                    </a>
+                </div>
+
+                <div class="col">
+                    <a href="/Admin/CreateForumTopic" class="btn btn-outline-dark w-100 text-start">
                         <i class="bi bi-plus-circle me-2"></i> Create Forum Topic
                     </a>
                 </div>
+
                 <div class="col">
-                    <a href="/Admin/BannedUsers" class="btn btn-outline-dark w-100 text-start">
-                        <i class="bi bi-person-x me-2"></i> View Banned Users
+                    <a href="/Admin/CreateMarketplaceCategory" class="btn btn-outline-dark w-100 text-start">
+                        <i class="bi bi-bag-plus me-2"></i> Create Marketplace Category
                     </a>
                 </div>
+
+                <div class="col">
+                    <a href="/Admin/CreateEventCategory" class="btn btn-outline-dark w-100 text-start">
+                        <i class="bi bi-calendar-plus me-2"></i> Create Event Category
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @if (TempData["MarketplaceCategoryCreated"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Category Created!',
+                text: '@TempData["MarketplaceCategoryCreated"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+    
+    @if (TempData["EventCategoryCreated"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Category Created!',
+                text: '@TempData["EventCategoryCreated"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+    
+    @if (TempData["ForumTopicCreated"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Category Created!',
+                text: '@TempData["ForumTopicCreated"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+}

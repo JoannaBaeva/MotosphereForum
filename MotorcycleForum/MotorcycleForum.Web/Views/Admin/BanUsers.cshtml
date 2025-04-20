@@ -1,0 +1,151 @@
+﻿@model IEnumerable<UserBanViewModel>
+
+@{
+    ViewData["Title"] = "Ban/Unban Users";
+}
+
+<div class="py-5 container">
+    <h1 class="text-white fw-bold mb-5">🚫 Manage Bans</h1>
+
+    <div class="card bg-light animate__animated animate__fadeIn border-0 shadow-lg">
+        <div class="card-body">
+            <h4 class="text-dark fw-bold mb-4">👥 All Users</h4>
+
+            <!-- Filter -->
+            <div class="mb-3 d-flex justify-content-end">
+                <select id="filterSelect" class="form-select w-auto">
+                    <option value="all">All Users</option>
+                    <option value="banned">Banned Only</option>
+                    <option value="unbanned">Unbanned Only</option>
+                </select>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-responsive">
+                <table class="table-hover table align-middle" id="usersTable">
+                    <thead class="table-danger">
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr class="@(user.IsBanned ? "banned-row" : "unbanned-row")">
+                            <td>@user.Username</td>
+                            <td>@user.Email</td>
+                            <td>
+                                @if (user.IsBanned)
+                                {
+                                    <span class="badge bg-danger">Banned</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!user.IsBanned)
+                                {
+                                    <form asp-action="BanUser" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="email" value="@user.Email" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-person-dash"></i> Ban
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="UnbanUser" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="email" value="@user.Email" />
+                                        <button type="submit" class="btn btn-outline-success btn-sm">
+                                            <i class="bi bi-person-check"></i> Unban
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between mt-4">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Admin Panel
+                        </a>
+                    }
+                    @if (User.IsInRole("Moderator"))
+                    {
+                        <a asp-action="Mod" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Mod Panel
+                        </a>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const filterSelect = document.getElementById('filterSelect');
+        const usersTable = document.getElementById('usersTable');
+
+        filterSelect.addEventListener('change', function () {
+            const value = this.value;
+            const rows = usersTable.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                if (value === 'all') {
+                    row.style.display = '';
+                } else if (value === 'banned' && row.classList.contains('banned-row')) {
+                    row.style.display = '';
+                } else if (value === 'unbanned' && row.classList.contains('unbanned-row')) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    @if (TempData["UserBanned"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '@TempData["UserBanned"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+    
+    @if (TempData["UserUnbanned"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '@TempData["UserUnbanned"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+
+
+}

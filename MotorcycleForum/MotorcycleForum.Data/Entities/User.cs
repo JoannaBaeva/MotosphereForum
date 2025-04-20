@@ -17,6 +17,7 @@ namespace MotorcycleForum.Data.Entities
         public string ProfilePictureUrl { get; set; } = null!;
         public string? Bio { get; set; }
         public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
+        public bool IsBanned { get; set; } = false;
 
         public ICollection<Event> OrganizedEvents { get; set; } = new List<Event>();
         public ICollection<MarketplaceListing> MarketplaceListings { get; set; } = new List<MarketplaceListing>();

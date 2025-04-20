@@ -1,0 +1,25 @@
+﻿@page
+@model MotorcycleForum.Web.Areas.Identity.Pages.Account.BannedModel
+@{
+    ViewData["Title"] = "Account Banned";
+}
+
+<div class="py-5 animate__animated animate__fadeInDown container text-center">
+    <div class="bg-white p-5 mx-auto rounded shadow" style="max-width: 600px;">
+        <h1 class="text-danger fw-bold mb-4">
+            <i class="bi bi-slash-circle-fill"></i> Banned
+        </h1>
+
+        <p class="lead text-dark mb-4">
+            Your account has been banned and you cannot log in at this time.
+        </p>
+
+        <p class="text-muted mb-4">
+            If you believe this is a mistake or wish to appeal, please contact our support team.
+        </p>
+
+        <a href="/" class="btn btn-outline-danger fw-bold">
+            <i class="bi bi-arrow-left"></i> Return Home
+        </a>
+    </div>
+</div>

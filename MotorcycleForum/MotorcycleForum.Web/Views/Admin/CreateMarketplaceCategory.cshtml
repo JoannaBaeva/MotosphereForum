@@ -1,0 +1,41 @@
+﻿@model Category
+
+@{
+    ViewData["Title"] = "Create Marketplace Category";
+}
+
+<div class="py-5 container">
+    <div class="bg-white p-5 animate__animated animate__fadeInUp rounded shadow">
+        <h1 class="text-dark border-bottom border-danger pb-2 mb-3 fw-bold bi bi-bag-plus"> Create Marketplace Category</h1>
+
+        <form asp-action="CreateMarketplaceCategory" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label fw-semibold text-dark">Category Username</label>
+                <input asp-for="Name" class="form-control" placeholder="Enter category name..." />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Admin Panel
+                    </a>
+                }
+                @if (User.IsInRole("Moderator"))
+                {
+                    <a asp-action="Mod" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Mod Panel
+                    </a>
+                }
+                <button type="submit" class="btn fw-bold" style="background-color: #d81324; color: white;">
+                    <i class="bi bi-plus-circle"></i> Create
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

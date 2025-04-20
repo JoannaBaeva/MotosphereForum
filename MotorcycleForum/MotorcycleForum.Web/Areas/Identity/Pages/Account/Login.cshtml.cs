@@ -110,9 +110,23 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
+                }
+
+                if (user.IsBanned)
+                {
+                    _logger.LogWarning("Banned user attempted login.");
+                    return RedirectToPage("/Account/Banned");
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");

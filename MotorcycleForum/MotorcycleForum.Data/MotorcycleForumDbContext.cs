@@ -26,7 +26,9 @@ namespace MotorcycleForum.Data
         public DbSet<Category> Categories { get; set; } = null!;
         public DbSet<EventParticipant> EventParticipants { get; set; } = null!;
         public DbSet<EventCategory> EventCategories { get; set; } = null!;
-        public DbSet<Vote> Votes { get; set; } = null!; 
+        public DbSet<Vote> Votes { get; set; } = null!;
+        public DbSet<BannedEmail> BannedEmails { get; set; }
+
 
 
 

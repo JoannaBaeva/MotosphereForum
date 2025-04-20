@@ -17,14 +17,11 @@ namespace MotorcycleForum.Data.Entities.Forum
         [Required]
         public string Title { get; set; } = null!;
         
-        [Required]
         public Guid? CreatedById { get; set; }
         
-        [Required]
         [ForeignKey(nameof(CreatedById))]
-        public User Creator { get; set; } = null!;
+        public User? Creator { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-        public bool IsApproved { get; set; } = false;
         public ICollection<ForumPost> Posts { get; set; } = new List<ForumPost>();
 
 

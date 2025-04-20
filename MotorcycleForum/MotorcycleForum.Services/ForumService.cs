@@ -17,12 +17,6 @@ namespace MotorcycleForum.Services
             _context = context;
         }
 
-        public List<ForumTopic> GetApprovedTopics()
-        {
-            return _context.ForumTopics
-                .Where(t => t.IsApproved)
-                .ToList();
-        }
     }
 
 }

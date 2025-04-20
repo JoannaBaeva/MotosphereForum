@@ -205,7 +205,7 @@ namespace MotorcycleForum.Web.Controllers
                 Location = eventItem.Location,
                 EventDate = eventItem.EventDate,
                 CategoryId = eventItem.CategoryId,
-                Categories = new SelectList(_context.EventCategories, "CategoryId", "Name", eventItem.CategoryId)
+                Categories = new SelectList(_context.EventCategories, "CategoryId", "Username", eventItem.CategoryId)
             };
 
             return View(viewModel);
@@ -218,7 +218,7 @@ namespace MotorcycleForum.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model.Categories = new SelectList(_context.EventCategories, "CategoryId", "Name", model.CategoryId);
+                model.Categories = new SelectList(_context.EventCategories, "CategoryId", "Username", model.CategoryId);
                 return View(model);
             }
 

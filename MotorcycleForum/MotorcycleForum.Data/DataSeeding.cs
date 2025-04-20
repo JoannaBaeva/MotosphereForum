@@ -74,7 +74,6 @@ namespace MotorcycleForum.Data
                     TopicId = 1,
                     CreatedById = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"), // Ensure this ID exists in the User table
                     CreatedDate = DateTime.UtcNow,
-                    IsApproved = true,
                     Title = "General Discussion"
                 },
                 new ForumTopic
@@ -82,7 +81,6 @@ namespace MotorcycleForum.Data
                     TopicId = 2,
                     CreatedById = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
                     CreatedDate = DateTime.UtcNow,
-                    IsApproved = true,
                     Title = "Motorcycle Maintenance & Repair"
                 },
                 new ForumTopic
@@ -90,7 +88,6 @@ namespace MotorcycleForum.Data
                     TopicId = 3,
                     CreatedById = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
                     CreatedDate = DateTime.UtcNow,
-                    IsApproved = true,
                     Title = "Gear & Accessories"
                 }
             );
