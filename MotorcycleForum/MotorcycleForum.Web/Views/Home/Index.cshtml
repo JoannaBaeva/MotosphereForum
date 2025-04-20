@@ -1,99 +1,143 @@
-﻿@{
+﻿@model HomePageViewModel
+
+@{
     ViewData["Title"] = "Home";
 }
 
-<!-- Include animate.css in the head section of your layout (_Layout.cshtml) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+}
 
 <!-- Hero Section -->
-<section class="hero bg-dark text-white py-5 position-relative text-center" style="background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)), url('../assets/img/header2.jpg'); background-size: cover; background-position: center;">
+<section class="hero bg-dark text-white py-5 position-relative animate__animated animate__fadeIn text-center" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/assets/img/header2.jpg') no-repeat center center; background-size: cover;">
     <div class="container">
-        <div class="hero-content animate__animated animate__fadeInUp">
-            <h1 class="display-3 fw-bold" style="color: white;">Welcome to MotorcycleForum</h1>
-            <p class="lead mb-4" style="color: white;">Connecting motorcyclists worldwide. Discover events, join discussions, and find your next ride partner.</p>
-            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">Join the Community</a>
+        <h1 class="display-3 fw-bold mb-3">Welcome to Motosphere</h1>
+        <p class="lead mb-4">The ultimate place for motorcycle lovers: ride, connect, trade, and explore.</p>
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-lg fw-bold" style="background-color: #d81324; color: white;">
+            <i class="bi bi-person-plus"></i> Join the Community
+        </a>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="intro py-5 animate__animated animate__fadeInUp" style="background-color: #f9f9f9;">
+    <div class="container text-center">
+        <h2 class="fw-bold">What is Motosphere?</h2>
+        <p class="lead text-muted">A passionate hub where motorcyclists meet, share adventures, trade gear, and plan epic rides together.</p>
+    </div>
+</section>
+
+<!-- Upcoming Events -->
+<section class="py-5 animate__animated animate__fadeInUp">
+    <div class="container">
+        <h2 class="fw-bold mb-4 text-light text-center">Upcoming Events</h2>
+        <div class="row g-4">
+            @if (Model.UpcomingEvents != null && Model.UpcomingEvents.Count > 0)
+            {
+                foreach (var eventItem in Model.UpcomingEvents)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <h5 class="fw-bold">@eventItem.Title</h5>
+                                <p class="text-muted small mb-1"><i class="bi bi-calendar"></i> @eventItem.CreatedDate.ToString("dd-MM-yy")</p>
+                                <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> @eventItem.Location</p>
+                                <a asp-controller="Events" asp-action="Details" asp-route-id="@eventItem.EventId" class="btn btn-outline-primary btn-sm fw-bold">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center">
+                    <p class="text-muted">No upcoming events yet. Be the first to <a href="/Events/Create">create one!</a></p>
+                </div>
+            }
         </div>
     </div>
 </section>
 
-
-
-<!-- Introduction Section with fadeInUp animation -->
-<section class="intro py-5 animate__animated animate__fadeInUp text-center" style="background-color: var(--light);">
+<!-- Marketplace Section -->
+<section class="py-5 animate__animated animate__fadeInUp" style="background-color: #f9f9f9;">
     <div class="container">
-        <h2 class="fw-medium">What is MotorcycleForum?</h2>
-        <p class="lead text-secondary">MotoNet is a social network where motorcyclists can connect, share experiences, and explore events around the world.</p>
-    </div>
-</section>
-
-<!-- Featured Events Section -->
-<section class="featured-events py-5">
-    <div class="container">
-        <!-- Animated section title -->
-        <h3 class="fw-medium animate__animated animate__fadeInDown text-center" style="color: var(--secondary);">Upcoming Events</h3>
-        <div class="row">
-            <!-- Example Event Card with zoomIn animation -->
-            <div class="col-md-4 mb-4 animate__animated animate__zoomIn">
-                <div class="card border-0 shadow-sm">
-                    <img class="card-img-top" src="event-image1.jpg" alt="Event Image">
-                    <div class="card-body">
-                        <h5 class="card-title fw-medium">Rally Ride 2024</h5>
-                        <p class="card-text">Date: March 15, 2024</p>
-                        <p class="card-text">Location: New York City</p>
-                        <a href="/Events/Details/1" class="btn btn-secondary btn-block">Join Now</a>
+        <h2 class="fw-bold mb-4 text-dark text-center">Marketplace Highlights</h2>
+        <div class="row g-4">
+            @if (Model.LatestListings != null && Model.LatestListings.Count > 0)
+            {
+                foreach (var listing in Model.LatestListings)
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            @if (listing.Images?.Any() == true)
+                            {
+                                <img src="@listing.Images.FirstOrDefault()?.ImageUrl"
+                                     class="card-img-top"
+                                     style="height: 290px"
+                                     alt="Listing Image" />
+                            }
+                            else
+                            {
+                                <div class="bg-secondary text-dark p-5 rounded-top text-center">
+                                    No Image
+                                </div>
+                            }
+                            <div class="card-body text-center">
+                                <h6 class="fw-bold text-dark">@listing.Title</h6>
+                                <p class="text-muted small">@listing.Price.ToString("C")</p>
+                                <a asp-controller="Marketplace" asp-action="Details" asp-route-id="@listing.ListingId" class="btn btn-primary btn-sm fw-bold">View</a>
+                            </div>
+                        </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center">
+                    <p class="text-muted">No items listed yet. Start trading <a href="/Marketplace/Create">here</a>!</p>
                 </div>
-            </div>
-            <!-- Repeat event cards as needed -->
-        </div>
-    </div>
-</section>
-
-<!-- Marketplace Section with fadeInUp animation -->
-<section class="marketplace py-5 animate__animated animate__fadeInUp" style="background-color: var(--light);">
-    <div class="container">
-        <h3 class="fw-medium text-center" style="color: var(--secondary);">Marketplace</h3>
-        <div class="row">
-            <!-- Example Sale Post Card with zoomIn animation -->
-            <div class="col-md-3 mb-4 animate__animated animate__zoomIn">
-                <div class="card border-0 shadow-sm">
-                    <img class="card-img-top" src="motorcycle1.jpg" alt="Motorcycle for Sale">
-                    <div class="card-body">
-                        <h5 class="card-title fw-medium">2023 Harley Davidson</h5>
-                        <p class="card-text">Price: $12,000</p>
-                        <a href="/Sale/Details/1" class="btn btn-primary btn-block">View Item</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Repeat sale post cards as needed -->
+            }
         </div>
     </div>
 </section>
 
 <!-- Forum Section -->
-<section class="forum-section py-5">
+<section class="py-5 animate__animated animate__fadeInUp">
     <div class="container">
-        <!-- Animated forum title with fadeInDown animation -->
-        <h3 class="fw-medium animate__animated animate__fadeInDown text-center" style="color: var(--secondary);">Trending Discussions</h3>
-        <!-- Forum list with fadeInUp animation -->
-        <div class="list-group animate__animated animate__fadeInUp shadow-sm">
-            <a href="/Forum/Topic/1" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                <h5>Best Routes for Spring Rides</h5>
-                <span class="badge badge-primary badge-pill">Hot</span>
-            </a>
-            <!-- Repeat list items for other trending topics -->
+        <h2 class="fw-bold mb-4 text-light text-center">Trending Discussions</h2>
+        <div class="list-group shadow-sm">
+            @if (Model.TrendingPosts != null && Model.TrendingPosts.Count > 0)
+            {
+                foreach (var post in Model.TrendingPosts)
+                {
+                    <a asp-controller="Forum" asp-action="Details" asp-route-id="@post.ForumPostId" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span>@post.Title</span>
+                        <span class="badge bg-danger">Hot</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="text-muted py-3 text-center">
+                    No discussions yet. <a href="/Forum/Create">Join the conversation!</a>
+                </div>
+            }
         </div>
-        <div class="mt-3 text-center">
-            <a class="btn btn-secondary animate__animated animate__bounceIn" href="/Forum">Join the Discussion</a>
+        <div class="mt-4 text-center">
+            <a href="/Forum" class="btn btn-outline-dark fw-bold btn-light">
+                <i class="bi bi-chat-dots"></i> Explore Forum
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Call-to-Action Section with fadeInUp and heartBeat animations -->
-<section class="cta text-white py-5 animate__animated animate__fadeInUp text-center" style="background-color: var(--primary);">
+<!-- Final CTA -->
+<section class="py-5 text-white animate__animated animate__fadeInUp text-center" style="background-color: #d81324;">
     <div class="container">
-        <h4 class="fw-medium">Ready to join the MotoNet community?</h4>
-        <p>Connect with fellow riders, explore events, and make new friends.</p>
-        <a class="btn btn-light btn-lg animate__animated animate__heartBeat" href="/Account/Register">Sign Up Today</a>
+        <h2 class="fw-bold">Join thousands of riders on Motosphere today!</h2>
+        <p class="lead">Find new friends, epic rides, amazing events, and great deals.</p>
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-light btn-lg fw-bold">
+            <i class="bi bi-person-plus-fill"></i> Sign Up Now
+        </a>
     </div>
 </section>
