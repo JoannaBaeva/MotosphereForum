@@ -1,0 +1,179 @@
+﻿@model IEnumerable<Event>
+
+@{
+    ViewData["Title"] = "Event Calendar";
+
+    var upcomingEvents = Model
+        .Where(e => e.EventDate.HasValue && e.EventDate.Value > DateTime.UtcNow)
+        .OrderBy(e => e.EventDate)
+        .ToList();
+
+    var pastEvents = Model
+        .Where(e => e.EventDate.HasValue && e.EventDate.Value <= DateTime.UtcNow)
+        .OrderByDescending(e => e.EventDate)
+        .ToList();
+}
+
+<div class="py-5 container">
+    <div class="bg-white p-4 animate__animated animate__fadeIn rounded shadow">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-dark border-bottom border-danger pb-2 mb-0 fw-bold bi bi-calendar-event"> Event Calendar</h1>
+            <a href="@Url.Action("Create")" class="btn fw-bold" style="background-color: #d81324; color: white;">
+                <i class="bi bi-plus-circle"></i> Create Event
+            </a>
+        </div>
+
+        <!-- Filters -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-2">
+                <select id="categoryFilter" class="form-select">
+                    <option value="">All Categories</option>
+                    @foreach (var category in Model.Select(e => e.Category).DistinctBy(c => c.CategoryId))
+                    {
+                        <option value="@category.Name">@category.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6 mb-2">
+                <select id="dateFilter" class="form-select">
+                    <option value="all">All Events</option>
+                    <option value="upcoming">Upcoming Events</option>
+                    <option value="past">Past Events</option>
+                </select>
+            </div>
+        </div>
+
+
+        <!-- Upcoming Events Section -->
+        <div id="eventsContainer" class="row g-4">
+            @foreach (var eventItem in upcomingEvents)
+            {
+                <div class="col-md-6 col-lg-4 animate__animated animate__fadeInUp event-card"
+                     data-category="@eventItem.Category.Name"
+                     data-date="@eventItem.EventDate?.ToString("yyyy-MM-ddTHH:mm")">
+
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+
+                            <!-- Red Badge for Date -->
+                            <div class="mb-3 text-center">
+                                <span class="badge rounded-pill bg-danger fs-6 px-3 py-2">
+                                    @(eventItem.EventDate?.ToString("dd/MM/yyyy") ?? "Unknown")
+                                </span>
+                            </div>
+
+                            <h5 class="fw-bold text-dark text-center">@eventItem.Title</h5>
+
+                            <p class="text-muted small mb-1 text-center">
+                                <i class="bi bi-clock"></i> @(eventItem.EventDate?.ToString("HH:mm") ?? "TBD")
+                            </p>
+
+                            <p class="text-muted small mb-1 text-center">
+                                <i class="bi bi-geo-alt"></i> @eventItem.Location
+                            </p>
+
+                            <p class="text-muted small text-center">
+                                <i class="bi bi-tags"></i> @eventItem.Category.Name
+                            </p>
+
+                            <!-- Participants for Upcoming Events ONLY -->
+                            <p class="text-muted small text-center">
+                                <i class="bi bi-people"></i> Participants: @(eventItem.Participants?.Count ?? 0)
+                            </p>
+
+                            <div class="mt-auto text-center">
+                                <a asp-action="Details" asp-route-id="@eventItem.EventId" class="btn btn-outline-primary btn-sm fw-semibold">
+                                    <i class="bi bi-info-circle"></i> View Details
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+        
+        <!-- Past Events Section -->
+        @if (pastEvents.Any())
+        {
+            <div id="pastEventsSection" class="mt-5">
+                <h4 class="text-dark fw-bold mb-3 past-event-card">🕰️ Past Events</h4>
+                <div class="row g-4">
+                    @foreach (var pastEvent in pastEvents)
+                    {
+                        <div class="col-md-6 col-lg-4 animate__animated animate__fadeInUp event-card past-event-card"
+                             data-category="@pastEvent.Category.Name"
+                             data-date="@pastEvent.EventDate?.ToString("yyyy-MM-ddTHH:mm")">
+
+                            <div class="card h-100 bg-light border-0 shadow-sm">
+                                <div class="card-body d-flex flex-column">
+
+                                    <div class="mb-3 text-center">
+                                        <span class="badge rounded-pill bg-secondary fs-6 px-3 py-2">
+                                            @(pastEvent.EventDate?.ToString("dd MMM yyyy") ?? "Unknown Date")
+                                        </span>
+                                    </div>
+
+                                    <h5 class="fw-bold text-dark text-center">@pastEvent.Title</h5>
+
+                                    <p class="text-muted small mb-1 text-center">
+                                        <i class="bi bi-geo-alt"></i> @pastEvent.Location
+                                    </p>
+
+                                    <p class="text-muted small text-center">
+                                        <i class="bi bi-tags"></i> @pastEvent.Category.Name
+                                    </p>
+
+                                    <div class="mt-auto text-center">
+                                        <a asp-action="Details" asp-route-id="@pastEvent.EventId" class="btn btn-outline-secondary btn-sm fw-semibold">
+                                            <i class="bi bi-eye"></i> View Details
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/Events/index.js"></script>
+    @if (TempData["EventCreated"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Event Submitted!',
+                text: '@TempData["EventCreated"]',
+                confirmButtonColor: '#d81324',
+                timer: 1850,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+    @if (TempData["EventDeleted"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Event Deleted!',
+                text: '@TempData["EventDeleted"]',
+                confirmButtonColor: '#d81324',
+                timer: 1850,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+}

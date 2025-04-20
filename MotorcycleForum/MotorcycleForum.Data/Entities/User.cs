@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MotorcycleForum.Data.Entities.Event_Tracker;
 
 namespace MotorcycleForum.Data.Entities
 {

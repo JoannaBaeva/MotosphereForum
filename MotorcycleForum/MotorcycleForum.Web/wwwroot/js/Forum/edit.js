@@ -83,3 +83,5 @@
         });
     }
 });
+
+window.existingImagesCount = Model.ExistingImageUrls.Count;

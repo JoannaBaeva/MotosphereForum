@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MotorcycleForum.Data.Entities;
+using MotorcycleForum.Data.Entities.Event_Tracker;
 using MotorcycleForum.Data.Entities.Forum;
 using MotorcycleForum.Data.Entities.Marketplace;
 
@@ -166,7 +167,6 @@ namespace MotorcycleForum.Data
                 }
             );
 
-            //Seed Listing Images
             modelBuilder.Entity<MarketplaceListingImage>().HasData(
                 new MarketplaceListingImage
                 {
@@ -185,6 +185,47 @@ namespace MotorcycleForum.Data
                     ImageId = Guid.NewGuid(),
                     ListingId = Guid.Parse("7998740b-406d-4504-b9df-5f8aef508054"),
                     ImageUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/marketplace/seed-images/Exaust.png"
+                }
+            );
+
+            modelBuilder.Entity<EventCategory>().HasData(
+                new EventCategory
+                {
+                    CategoryId = Guid.Parse("9eae427f-4376-493b-a662-c1060dc6d30b"),
+                    Name = "Motorcycle Show"
+                },
+                new EventCategory
+                {
+                    CategoryId = Guid.Parse("85a66af6-084e-46ed-beb4-9b3062b17dc6"),
+                    Name = "Workshop"
+                }
+            );
+            
+            modelBuilder.Entity<Event>().HasData(
+                new Event
+                {
+                    EventId = Guid.NewGuid(),
+                    Title = "Spring Motorcycle Meetup",
+                    Description = "Join us for a big spring motorcycle meetup at the central park!",
+                    EventDate = DateTime.UtcNow.AddDays(32),
+                    Location = "Central Park, NY",
+                    CreatedDate = DateTime.UtcNow.AddDays(5),
+                    IsApproved = true,
+                    OrganizerId = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
+                    CategoryId = Guid.Parse("9eae427f-4376-493b-a662-c1060dc6d30b")
+                },
+                new Event
+                {
+                    EventId = Guid.NewGuid(),
+                    Title = "Motorcycle Maintenance Workshop",
+                    Description =
+                        "Learn the basics of motorcycle maintenance and repair from experienced mechanics!",
+                    EventDate = DateTime.UtcNow.AddDays(-20),
+                    Location = "Sofia Tech Park",
+                    CreatedDate = DateTime.UtcNow.AddDays(-35),
+                    IsApproved = true,
+                    OrganizerId = Guid.Parse("0ab81baf-1cdd-42cd-8d11-391f5118558e"),
+                    CategoryId = Guid.Parse("85a66af6-084e-46ed-beb4-9b3062b17dc6")
                 }
             );
         }

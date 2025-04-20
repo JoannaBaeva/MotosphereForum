@@ -1,0 +1,70 @@
+﻿@model EventFormViewModel
+
+@{
+    ViewData["Title"] = "Edit Event";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/forum.css" />
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+}
+
+<div class="py-5 container">
+    <div class="bg-white p-5 animate__animated animate__fadeInUp rounded shadow-lg">
+        <h2 class="text-dark fw-bold mb-4 border-bottom border-danger pb-3">✏️ Edit Event</h2>
+
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="EventId" />
+
+
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label fw-semibold text-dark"></label>
+                <input asp-for="Title" class="form-control shadow-sm" placeholder="Enter event title" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label fw-semibold text-dark"></label>
+                <textarea asp-for="Description" class="form-control shadow-sm" rows="6" placeholder="Describe the event..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Location" class="form-label fw-semibold text-dark"></label>
+                <input asp-for="Location" class="form-control shadow-sm" placeholder="Location (city, address...)" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EventDate" class="form-label text-dark fw-semibold">Event Date</label>
+                <input asp-for="EventDate" class="form-control shadow-sm" id="eventDateInput" placeholder="Select date and time..." />
+                <span asp-validation-for="EventDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="CategoryId" class="form-label fw-semibold text-dark"></label>
+                <select asp-for="CategoryId" class="form-select shadow-sm" asp-items="Model.Categories">
+                    <option value="">-- Select a Category --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+                <button type="submit" class="btn fw-bold" style="background-color: #d81324; color: white;">
+                    <i class="bi bi-save me-1"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="~/js/Events/edit.js"></script>
+
+}

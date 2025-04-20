@@ -3,8 +3,13 @@
     ViewData["Title"] = "Forum";
 }
 
-<div class="container py-5">
-    <div class="bg-white rounded-4 shadow-lg p-5 animate__animated animate__fadeIn">
+@section Styles
+{
+    <link rel="stylesheet" href="css/forum.css"/>
+}
+
+<div class="py-5 container">
+    <div class="bg-white rounded-4 p-5 animate__animated animate__fadeIn shadow-lg">
         <div class="d-flex justify-content-between align-items-center mb-5">
             <h1 class="display-5 fw-bold border-bottom border-danger pb-2 mb-0 text-dark">
                 <i class="bi bi-chat-left-text me-2"></i> Forum
@@ -19,7 +24,7 @@
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold text-dark"><i class="bi bi-funnel me-1"></i>Filter by Topic</label>
-                    <select class="form-select shadow-sm rounded-pill" id="TopicId" name="topicId">
+                    <select class="form-select rounded-pill shadow-sm" id="TopicId" name="topicId">
                         <option value="">-- Select a topic --</option>
                         @foreach (var topic in (ViewBag.Topics as List<SelectListItem> ?? new()))
                         {
@@ -49,7 +54,7 @@
                 @foreach (var post in Model)
                 {
                     <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm hover-shadow animate__animated animate__fadeInUp">
+                        <div class="card h-100 hover-shadow animate__animated animate__fadeInUp border-0 shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title fw-bold text-dark">@post.Title</h5>
                                 <p class="card-text text-muted">
@@ -58,7 +63,7 @@
                                 </p>
                                 @if (!string.IsNullOrWhiteSpace(post.Topic.Title))
                                 {
-                                    <span class="badge bg-dark-subtle text-dark border border-dark">
+                                    <span class="badge bg-dark-subtle text-dark border-dark border">
                                         <i class="bi bi-tag-fill me-1"></i> @post.Topic.Title
                                     </span>
                                 }
@@ -67,7 +72,7 @@
                                     <span class="badge bg-danger rounded-pill"><i class="bi bi-hand-thumbs-down-fill me-1"></i>@post.Downvotes</span>
                                 </div>
                             </div>
-                            <div class="card-footer bg-transparent border-0 text-center pb-3">
+                            <div class="card-footer bg-transparent pb-3 border-0 text-center">
                                 <a href="@Url.Action("Details", "Forum", new { id = post.ForumPostId })" class="btn btn-outline-danger btn-sm rounded-pill px-4">
                                     <i class="bi bi-eye"></i> View
                                 </a>
@@ -78,61 +83,14 @@
             }
             else
             {
-                <p class="text-muted fs-5 text-center w-100">No posts found matching your criteria. Try adjusting your filters!</p>
+                <p class="text-muted fs-5 w-100 text-center">No posts found matching your criteria. Try adjusting your filters!</p>
             }
         </div>
     </div>
 </div>
 
-<style>
-    .btn:hover, .btn-lg:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(216,19,36,0.3);
-        transition: all 0.3s ease;
-    }
+@section Scripts
+{
+    <script src="~/js/Events/create.js"></script>
+}
 
-    select.form-select,
-    input.form-control {
-        transition: box-shadow 0.3s ease-in-out;
-        border-radius: 50px;
-    }
-
-    select:focus,
-    input:focus {
-        border-color: #d81324;
-        box-shadow: 0 0 0 0.25rem rgba(216, 19, 36, 0.2);
-    }
-
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease-in-out;
-    }
-
-    .animate__animated {
-        animation-duration: 1s;
-    }
-</style>
-
-
-<script>
-    @if (TempData["ForumDeleteSuccess"] != null)
-    {
-        <text>
-                    document.addEventListener("DOMContentLoaded", function () {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: '@TempData["ForumDeleteSuccess"]',
-                            confirmButtonColor: '#d81324',
-                            background: '#fff',
-                            customClass: {
-                                popup: 'shadow rounded',
-                                confirmButton: 'btn btn-danger fw-bold'
-                            },
-                            buttonsStyling: false
-                        });
-                    });
-        </text>
-    }
-</script>

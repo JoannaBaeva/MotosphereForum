@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MotorcycleForum.Data.Entities.Forum;
 using MotorcycleForum.Data.Entities.Marketplace;
 using MotorcycleForum.Data.Entities;
+using MotorcycleForum.Data.Entities.Event_Tracker;
 
 namespace MotorcycleForum.Data
 {
@@ -24,6 +25,7 @@ namespace MotorcycleForum.Data
         public DbSet<Comment> Comments { get; set; } = null!;
         public DbSet<Category> Categories { get; set; } = null!;
         public DbSet<EventParticipant> EventParticipants { get; set; } = null!;
+        public DbSet<EventCategory> EventCategories { get; set; } = null!;
         public DbSet<Vote> Votes { get; set; } = null!; 
 
 

@@ -1,0 +1,147 @@
+﻿@model Event
+
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+<div class="py-5 container">
+    <div class="bg-white p-5 animate__animated animate__fadeIn rounded shadow">
+
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                <i class="bi bi-arrow-left"></i> Go Back
+            </a>
+        </div>
+
+        <h2 class="fw-bold text-dark mb-4 border-bottom pb-3">@Model.Title</h2>
+
+        <div class="row g-4">
+            <div class="col-md-8">
+                <p class="text-muted">
+                    <i class="bi bi-calendar-event"></i>
+                    @(Model.EventDate?.ToString("dd/MM/yyyy HH:mm") ?? "Date TBD")
+                </p>
+
+                <p class="text-muted">
+                    <i class="bi bi-geo-alt"></i> @Model.Location
+                </p>
+
+                <p class="text-muted">
+                    <i class="bi bi-tags"></i> @Model.Category?.Name
+                </p>
+
+                <p class="mt-4">@Model.Description</p>
+
+                <p class="text-muted small mt-5">
+                    Created on @Model.CreatedDate.ToString("dd/MM/yyyy") by <strong>@Model.Organizer.FullName</strong>
+                </p>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-3 bg-light h-100 rounded shadow-sm">
+                    <h5 class="fw-bold text-dark mb-3">Participants</h5>
+
+                    @if (Model.Participants != null && Model.Participants.Any())
+                    {
+                        <ul class="list-unstyled">
+                            @foreach (var participant in Model.Participants)
+                            {
+                                <li class="mb-2">
+                                    <i class="bi bi-person-circle text-danger"></i> @participant.User.FullName
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No participants yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-5 d-flex gap-2 flex-wrap">
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                var isAdmin = User.IsInRole("Admin");
+                var isMod = User.IsInRole("Moderator");
+                var isOwner = userId == Model.OrganizerId.ToString();
+                var isParticipant = Model.Participants?.Any(p => p.UserId.ToString() == userId) ?? false;
+                var isUpcoming = Model.EventDate > DateTime.UtcNow;
+
+                <!-- Show Participate button ONLY if upcoming -->
+                @if (isUpcoming)
+                {
+                    <form asp-action="ToggleParticipation" asp-route-id="@Model.EventId" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn @(isParticipant ? "btn-outline-danger" : "btn-outline-success") fw-bold">
+                            <i class="bi @(isParticipant ? "bi-x-circle" : "bi-person-plus")"></i>
+                            @(isParticipant ? "Cancel Participation" : "Join Event")
+                        </button>
+                    </form>
+                }
+
+                <!-- Edit Button (only if owner) -->
+                @if (isOwner)
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.EventId" class="btn btn-outline-primary fw-bold">
+                        <i class="bi bi-pencil"></i> Edit Event
+                    </a>
+                }
+
+                <!-- Delete Button (owner / mod / admin) -->
+                @if (isOwner || isAdmin || isMod)
+                {
+                    <button class="btn btn-outline-danger fw-bold" onclick="confirmDelete('@Model.EventId')">
+                        <i class="bi bi-trash"></i> Delete Event
+                    </button>
+                }
+            }
+            else
+            {
+                @* Optionally show "Login to participate" text only if event is upcoming *@
+                @if (Model.EventDate > DateTime.UtcNow)
+                {
+                    <div class="text-muted small mt-2">
+                        Login to participate in this event.
+                    </div>
+                }
+            }
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function confirmDelete(eventId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are about to delete this event.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d81324',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!',
+                background: '#fff',
+                backdrop: 'rgba(0,0,0,0.4)',
+                customClass: {
+                    popup: 'shadow-lg rounded',
+                    confirmButton: 'btn btn-danger fw-bold',
+                    cancelButton: 'btn btn-secondary fw-bold ms-2'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/Events/Delete/' + eventId;
+                }
+            });
+        }
+    </script>
+}

@@ -73,8 +73,27 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Reset Your Password",
+                    $@"
+    <div style='font-family: Arial, sans-serif; padding: 20px; background-color: #f7f7f7; color: #333;'>
+        <h2 style='color: #d81324;'>Reset Your Password</h2>
+        <p>Hello,</p>
+        <p>We received a request to reset your password. Click the button below to set a new password:</p>
+
+        <div style='margin: 30px 0; text-align: center;'>
+            <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+               style='background-color: #d81324; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block;'>
+                Reset Password
+            </a>
+        </div>
+
+        <p>If you didn't request a password reset, you can safely ignore this email.</p>
+
+        <hr style='margin: 40px 0; border: none; border-top: 1px solid #ddd;' />
+
+        <p style='font-size: 12px; color: #888;'>Thank you,<br />The Motosphere Team 🏍️</p>
+    </div>
+    ");
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
