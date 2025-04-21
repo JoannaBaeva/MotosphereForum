@@ -137,11 +137,10 @@ namespace MotorcycleForum.Web.Controllers
         public IActionResult Create()
         {
             var categories = _context.Categories.ToList();
-            Console.WriteLine("CATEGORIES COUNT: " + categories.Count); // Debug log
 
             var model = new MarketplaceListingViewModel
             {
-                Categories = new SelectList(categories, "CategoryId", "Username")
+                Categories = new SelectList(categories, "CategoryId", "Name")
             };
 
             return View(model);
@@ -161,7 +160,7 @@ namespace MotorcycleForum.Web.Controllers
 
             if (!ModelState.IsValid)
             {
-                model.Categories = new SelectList(_context.Categories, "CategoryId", "Username", model.CategoryId);
+                model.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
                 return View(model);
             }
 
@@ -239,7 +238,7 @@ namespace MotorcycleForum.Web.Controllers
                 CategoryId = listing.CategoryId,
                 IsActive = listing.IsActive,
                 PhoneNumber = listing.SellerPhoneNumber,
-                Categories = new SelectList(_context.Categories, "CategoryId", "Username", listing.CategoryId),
+                Categories = new SelectList(_context.Categories, "CategoryId", "N   ", listing.CategoryId),
                 ExistingImageUrls = listing.Images.Select(i => i.ImageUrl).ToList(),
                 ImageIds = listing.Images.Select(i => i.ImageId).ToList()
             };
@@ -256,7 +255,7 @@ namespace MotorcycleForum.Web.Controllers
 
             if (!ModelState.IsValid)
             {
-                model.Categories = new SelectList(_context.Categories, "CategoryId", "Username", model.CategoryId);
+                model.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
                 return View(model);
             }
 
@@ -278,7 +277,7 @@ namespace MotorcycleForum.Web.Controllers
             if ((remainingImages + newUploads) < 1)
             {
                 ModelState.AddModelError("", "You must have at least one image in your listing.");
-                model.Categories = new SelectList(_context.Categories, "CategoryId", "Username", model.CategoryId);
+                model.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
                 return View(model);
             }
 

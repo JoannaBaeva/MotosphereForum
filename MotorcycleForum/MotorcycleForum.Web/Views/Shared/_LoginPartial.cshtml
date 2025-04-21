@@ -28,14 +28,14 @@
             <li><hr class="dropdown-divider" /></li>
                 @if (User.IsInRole("Admin"))
                 {
-                    <a class="dropdown-item" href="Admin/Index">
+                    <a class="dropdown-item" asp-controller="Admin" asp-action="Index">
                         <i class="bi bi-hammer me-2"></i> Admin Panel
                     </a>
                     <li><hr class="dropdown-divider" /></li>
                 }
                 @if (User.IsInRole("Moderator"))
                 {
-                    <a class="dropdown-item" href="Admin/Mod">
+                <a class="dropdown-item" asp-controller="Admin" asp-action="Mod">
                         <i class="bi bi-hammer me-2"></i> Mod Panel
                     </a>
                     <li><hr class="dropdown-divider" /></li>

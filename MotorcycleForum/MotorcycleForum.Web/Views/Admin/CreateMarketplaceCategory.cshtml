@@ -1,4 +1,4 @@
-﻿@model Category
+﻿@model CreateMarketplaceCategoryViewModel
 
 @{
     ViewData["Title"] = "Create Marketplace Category";
@@ -14,28 +14,59 @@
             <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="Name" class="form-label fw-semibold text-dark">Category Username</label>
+                <label asp-for="Name" class="form-label fw-semibold text-dark">Category name</label>
                 <input asp-for="Name" class="form-control" placeholder="Enter category name..." />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                @if (User.IsInRole("Admin"))
-                {
-                    <a asp-action="Index" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to Admin Panel
-                    </a>
-                }
-                @if (User.IsInRole("Moderator"))
-                {
-                    <a asp-action="Mod" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to Mod Panel
-                    </a>
-                }
                 <button type="submit" class="btn fw-bold" style="background-color: #d81324; color: white;">
                     <i class="bi bi-plus-circle"></i> Create
                 </button>
             </div>
         </form>
+        
+        <div class="table-responsive animate__animated animate__fadeInUp mt-4">
+            <table class="table-hover table align-middle shadow-sm">
+                <thead class="table-dark">
+                <tr>
+                    <th>Category Name</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var category in Model.Categories)
+                {
+                    <tr>
+                        <td class="fw-semibold">@category.Name</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <form asp-action="DeleteMarketplaceCategory" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@category.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm fw-bold">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                    @Html.AntiForgeryToken()
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Admin Panel
+                </a>
+            }
+            @if (User.IsInRole("Moderator"))
+            {
+                <a asp-action="Mod" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Mod Panel
+                </a>
+            }
+        </div>
+
     </div>
 </div>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using MotorcycleForum.Data.Entities.Forum;
 using MotorcycleForum.Data.Entities.Marketplace;
 using MotorcycleForum.Web.Models.Admin;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MotorcycleForum.Web.Controllers
 {
@@ -40,6 +42,7 @@ namespace MotorcycleForum.Web.Controllers
             return View(model);
         }
 
+        //Create Moderator
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> CreateModerator()
@@ -62,7 +65,6 @@ namespace MotorcycleForum.Web.Controllers
 
             return View(model);
         }
-
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -102,83 +104,280 @@ namespace MotorcycleForum.Web.Controllers
             return RedirectToAction(nameof(CreateModerator));
         }
 
+
+
         //Mods can access too
+
+        // Mod Panel
+        [Authorize(Roles = "Moderator")]
+        public async Task<IActionResult> Mod()
+        {
+            var model = new AdminDashboardViewModel
+            {
+                TotalUsers = await _context.Users.CountAsync(),
+                ForumPostsCount = await _context.ForumPosts.CountAsync(),
+                MarketplaceListingsCount = await _context.MarketplaceListings.CountAsync(),
+                EventsCount = await _context.Events.CountAsync()
+            };
+
+            return View(model);
+        }
+        
+        // Create Marketplace Category
 
         [Authorize(Roles = "Admin, Moderator")]
         [HttpGet]
-        public IActionResult CreateMarketplaceCategory()
+        public async Task<IActionResult> CreateMarketplaceCategory()
         {
-            return View();
+            var categories = await _context.Categories
+                .Select(u => new CreateMarketplaceCategoryViewModel()
+                {
+                    Id = u.CategoryId,
+                    Name = u.Name
+                })
+                .ToListAsync();
+            
+            var model = new CreateMarketplaceCategoryViewModel
+            {
+                Categories = categories
+            };
+            
+            return View(model);
         }
 
         [Authorize(Roles = "Admin, Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateMarketplaceCategory(Category category)
+        public async Task<IActionResult> CreateMarketplaceCategory(CreateMarketplaceCategoryViewModel category)
         {
-            if (!ModelState.IsValid)
+            if (category.Name == null)
             {
+                ModelState.AddModelError("Name", "Category name is required.");
                 return View(category);
             }
 
-            _context.Categories.Add(category);
+            var newCategory = new Category { CategoryId = Guid.NewGuid(), Name = category.Name };
+
+            _context.Categories.Add(newCategory);
             await _context.SaveChangesAsync();
 
             TempData["MarketplaceCategoryCreated"] = "Marketplace category created successfully!";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(CreateMarketplaceCategory));
         }
+        
+        [Authorize(Roles = "Admin, Moderator")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteMarketplaceCategory(Guid id)
+        {
+            var categoryToDelete = await _context.Categories.FindAsync(id);
+            if (categoryToDelete == null)
+            {
+                return NotFound();
+            }
+            
+            var listingsInCategory = await _context.MarketplaceListings
+                .Where(l => l.CategoryId == id)
+                .ToListAsync();
+
+            foreach (var listing in listingsInCategory)
+            {
+                await DeleteListingDataAsync(listing.ListingId);
+            }
+            
+            _context.Categories.Remove(categoryToDelete);
+            
+            await _context.SaveChangesAsync();
+            
+            TempData["MarketplaceCategoryDeleted"] = "Marketplace category deleted successfully!";
+            return RedirectToAction(nameof(CreateMarketplaceCategory));
+        }
+        
+        private async Task DeleteListingDataAsync(Guid listingId)
+        {
+            var listing = await _context.MarketplaceListings
+                .Include(l => l.Images)
+                .FirstOrDefaultAsync(l => l.ListingId == listingId);
+            if (listing == null)
+                return;
+            var s3 = new S3Service();
+            foreach (var image in listing.Images)
+            {
+                if (!string.IsNullOrEmpty(image.ImageUrl))
+                {
+                    var uri = new Uri(image.ImageUrl);
+                    var key = uri.AbsolutePath.TrimStart('/');
+                    await s3.DeleteFileAsync(key);
+                }
+            }
+            _context.MarketplaceListingImages.RemoveRange(listing.Images);
+            _context.MarketplaceListings.Remove(listing);
+        }
+
+        // Create Event Category
 
         [Authorize(Roles = "Admin, Moderator")]
         [HttpGet]
-        public IActionResult CreateEventCategory()
+        public async Task<IActionResult> CreateEventCategory()
         {
-            return View();
+            var categories = await _context.EventCategories
+                .Select(u => new CreateEventCategoryViewModel()
+                {
+                    Id = u.CategoryId,
+                    Name = u.Name
+                })
+                .ToListAsync();
+            
+            var model = new CreateEventCategoryViewModel { Categories = categories };
+            return View(model);
+
         }
 
         [Authorize(Roles = "Admin, Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateEventCategory(EventCategory category)
+        public async Task<IActionResult> CreateEventCategory(CreateEventCategoryViewModel category)
         {
-            if (!ModelState.IsValid)
+            if (category.Name == null)
             {
+                ModelState.AddModelError("Name", "Category name is required.");
                 return View(category);
             }
 
-            _context.EventCategories.Add(category);
+            var newCategory = new EventCategory { CategoryId = Guid.NewGuid(), Name = category.Name };
+
+            _context.EventCategories.Add(newCategory);
             await _context.SaveChangesAsync();
 
             TempData["EventCategoryCreated"] = "Event category created successfully!";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(CreateEventCategory));
         }
 
+        [Authorize(Roles = "Moderator, Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteEventCategory(Guid id)
+        {
+            var categoryToDelete = await _context.EventCategories.FindAsync(id);
+            if (categoryToDelete == null)
+            {
+                return NotFound();
+            }
+
+            _context.EventCategories.Remove(categoryToDelete);
+            _context.Events.RemoveRange(_context.Events.Where(e => e.CategoryId == id));
+            
+            await _context.SaveChangesAsync();
+            TempData["EventCategoryDeleted"] = "Event category deleted successfully!";
+            return RedirectToAction(nameof(CreateEventCategory));
+        }
+
+
+
+        //Create Forum Topic
+        
         [Authorize(Roles = "Admin,Moderator")]
         [HttpGet]
-        public IActionResult CreateForumTopic()
+        public async Task<IActionResult> CreateForumTopic()
         {
-            return View();
+            var topics = await _context.ForumTopics
+                .Select(t => new CreateForumTopicViewModel()
+                {
+                    Id = t.TopicId,
+                    Name = t.Title
+                })
+                .ToListAsync();
+
+            var model = new CreateForumTopicViewModel { Topics = topics };
+            return View(model);
         }
 
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateForumTopic(ForumTopic topic)
+        public async Task<IActionResult> CreateForumTopic(CreateForumTopicViewModel topic)
         {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(topic.Name))
             {
+                ModelState.AddModelError("Name", "Name is required.");
                 return View(topic);
             }
 
-            topic.CreatedById = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var newTopic = new ForumTopic { Title = topic.Name };
 
-            _context.ForumTopics.Add(topic);
+            _context.ForumTopics.Add(newTopic);
             await _context.SaveChangesAsync();
 
             TempData["ForumTopicCreated"] = "Forum topic created successfully!";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(CreateForumTopic));
+        }
+
+        [Authorize(Roles = "Admin,Moderator")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteForumTopic(int id)
+        {
+            var topicToDelete = await _context.ForumTopics.FindAsync(id);
+            if (topicToDelete == null)
+            {
+                return NotFound();
+            }
+
+            var postsInTopic = await _context.ForumPosts
+                .Where(p => p.TopicId == id)
+                .ToListAsync();
+
+            foreach (var post in postsInTopic)
+            {
+                await DeletePostDataAsync(post.ForumPostId);
+            }
+
+            _context.ForumTopics.Remove(topicToDelete);
+            await _context.SaveChangesAsync();
+
+            TempData["ForumTopicDeleted"] = "Forum topic deleted successfully!";
+            return RedirectToAction(nameof(CreateForumTopic));
+        }
+
+        private async Task DeletePostDataAsync(Guid postId)
+        {
+            var post = await _context.ForumPosts
+                .Include(p => p.Images)
+                .Include(p => p.Comments)
+                .ThenInclude(c => c.Replies)
+                .FirstOrDefaultAsync(p => p.ForumPostId == postId);
+
+            if (post == null)
+                return;
+
+            var s3 = new S3Service();
+
+            foreach (var image in post.Images)
+            {
+                if (!string.IsNullOrEmpty(image.ImageUrl))
+                {
+                    var uri = new Uri(image.ImageUrl);
+                    var key = uri.AbsolutePath.TrimStart('/');
+
+                    await s3.DeleteFileAsync(key);
+                }
+            }
+
+            foreach (var comment in post.Comments)
+            {
+                if (comment.Replies != null && comment.Replies.Any())
+                {
+                    _context.Comments.RemoveRange(comment.Replies);
+                }
+            }
+
+            _context.Comments.RemoveRange(post.Comments);
+            _context.ForumPostImages.RemoveRange(post.Images);
+            _context.ForumPosts.Remove(post);
         }
 
 
+        // Ban Users
         [Authorize(Roles = "Admin,Moderator")]
         [HttpGet]
         public async Task<IActionResult> BanUsers()
@@ -259,6 +458,8 @@ namespace MotorcycleForum.Web.Controllers
             return RedirectToAction(nameof(BanUsers));
         }
 
+
+        // Approve Events
         [Authorize(Roles = "Admin,Moderator")]
         [HttpGet]
         public async Task<IActionResult> ApproveEvents()
@@ -313,19 +514,6 @@ namespace MotorcycleForum.Web.Controllers
             return RedirectToAction(nameof(ApproveEvents));
         }
 
-        [Authorize(Roles = "Moderator")]
-        public async Task<IActionResult> Mod()
-        {
-            var model = new AdminDashboardViewModel
-            {
-                TotalUsers = await _context.Users.CountAsync(),
-                ForumPostsCount = await _context.ForumPosts.CountAsync(),
-                MarketplaceListingsCount = await _context.MarketplaceListings.CountAsync(),
-                EventsCount = await _context.Events.CountAsync()
-            };
-
-            return View(model);
-        }
 
     }
 }

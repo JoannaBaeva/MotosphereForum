@@ -29,8 +29,16 @@ namespace MotorcycleForum.Web.Controllers
                 .Where(e => e.IsApproved)
                 .OrderBy(e => e.EventDate)
                 .ToListAsync();
+            
+            var categories = await _context.EventCategories.ToListAsync();
+            
+            var model = new EventsIndexViewModel
+            {
+                Events = events,
+                Categories = categories
+            };
 
-            return View(events);
+            return View(model);
         }
 
 

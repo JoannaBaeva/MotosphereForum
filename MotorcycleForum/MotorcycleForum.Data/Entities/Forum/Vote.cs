@@ -17,7 +17,7 @@ namespace MotorcycleForum.Data.Entities.Forum
         public Guid UserId { get; set; }
         public Guid ForumPostId { get; set; }
 
-        public VoteType VoteType { get; set; } // Enum to track Upvote or Downvote
+        public VoteType VoteType { get; set; } 
 
         [ForeignKey("UserId")]
         public User? User { get; set; }

@@ -1,4 +1,4 @@
-﻿@model ForumTopic
+﻿@model CreateForumTopicViewModel
 
 @{
     ViewData["Title"] = "Create Forum Topic";
@@ -14,28 +14,91 @@
             <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="Title" class="form-label fw-semibold text-dark">Topic Title</label>
-                <input asp-for="Title" class="form-control shadow-sm" placeholder="Enter topic title..." />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <label asp-for="Name" class="form-label fw-semibold text-dark">Topic Name</label>
+                <input asp-for="Name" class="form-control shadow-sm" placeholder="Enter topic name..." />
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                @if (User.IsInRole("Admin"))
-                {
-                    <a asp-action="Index" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to Admin Panel
-                    </a>
-                }
-                @if (User.IsInRole("Moderator"))
-                {
-                    <a asp-action="Mod" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to Mod Panel
-                    </a>
-                }
                 <button type="submit" class="btn fw-bold" style="background-color: #d81324; color: white;">
                     <i class="bi bi-plus-circle"></i> Create Topic
                 </button>
             </div>
         </form>
+        
+        <div class="table-responsive animate__animated animate__fadeInUp mt-4">
+            <table class="table-hover table align-middle shadow-sm">
+                <thead class="table-dark">
+                <tr>
+                    <th>Topic Name</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var topic in Model.Topics)
+                {
+                    <tr>
+                        <td class="fw-semibold">@topic.Name</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <form asp-action="DeleteForumTopic" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@topic.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm fw-bold">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                    @Html.AntiForgeryToken()
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Admin Panel
+                </a>
+            }
+            @if (User.IsInRole("Moderator"))
+            {
+                <a asp-action="Mod" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Mod Panel
+                </a>
+            }
+        </div>
+
     </div>
 </div>
+
+@section Scripts {
+    @if (TempData["ForumTopicDeleted"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Topic Deleted!',
+                text: '@TempData["ForumTopicDeleted"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+    
+    @if (TempData["ForumTopicCreated"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Topic Created!',
+                text: '@TempData["ForumTopicCreated"]',
+                confirmButtonColor: '#d81324',
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        </script>
+    }
+}
