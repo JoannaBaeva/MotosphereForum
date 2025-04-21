@@ -5,14 +5,14 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
-<div class="container vh-100 d-flex justify-content-center align-items-start py-5">
+<div class="vh-100 d-flex align-items-start py-5 container">
     <div class="card p-5 rounded-5 shadow-lg" style="background: rgba(0, 0, 0, 0.85); max-width: 900px; width: 100%; border: none;">
-        <h3 class="text-center text-light mb-4 fw-bold display-6">@ViewData["Title"]</h3>
+        <h3 class="text-light mb-4 fw-bold display-6 text-center">@ViewData["Title"]</h3>
         <hr class="text-light mb-4" />
 
         <div class="text-light text-center">
             <!-- Profile Picture -->
-            <img src="@Model.ProfilePictureUrl" alt="Profile Picture" class="rounded-circle mb-3 border border-light" style="width: 140px; height: 140px; object-fit: cover;">
+            <img src="@Model.ProfilePictureUrl" alt="Profile Picture" class="rounded-circle mb-3 border-light border" style="width: 140px; height: 140px; object-fit: cover;">
 
             <!-- Update Form -->
             <form method="post" enctype="multipart/form-data" action="/Identity/Account/Manage/Index">
