@@ -238,7 +238,7 @@ namespace MotorcycleForum.Web.Controllers
                 CategoryId = listing.CategoryId,
                 IsActive = listing.IsActive,
                 PhoneNumber = listing.SellerPhoneNumber,
-                Categories = new SelectList(_context.Categories, "CategoryId", "N   ", listing.CategoryId),
+                Categories = new SelectList(_context.Categories, "CategoryId", "Name", listing.CategoryId),
                 ExistingImageUrls = listing.Images.Select(i => i.ImageUrl).ToList(),
                 ImageIds = listing.Images.Select(i => i.ImageId).ToList()
             };

@@ -19,7 +19,7 @@
             <div class="bg-white p-4 rounded shadow-sm">
                 <!-- Main Image -->
                 <div class="mb-4 text-center">
-                    <img id="mainImage" src="@firstImage" class="img-fluid w-100 rounded" style="height: 350px; max-width: 340px; object-fit: contain;" alt="Main image" />
+                    <img id="mainImage" src="@firstImage" class="img-fluid w-100 zoomable rounded" style="height: 350px; max-width: 340px; object-fit: contain;" alt="Main image" />
                 </div>
 
                 <!-- Thumbnails -->
@@ -138,5 +138,51 @@
 @section Scripts
 {
     <script src="~/js/Marketplace/listing-details.js"></script>
+    
+    <script>
+                document.addEventListener("DOMContentLoaded", function () {
+            const mainImage = document.getElementById("mainImage");
+
+            if (mainImage) {
+                mainImage.style.cursor = "zoom-in";
+
+                mainImage.addEventListener("click", function () {
+                    const overlay = document.createElement("div");
+                    overlay.style.position = "fixed";
+                    overlay.style.top = 0;
+                    overlay.style.left = 0;
+                    overlay.style.width = "100%";
+                    overlay.style.height = "100%";
+                    overlay.style.backgroundColor = "rgba(0, 0, 0, 0.85)";
+                    overlay.style.display = "flex";
+                    overlay.style.alignItems = "center";
+                    overlay.style.justifyContent = "center";
+                    overlay.style.zIndex = "2000";
+                    overlay.style.cursor = "zoom-out";
+                    overlay.style.animation = "fadeIn 0.3s ease";
+
+                    const zoomedImg = document.createElement("img");
+                    zoomedImg.src = mainImage.src;
+                    zoomedImg.style.maxWidth = "90%";
+                    zoomedImg.style.maxHeight = "90%";
+                    zoomedImg.style.borderRadius = "1rem";
+                    zoomedImg.style.boxShadow = "0 0 20px rgba(0, 0, 0, 0.5)";
+                    zoomedImg.style.animation = "popIn 0.3s ease";
+
+                    overlay.appendChild(zoomedImg);
+                    document.body.appendChild(overlay);
+
+                    overlay.addEventListener("click", function () {
+                        overlay.style.animation = "fadeOut 0.3s ease";
+                        setTimeout(() => {
+                            document.body.removeChild(overlay);
+                        }, 300);
+                    });
+                });
+            }
+        });
+        document.head.appendChild(style);
+
+    </script>
 }
 
