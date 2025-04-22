@@ -60,10 +60,10 @@
 
 ## Project Structure
 
-- `Motosphere.Web` — Main ASP.NET Core Web application (Controllers, Views, wwwroot)
-- `Motosphere.Data` — Entity Framework Core models and DbContext
-- `Motosphere.Services` — Business logic and external services (e.g., S3 Service)
-- `Motosphere.Tests` — Unit tests
+- `MotorcycleForum.Web` — Main ASP.NET Core Web application (Controllers, Views, wwwroot)
+- `MotorcycleForum.Data` — Entity Framework Core models and DbContext
+- `MotorcycleForum.Services` — Business logic and external services
+- `MotorcycleForum.Tests` — Unit tests
 
 ---
 
