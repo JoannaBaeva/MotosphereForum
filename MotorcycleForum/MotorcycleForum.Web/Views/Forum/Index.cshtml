@@ -58,7 +58,7 @@
                             <div class="card-body">
                                 <h5 class="card-title fw-bold text-dark">@post.Title</h5>
                                 <p class="card-text text-muted">
-                                    <i class="bi bi-person-circle"></i> <strong>@post.CreatorName</strong><br />
+                                    <a href="Profile/@post.CreatorId" class="bi bi-person-circle text-black-50 text-decoration-none"><strong> @post.CreatorName</strong><br /></a>
                                     <small><i class="bi bi-clock"></i> @post.CreatedDate.ToShortDateString()</small>
                                 </p>
                                 @if (!string.IsNullOrWhiteSpace(post.Topic.Title))

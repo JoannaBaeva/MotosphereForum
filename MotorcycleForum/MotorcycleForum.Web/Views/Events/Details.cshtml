@@ -31,10 +31,10 @@
                     <i class="bi bi-tags"></i> @Model.Category?.Name
                 </p>
 
-                <p class="mt-4">@Model.Description</p>
+                <p class="mt-4" style="white-space: pre-line;">@Model.Description</p>
 
                 <p class="text-muted small mt-5">
-                    Created on @Model.CreatedDate.ToString("dd/MM/yyyy") by <strong>@Model.Organizer.FullName</strong>
+                    Created on @Model.CreatedDate.ToString("dd/MM/yyyy") by <a href="~/Profile/@Model.OrganizerId" class="text-decoration-none text-black-50"><strong>@Model.Organizer.FullName</strong></a>
                 </p>
             </div>
 
@@ -48,7 +48,7 @@
                             @foreach (var participant in Model.Participants)
                             {
                                 <li class="mb-2">
-                                    <i class="bi bi-person-circle text-danger"></i> @participant.User.FullName
+                                    <i class="bi bi-person-circle text-danger"></i> <a href="~/Profile/@participant.User.Id" class="text-decoration-none text-black">@participant.User.FullName</a>
                                 </li>
                             }
                         </ul>

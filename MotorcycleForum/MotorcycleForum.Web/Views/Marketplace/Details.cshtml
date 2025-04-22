@@ -57,7 +57,7 @@
                 <!-- Description -->
                 <div>
                     <h5 class="text-dark fw-bold mb-2">Description</h5>
-                    <p class="text-muted">@Model.Description</p>
+                    <p class="text-muted" style="white-space: pre-line;">@Model.Description</p>
                 </div>
 
                 @if (isOwner)
@@ -78,12 +78,14 @@
         <div class="col-lg-4">
             <div class="bg-white p-4 animate__animated animate__fadeInUp rounded shadow">
                 <div class="mb-4 text-center">
-                    <img src="@Model.Seller.ProfilePictureUrl"
-                         alt="Seller Avatar"
-                         class="rounded-circle border-danger border border-2 shadow-sm"
-                         style="width: 80px; height: 80px; object-fit: cover;" />
+                    <a href="~/Profile/@Model.SellerId">
+                        <img src="@Model.Seller.ProfilePictureUrl"
+                             alt="Seller Avatar"
+                             class="rounded-circle border-danger border border-2 shadow-sm"
+                             style="width: 80px; height: 80px; object-fit: cover;" />
+                    </a>
 
-                    <h5 class="mt-3 mb-1 text-dark fw-bold">@Model.Seller.FullName</h5>
+                    <a href="~/Profile/@Model.SellerId" class="text-decoration-none"><h5 class="mt-3 mb-1 text-dark fw-bold">@Model.Seller.FullName</h5></a>
 
                     <p class="text-muted mb-0" style="font-size: 0.95rem;">
                         <i class="bi bi-calendar-check me-1"></i>

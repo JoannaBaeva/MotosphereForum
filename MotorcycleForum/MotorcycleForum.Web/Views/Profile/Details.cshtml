@@ -1,0 +1,175 @@
+﻿@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="py-5 container">
+    <!-- Profile Header -->
+    <div class="card rounded-4 bg-white text-dark p-5 mb-5 bg-opacity-75 shadow-lg">
+        <div class="text-center">
+            <img src="@Model.ProfilePictureUrl"
+                 class="profile-avatar mb-4"
+                 alt="Profile Picture" />
+
+            <h1 class="profile-username mb-2">@Model.Username</h1>
+
+            <p class="profile-member-date mb-3">
+                <i class="bi bi-calendar-event me-1"></i> Member since @(Model.RegistrationDate.ToString("MMMM yyyy"))
+            </p>
+
+            <!-- Bio -->
+            @if (!string.IsNullOrWhiteSpace(Model.Bio))
+            {
+                <p class="profile-bio">@Model.Bio</p>
+            }
+            else
+            {
+                <p class="fst-italic text-muted">This user hasn't written a bio yet.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs justify-content-center mb-4" id="profileTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab">
+                Posts (@Model.ForumPosts.Count)
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="listings-tab" data-bs-toggle="tab" data-bs-target="#listings" type="button" role="tab">
+                Listings (@Model.MarketplaceListings.Count)
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">
+                Events (@Model.Events.Count)
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="profileTabsContent">
+        <!-- Posts Tab -->
+        <div class="tab-pane fade show active" id="posts" role="tabpanel">
+            @if (Model.ForumPosts.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var post in Model.ForumPosts)
+                    {
+                        <div class="col-md-6">
+                            <div class="tab-card card bg-white text-dark h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title text-danger">@post.Title</h5>
+                                    <p class="card-text">@post.Content.Substring(0, Math.Min(100, post.Content.Length))...</p>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-hand-thumbs-up"></i> @post.Upvotes
+                                        </span>
+                                        <a href="/Forum/Details/@post.ForumPostId" class="btn btn-outline-danger btn-sm">View Post</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-muted my-5 text-center">
+                    <i class="bi bi-inbox display-1 mb-3"></i>
+                    <h5>No posts yet.</h5>
+                </div>
+            }
+        </div>
+
+        <!-- Listings Tab -->
+        <div class="tab-pane fade" id="listings" role="tabpanel">
+            @if (Model.MarketplaceListings.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var listing in Model.MarketplaceListings)
+                    {
+                        <div class="col-md-6">
+                            <div class="tab-card card bg-white text-dark h-100 shadow-sm">
+                                <img src="@(listing.Images.FirstOrDefault()?.ImageUrl ?? "/assets/img/no-image-found.png")"
+                                     alt="Listing Image"
+                                     class="card-img-top rounded-top bg-secondary"
+                                     style="object-fit: cover; height: 200px;" />
+
+                                <div class="card-body">
+                                    <h5 class="card-title text-danger">@listing.Title</h5>
+                                    <p class="card-text">@listing.Price.ToString("C")</p>
+
+                                    <a href="/Marketplace/Details/@listing.ListingId" class="btn btn-outline-danger btn-sm">View Listing</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-muted my-5 text-center">
+                    <i class="bi bi-shop-window display-1 mb-3"></i>
+                    <h5>No listings yet.</h5>
+                </div>
+            }
+        </div>
+
+        <!-- Events Tab -->
+        <div class="tab-pane fade" id="events" role="tabpanel">
+            @if (Model.Events.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var ev in Model.Events)
+                    {
+                        <div class="col-md-6">
+                            <div class="tab-card card bg-white text-dark h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title text-danger">@ev.Title</h5>
+                                    <span class="badge bg-primary mb-2">
+                                        <i class="bi bi-calendar-event"></i> @(ev.EventDate?.ToString("dd/MM/yyyy HH:mm") ?? "Date TBD")
+                                    </span>
+
+                                    <a href="/Events/Details/@ev.EventId" class="btn btn-outline-danger btn-sm d-block mt-3">View Event</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-muted my-5 text-center">
+                    <i class="bi bi-calendar-x display-1 mb-3"></i>
+                    <h5>No events yet.</h5>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tabs = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('show.bs.tab', function () {
+                    this.classList.remove('animate__animated', 'animate__fadeIn');
+                });
+
+                tab.addEventListener('shown.bs.tab', function () {
+                    this.classList.add('animate__animated', 'animate__fadeIn');
+                });
+            });
+        });
+    </script>
+}

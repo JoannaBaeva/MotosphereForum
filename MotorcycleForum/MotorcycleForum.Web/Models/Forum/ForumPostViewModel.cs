@@ -8,7 +8,7 @@ namespace MotorcycleForum.Web.Models.Forum
     {
         public Guid ForumPostId { get; set; }
         public string Title { get; set; } = null!;
-        public string Content { get; set; } = null!;
+        public Guid? CreatorId { get; set; }
         public string CreatorName { get; set; } = null!;
         public ForumTopic Topic { get; set; } = null!;
         public DateTime CreatedDate { get; set; }

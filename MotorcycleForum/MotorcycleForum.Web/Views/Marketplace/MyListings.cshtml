@@ -88,10 +88,9 @@
                                 <a asp-action="Edit" asp-route-id="@listing.ListingId" class="btn btn-outline-primary btn-sm">
                                     <i class="bi bi-pencil"></i> Edit
                                 </a>
-                                <form asp-action="Delete" asp-route-id="@listing.ListingId" class="btn btn-outline-danger btn-sm">
-                                        <i class="bi bi-trash"></i> Delete
-                                    @Html.AntiForgeryToken()
-                                </form>
+                                <a asp-action="Delete" asp-route-id="@listing.ListingId" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
                             </div>
                         </div>
                     </div>

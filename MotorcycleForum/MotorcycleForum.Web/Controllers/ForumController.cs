@@ -56,6 +56,7 @@ namespace MotorcycleForum.Web.Controllers
                     ForumPostId = p.ForumPostId,
                     Title = p.Title,
                     CreatorName = p.Author.FullName ?? "Unknown",
+                    CreatorId = p.AuthorId,
                     CreatedDate = p.CreatedDate,
                     Topic = p.Topic,
                     Upvotes = p.Upvotes,
@@ -342,6 +343,7 @@ namespace MotorcycleForum.Web.Controllers
                 Content = post.Content,
                 CreatedDate = post.CreatedDate,
                 CreatorName = post.Author.FullName,
+                CreatorId = post.AuthorId,
                 CreatorProfilePictureUrl = post.Author.ProfilePictureUrl,
                 Topic = post.Topic,
                 Upvotes = post.Upvotes,
@@ -359,6 +361,7 @@ namespace MotorcycleForum.Web.Controllers
                         Content = c.Content,
                         CreatedDate = c.CreatedDate,
                         CreatorName = c.Author.FullName,
+                        CreatorId = c.AuthorId,
                         CreatorProfilePictureUrl = c.Author.ProfilePictureUrl,
                         IsOwner = c.AuthorId == userId,
                         Replies = c.Replies.Select(r => new CommentViewModel
@@ -434,7 +437,7 @@ namespace MotorcycleForum.Web.Controllers
             if (comment == null)
                 return Json(new { success = false, message = "Comment not found." });
 
-            if (comment.AuthorId != user.Id)
+            if (comment.AuthorId != user.Id && !User.IsInRole("Admin") && !User.IsInRole("Moderator")) 
                 return Json(new { success = false, message = "You can only delete your own comments." });
 
             if (comment.Replies.Any())

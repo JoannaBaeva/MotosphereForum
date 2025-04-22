@@ -22,7 +22,12 @@
                     <div class="col-md-8">
                         <div class="mb-3">
                             <label class="form-label text-light" for="FullName">Username</label>
-                            <input class="form-control bg-dark text-light border-secondary" type="text" id="FullName" name="FullUsername" value= "@Model.FullName"/>
+                            <input class="form-control bg-dark text-light border-secondary" type="text" id="FullName" name="FullName" value="@Model.FullName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-light" for="Bio">Bio</label>
+                            <textarea class="form-control bg-dark text-light border-secondary" id="Bio" name="Bio" rows="4" placeholder="Tell us a bit about yourself...">@Model.Bio</textarea>
                         </div>
 
                         <div class="mb-3">
@@ -31,7 +36,7 @@
                         </div>
 
                         <div class="text-center">
-                            <button type="submit" class="btn btn-outline-light rounded-pill px-4 j">Save Changes</button>
+                            <button type="submit" class="btn btn-outline-light rounded-pill px-4">Save Changes</button>
                         </div>
                     </div>
                 </div>
@@ -47,6 +52,23 @@
     </div>
 </div>
 
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const bioTextarea = document.getElementById('Bio');
+
+            if (bioTextarea) {
+                bioTextarea.setAttribute('style', 'height:' + (bioTextarea.scrollHeight) + 'px;overflow-y:hidden;');
+                bioTextarea.addEventListener('input', autoResize);
+            }
+
+            function autoResize() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            }
+        });
+    </script>
 }

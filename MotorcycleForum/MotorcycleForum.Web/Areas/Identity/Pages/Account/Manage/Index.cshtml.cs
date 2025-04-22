@@ -26,6 +26,9 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account.Manage
 
         [BindProperty]
         public IFormFile ProfilePicture { get; set; }
+        
+        [BindProperty]
+        public string Bio { get; set; } = string.Empty;
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -38,7 +41,8 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account.Manage
 
             FullName = user.FullName;
             ProfilePictureUrl = user.ProfilePictureUrl;
-
+            Bio = user.Bio ?? "";
+            
             return Page();
         }
 
@@ -71,6 +75,12 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account.Manage
                 updated = true;
             }
 
+            if (!string.IsNullOrWhiteSpace(Bio) && Bio != user.Bio)
+            {
+                user.Bio = Bio;
+                updated = true;
+            }
+            
             if (updated)
             {
                 await _userManager.UpdateAsync(user);

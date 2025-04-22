@@ -8,6 +8,7 @@ namespace MotorcycleForum.Web.Models.Forum
         public Guid Id { get; set; }
         public string Content { get; set; } = null!;
         public string CreatorName { get; set; } = null!;
+        public Guid CreatorId { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsOwner { get; set; }
         public string CreatorProfilePictureUrl { get; set; } = null!;

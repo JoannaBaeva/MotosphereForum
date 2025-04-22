@@ -23,19 +23,25 @@
             <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                 <h2 class="fw-bold mb-0">@Model.Title</h2>
                 <div class="d-flex align-items-center">
-                    <img src="@Model.CreatorProfilePictureUrl" class="rounded-circle me-3 border-danger border"
+                    <img src="@Model.CreatorProfilePictureUrl" 
+                         class="rounded-circle me-3 border-danger border"
                          style="width: 48px; height: 48px; object-fit: cover;" alt="Author avatar" />
                     <div class="text-end">
-                        <div class="fw-semibold">@Model.CreatorName</div>
-                        <small class="text-light"><i class="bi bi-calendar-event me-1"></i>@Model.CreatedDate.ToString("MMM dd, yyyy")</small>
+                        <a href="/Profile/@Model.CreatorId" class="fw-semibold text-decoration-none text-light">
+                            @Model.CreatorName
+                        </a>
+                        <small class="text-light d-block">
+                            <i class="bi bi-calendar-event me-1"></i>@Model.CreatedDate.ToString("MMM dd, yyyy")
+                        </small>
                     </div>
                 </div>
             </div>
         </div>
 
+
         <!-- Body -->
         <div class="card-body bg-dark text-light px-3 px-md-4 py-4 bg-opacity-75">
-            <p class="fs-5 lh-lg">@Model.Content</p>
+            <p class="fs-5 lh-lg" style="white-space: pre-line;">@Model.Content</p>
 
             <!-- Image Carousel -->
             @if (Model.ImageUrls.Any())
@@ -47,7 +53,7 @@
                             {
                                 <div class="carousel-item @(i == 0 ? "active" : "")">
                                     <img src="@Model.ImageUrls[i]"
-                                         class="d-block object-fit-cover"
+                                         class="d-block object-fit-cover zoomable"
                                          style="height: 320px; object-fit: cover; cursor: zoom-in; border-radius: 8px;"
                                          alt="Forum Image @(i + 1)" />
                                 </div>
@@ -157,13 +163,88 @@
     </div>
 </div>
 
+<input type="hidden" id="isAuthenticated" value="@User.Identity.IsAuthenticated.ToString().ToLower()" />
 
 <!-- JavaScript -->
 @section Scripts {
     <script src="~/js/Forum/forum-voting.js"></script>
     <script src="~/js/Forum/forum-comments.js"></script>
     <script src="~/js/Forum/post-image-view.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const isAuthenticated = document.getElementById('isAuthenticated')?.value === "true";
+
+            // Voting buttons
+            const upvoteBtn = document.getElementById("upvote-btn");
+            const downvoteBtn = document.getElementById("downvote-btn");
+
+            if (upvoteBtn) {
+                upvoteBtn.addEventListener("click", function (e) {
+                    if (!isAuthenticated) {
+                        e.preventDefault();
+                        showLoginReminder();
+                    }
+                });
+            }
+
+            if (downvoteBtn) {
+                downvoteBtn.addEventListener("click", function (e) {
+                    if (!isAuthenticated) {
+                        e.preventDefault();
+                        showLoginReminder();
+                    }
+                });
+            }
+
+            // Comment form
+            const commentForm = document.getElementById("comment-form");
+
+            if (commentForm) {
+                commentForm.addEventListener("submit", function (e) {
+                    if (!isAuthenticated) {
+                        e.preventDefault();
+                        showLoginReminder();
+                    }
+                });
+            }
+
+            // Reply forms (could be multiple reply forms!)
+            const replyForms = document.querySelectorAll(".reply-form");
+
+            replyForms.forEach(form => {
+                form.addEventListener("submit", function (e) {
+                    if (!isAuthenticated) {
+                        e.preventDefault();
+                        showLoginReminder();
+                    }
+                });
+            });
+        });
+
+        function showLoginReminder() {
+            Swal.fire({
+                title: 'Login Required',
+                text: 'Please log in to interact with posts.',
+                icon: 'warning',
+                confirmButtonText: 'Log In',
+                confirmButtonColor: '#d81324',
+                background: '#fff',
+                backdrop: 'rgba(0,0,0,0.6)',
+                customClass: {
+                    popup: 'rounded-4 shadow-lg'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/Identity/Account/Login';
+                }
+            });
+        }
+    </script>
 }
+
 
 
 

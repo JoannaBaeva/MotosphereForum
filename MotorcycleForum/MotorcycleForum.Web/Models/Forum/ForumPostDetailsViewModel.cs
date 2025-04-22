@@ -11,6 +11,7 @@ namespace MotorcycleForum.Web.Models.Forum
         public DateTime CreatedDate { get; set; }
         public string CreatorName { get; set; } = null!;
         public string CreatorProfilePictureUrl { get; set; } = null!;
+        public Guid? CreatorId { get; set; }
         public int Upvotes { get; set; }
         public int Downvotes { get; set; }
         public ForumTopic Topic { get; set; } = null!;
