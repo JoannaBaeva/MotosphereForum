@@ -1,4 +1,5 @@
-# Motosphere
+# <img src="https://github.com/user-attachments/assets/73d90776-06ab-4f03-a260-c4d92b603279" width="50px" /> Motosphere 
+
 
 **Motosphere** is a specialized social network for motorcycle enthusiasts, providing a dedicated platform for connecting riders, sharing experiences, selling motorcycles and parts, and organizing motorcycle events.
 
