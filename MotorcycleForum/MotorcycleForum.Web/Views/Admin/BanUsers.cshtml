@@ -11,66 +11,75 @@
         <div class="card-body">
             <h4 class="text-dark fw-bold mb-4">👥 All Users</h4>
 
-            <!-- Filter -->
-            <div class="mb-3 d-flex justify-content-end">
-                <select id="filterSelect" class="form-select w-auto">
-                    <option value="all">All Users</option>
-                    <option value="banned">Banned Only</option>
-                    <option value="unbanned">Unbanned Only</option>
-                </select>
+            <!-- Filter and Search -->
+            <div class="row mb-3">
+                <div class="col-md-6 d-flex align-items-center">
+                    <label for="filterSelect" class="form-label me-2 fw-semibold text-dark">Filter by Status:</label>
+                    <select id="filterSelect" class="form-select w-auto">
+                        <option value="all">All Users</option>
+                        <option value="banned">Banned Only</option>
+                        <option value="unbanned">Unbanned Only</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="userSearch" class="form-label fw-semibold text-dark">Search Users:</label>
+                    <input type="text" id="userSearch" class="form-control shadow-sm" placeholder="Search by username or email...">
+                </div>
             </div>
+
 
             <!-- Users Table -->
             <div class="table-responsive">
                 <table class="table-hover table align-middle" id="usersTable">
                     <thead class="table-danger">
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    @foreach (var user in Model)
-                    {
-                        <tr class="@(user.IsBanned ? "banned-row" : "unbanned-row")">
-                            <td>@user.Username</td>
-                            <td>@user.Email</td>
-                            <td>
-                                @if (user.IsBanned)
-                                {
-                                    <span class="badge bg-danger">Banned</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-success">Active</span>
-                                }
-                            </td>
-                            <td>
-                                @if (!user.IsBanned)
-                                {
-                                    <form asp-action="BanUser" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="email" value="@user.Email" />
-                                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                                            <i class="bi bi-person-dash"></i> Ban
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <form asp-action="UnbanUser" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="email" value="@user.Email" />
-                                        <button type="submit" class="btn btn-outline-success btn-sm">
-                                            <i class="bi bi-person-check"></i> Unban
-                                        </button>
-                                    </form>
-                                }
-                            </td>
-                        </tr>
-                    }
+                        @foreach (var user in Model)
+                        {
+                            <tr class="@(user.IsBanned ? "banned-row" : "unbanned-row")">
+                                <td>@user.Username</td>
+                                <td>@user.Email</td>
+                                <td>
+                                    @if (user.IsBanned)
+                                    {
+                                        <span class="badge bg-danger">Banned</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!user.IsBanned)
+                                    {
+                                        <form asp-action="BanUser" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="email" value="@user.Email" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-person-dash"></i> Ban
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="UnbanUser" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="email" value="@user.Email" />
+                                            <button type="submit" class="btn btn-outline-success btn-sm">
+                                                <i class="bi bi-person-check"></i> Unban
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
                 <div class="d-flex justify-content-between mt-4">
@@ -95,26 +104,39 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         const filterSelect = document.getElementById('filterSelect');
+        const userSearch = document.getElementById('userSearch');
         const usersTable = document.getElementById('usersTable');
 
-        filterSelect.addEventListener('change', function () {
-            const value = this.value;
+        function filterRows() {
+            const statusValue = filterSelect.value;
+            const searchTerm = userSearch.value.trim().toLowerCase();
             const rows = usersTable.querySelectorAll('tbody tr');
 
             rows.forEach(row => {
-                if (value === 'all') {
-                    row.style.display = '';
-                } else if (value === 'banned' && row.classList.contains('banned-row')) {
-                    row.style.display = '';
-                } else if (value === 'unbanned' && row.classList.contains('unbanned-row')) {
+                const username = row.children[0]?.innerText.toLowerCase() || "";
+                const email = row.children[1]?.innerText.toLowerCase() || "";
+
+                const matchesStatus = (
+                    statusValue === 'all' ||
+                    (statusValue === 'banned' && row.classList.contains('banned-row')) ||
+                    (statusValue === 'unbanned' && row.classList.contains('unbanned-row'))
+                );
+
+                const matchesSearch = username.includes(searchTerm) || email.includes(searchTerm);
+
+                if (matchesStatus && matchesSearch) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
                 }
             });
-        });
+        }
+
+        filterSelect.addEventListener('change', filterRows);
+        userSearch.addEventListener('input', filterRows);
     </script>
 
     @if (TempData["UserBanned"] != null)
@@ -131,7 +153,7 @@
             });
         </script>
     }
-    
+
     @if (TempData["UserUnbanned"] != null)
     {
         <script>

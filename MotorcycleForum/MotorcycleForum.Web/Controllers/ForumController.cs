@@ -37,6 +37,7 @@ namespace MotorcycleForum.Web.Controllers
                     Selected = t.TopicId == topicId
                 })
                 .ToListAsync();
+
             var postsQuery = _context.ForumPosts
                 .Include(p => p.Author)
                 .Include(p => p.Topic)
@@ -46,7 +47,13 @@ namespace MotorcycleForum.Web.Controllers
                 postsQuery = postsQuery.Where(p => p.TopicId == topicId.Value);
 
             if (!string.IsNullOrWhiteSpace(search))
-                postsQuery = postsQuery.Where(p => p.Title.Contains(search));
+            {
+                var loweredSearch = search.ToLower();
+                postsQuery = postsQuery.Where(p =>
+                        p.Title.Contains(search) ||
+                        (p.Author != null && p.Author.FullName.Contains(search))
+                    );
+            }
 
             var posts = await postsQuery
                 .AsNoTracking()
