@@ -28,7 +28,6 @@ namespace MotorcycleForum.Data.Entities.Forum
 
         [ForeignKey(nameof(ForumPostId))]
         public ForumPost ForumPost { get; set; } = null!;
-
         public Guid? ParentCommentId { get; set; }
 
         [ForeignKey(nameof(ParentCommentId))]

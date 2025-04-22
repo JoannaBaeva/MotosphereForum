@@ -382,7 +382,10 @@ namespace MotorcycleForum.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> BanUsers()
         {
+            var currentUserEmail = User.Identity?.Name;
+
             var users = await _context.Users
+                .Where(u => u.Email != "motosphere.site@gmail.com" && u.Email != currentUserEmail)
                 .Select(u => new UserBanViewModel
                 {
                     UserId = u.Id,
@@ -395,6 +398,7 @@ namespace MotorcycleForum.Web.Controllers
 
             return View(users);
         }
+
 
 
         [Authorize(Roles = "Admin,Moderator")]
