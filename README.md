@@ -1,6 +1,5 @@
 # <img src="https://github.com/user-attachments/assets/73d90776-06ab-4f03-a260-c4d92b603279" width="50px" /> Motosphere 
 
-
 **Motosphere** is a specialized social network for motorcycle enthusiasts, providing a dedicated platform for connecting riders, sharing experiences, selling motorcycles and parts, and organizing motorcycle events.
 
 ---
@@ -34,10 +33,15 @@
    git clone https://github.com/JoannaBaeva/motosphere.git
    ```
 
-2. **Configure Environment Variables:**
-   - Database connection string
-   - AWS S3 credentials
-   - Email service settings
+2. **Configuration Files:**
+   - Copy the provided template:
+     ```bash
+     cp appsettings.Template.json appsettings.Development.json
+     ```
+   - Fill in your secrets manually:
+     - Database connection string
+     - AWS S3 credentials
+     - Email service settings
 
 3. **Create Database Migration:**
    ```bash

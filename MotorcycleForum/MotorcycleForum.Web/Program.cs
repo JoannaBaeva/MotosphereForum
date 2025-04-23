@@ -5,15 +5,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MotorcycleForum.Data;
 using MotorcycleForum.Data.Entities;
+using MotorcycleForum.Services;
+using MotorcycleForum.Services.Forum;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+// Load secrets from appsettings.json / appsettings.Development.json
+var configuration = builder.Configuration;
+
+// Database
+var connectionString = configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<MotorcycleForumDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 {
     options.Password.RequireDigit = true;
@@ -27,19 +35,31 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 .AddDefaultTokenProviders()
 .AddDefaultUI();
 
+builder.Services.AddSingleton<S3Service>(sp =>
+{
+    var awsSection = configuration.GetSection("AWS");
+
+    var accessKey = awsSection["AccessKey"];
+    var secretKey = awsSection["SecretKey"];
+    var bucketName = awsSection["BucketName"];
+    var region = awsSection["Region"];
+
+    return new S3Service(accessKey, secretKey, bucketName, region);
+});
+
+// Other Services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.AddScoped<S3Service>();
-
+builder.Services.AddScoped<IForumService, ForumService>();
 
 var app = builder.Build();
 
+// Middlewares
 if (app.Environment.IsDevelopment())
     app.UseMigrationsEndPoint();
 else
     app.UseHsts();
-
 
 app.UseExceptionHandler("/Home/Error");
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
@@ -48,7 +68,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -56,6 +75,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
 app.MapRazorPages();
+
 app.Run();

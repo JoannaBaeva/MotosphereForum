@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="animate.css" Version="3.3.0" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.415.24" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.416.13" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />

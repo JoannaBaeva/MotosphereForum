@@ -13,11 +13,13 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly S3Service _s3Service;
 
-        public IndexModel(UserManager<User> userManager, SignInManager<User> signInManager)
+        public IndexModel(UserManager<User> userManager, SignInManager<User> signInManager, S3Service s3Service)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _s3Service = s3Service;
         }
 
         [BindProperty]
@@ -61,26 +63,26 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account.Manage
                 updated = true;
             }
 
-            // Only update the image if a new file was provided
-            if (ProfilePicture != null && ProfilePicture.Length > 0)
-            {
-                var s3 = new S3Service();
-                var fileExt = Path.GetExtension(ProfilePicture.FileName);
-                var fileKey = $"profiles/{user.Id}/profile{fileExt}";
-
-                using var stream = ProfilePicture.OpenReadStream();
-                var uploadedUrl = await s3.UploadFileAsync(stream, fileKey);
-
-                user.ProfilePictureUrl = uploadedUrl;
-                updated = true;
-            }
-
+            // Update bio if changed
             if (!string.IsNullOrWhiteSpace(Bio) && Bio != user.Bio)
             {
                 user.Bio = Bio;
                 updated = true;
             }
-            
+
+            // Update profile picture
+            if (ProfilePicture != null && ProfilePicture.Length > 0)
+            {
+                var fileExt = Path.GetExtension(ProfilePicture.FileName);
+                var fileKey = $"profiles/{user.Id}/profile{fileExt}";
+
+                using var stream = ProfilePicture.OpenReadStream();
+                var uploadedUrl = await _s3Service.UploadFileAsync(stream, fileKey);
+
+                user.ProfilePictureUrl = uploadedUrl;
+                updated = true;
+            }
+
             if (updated)
             {
                 await _userManager.UpdateAsync(user);

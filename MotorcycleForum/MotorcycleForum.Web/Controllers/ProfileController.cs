@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotorcycleForum.Data;
-using MotorcycleForum.Web.Models.Profile;
+using MotorcycleForum.Services.Models.Profile;
 
 namespace MotorcycleForum.Web.Controllers
 {

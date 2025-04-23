@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MotorcycleForum.Data;
 using MotorcycleForum.Data.Entities;
 using MotorcycleForum.Data.Entities.Marketplace;
-using MotorcycleForum.Web.Models.Marketplace;
+using MotorcycleForum.Services.Models.Marketplace;
 using System.Security.Claims;
 
 namespace MotorcycleForum.Web.Controllers
@@ -149,68 +149,65 @@ namespace MotorcycleForum.Web.Controllers
 
         // POST: MarketplaceListings/Create
         [Authorize]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(MarketplaceListingViewModel model)
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Create(MarketplaceListingViewModel model)
+{
+    if (model.ImageFiles == null || !model.ImageFiles.Any(f => f.Length > 0))
+    {
+        ModelState.AddModelError("ImageFiles", "Please upload at least one image.");
+    }
+
+    if (!ModelState.IsValid)
+    {
+        model.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
+        return View(model);
+    }
+
+    var sellerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    var listingId = Guid.NewGuid();
+
+    var listing = new MarketplaceListing(sellerId)
+    {
+        ListingId = listingId,
+        Title = model.Title,
+        Description = model.Description,
+        Price = model.Price,
+        Location = model.Location,
+        CategoryId = model.CategoryId,
+        CreatedDate = DateTime.UtcNow,
+        IsActive = model.IsActive,
+        SellerPhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? "No phone number given" : model.PhoneNumber
+    };
+
+    if (model.ImageFiles is not null && model.ImageFiles.Count > 0)
+    {
+        foreach (var formFile in model.ImageFiles)
         {
-            if (model.ImageFiles == null || !model.ImageFiles.Any(f => f.Length > 0))
+            if (formFile.Length > 0)
             {
-                ModelState.AddModelError("ImageFiles", "Please upload at least one image.");
-            }
+                var fileExt = Path.GetExtension(formFile.FileName);
+                var s3FileName = $"marketplace/{listingId}/{Guid.NewGuid()}{fileExt}";
 
-            if (!ModelState.IsValid)
-            {
-                model.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
-                return View(model);
-            }
+                using var stream = formFile.OpenReadStream();
+                var imageUrl = await _s3Service.UploadFileAsync(stream, s3FileName);
 
-            var sellerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var listingId = Guid.NewGuid();
-
-            var listing = new MarketplaceListing(sellerId)
-            {
-                ListingId = listingId,
-                Title = model.Title,
-                Description = model.Description,
-                Price = model.Price,
-                Location = model.Location,
-                CategoryId = model.CategoryId,
-                CreatedDate = DateTime.UtcNow,
-                IsActive = model.IsActive,
-                SellerPhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? "No phone number given" : model.PhoneNumber
-            };
-
-            // Upload images to S3
-            if (model.ImageFiles is not null && model.ImageFiles.Count > 0)
-            {
-                var s3 = new S3Service();
-
-                foreach (var formFile in model.ImageFiles)
+                listing.Images.Add(new MarketplaceListingImage
                 {
-                    if (formFile.Length > 0)
-                    {
-                        var fileExt = Path.GetExtension(formFile.FileName);
-                        var s3FileName = $"marketplace/{listingId}/{Guid.NewGuid()}{fileExt}";
-
-                        using var stream = formFile.OpenReadStream();
-                        var imageUrl = await s3.UploadFileAsync(stream, s3FileName);
-
-                        listing.Images.Add(new MarketplaceListingImage
-                        {
-                            ImageId = Guid.NewGuid(),
-                            ListingId = listingId,
-                            ImageUrl = imageUrl
-                        });
-                    }
-                }
+                    ImageId = Guid.NewGuid(),
+                    ListingId = listingId,
+                    ImageUrl = imageUrl
+                });
             }
-
-
-            _context.MarketplaceListings.Add(listing);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(MyListings));
         }
+    }
+
+    _context.MarketplaceListings.Add(listing);
+    await _context.SaveChangesAsync();
+
+    return RedirectToAction(nameof(MyListings));
+}
+
 
         // GET: MarketplaceListings/Edit/{id}
         [Authorize]
@@ -293,7 +290,6 @@ namespace MotorcycleForum.Web.Controllers
             // Update images if new ones were uploaded
             if (model.ImageFiles != null && model.ImageFiles.Any())
             {
-                var s3 = new S3Service();
 
                 foreach (var file in model.ImageFiles)
                 {
@@ -303,7 +299,7 @@ namespace MotorcycleForum.Web.Controllers
                         var fileKey = $"marketplace/{model.ListingId}/{Guid.NewGuid()}{fileExt}";
 
                         using var stream = file.OpenReadStream();
-                        var imageUrl = await s3.UploadFileAsync(stream, fileKey);
+                        var imageUrl = await _s3Service.UploadFileAsync(stream, fileKey);
 
                         await _context.MarketplaceListingImages.AddAsync(new MarketplaceListingImage
                         {
@@ -369,13 +365,12 @@ namespace MotorcycleForum.Web.Controllers
             if (listing == null)
                 return NotFound();
 
-            var s3 = new S3Service();
 
             // Delete all S3 images
             foreach (var image in listing.Images)
             {
                 var s3Key = new Uri(image.ImageUrl).AbsolutePath.TrimStart('/');
-                await s3.DeleteFileAsync(s3Key);
+                await _s3Service.DeleteFileAsync(s3Key);
             }
 
             _context.MarketplaceListings.Remove(listing);
@@ -427,9 +422,8 @@ namespace MotorcycleForum.Web.Controllers
             if (image == null)
                 return NotFound();
 
-            var s3 = new S3Service();
             var s3Key = new Uri(image.ImageUrl).AbsolutePath.TrimStart('/');
-            await s3.DeleteFileAsync(s3Key);
+            await _s3Service.DeleteFileAsync(s3Key);
 
             _context.MarketplaceListingImages.Remove(image);
             await _context.SaveChangesAsync();

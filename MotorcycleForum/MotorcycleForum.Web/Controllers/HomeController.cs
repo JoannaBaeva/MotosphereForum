@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MotorcycleForum.Web.Models;
-using MotorcycleForum.Web.Models.Home;
+using MotorcycleForum.Services.Models;
+using MotorcycleForum.Services.Models.Home;
 using System.Diagnostics;
 using MotorcycleForum.Data;
 

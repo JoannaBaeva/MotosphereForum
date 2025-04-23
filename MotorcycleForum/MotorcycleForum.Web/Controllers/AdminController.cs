@@ -8,7 +8,7 @@ using MotorcycleForum.Data.Entities;
 using MotorcycleForum.Data.Entities.Event_Tracker;
 using MotorcycleForum.Data.Entities.Forum;
 using MotorcycleForum.Data.Entities.Marketplace;
-using MotorcycleForum.Web.Models.Admin;
+using MotorcycleForum.Services.Models.Admin;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -19,12 +19,14 @@ namespace MotorcycleForum.Web.Controllers
         private readonly MotorcycleForumDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly S3Service _s3Service;
 
-        public AdminController(MotorcycleForumDbContext context, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        public AdminController(MotorcycleForumDbContext context, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, S3Service s3Service)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _s3Service = s3Service;
         }
 
         // Only Admins can access
@@ -192,24 +194,26 @@ namespace MotorcycleForum.Web.Controllers
             TempData["MarketplaceCategoryDeleted"] = "Marketplace category deleted successfully!";
             return RedirectToAction(nameof(CreateMarketplaceCategory));
         }
-        
+
         private async Task DeleteListingDataAsync(Guid listingId)
         {
             var listing = await _context.MarketplaceListings
                 .Include(l => l.Images)
                 .FirstOrDefaultAsync(l => l.ListingId == listingId);
+
             if (listing == null)
                 return;
-            var s3 = new S3Service();
+
             foreach (var image in listing.Images)
             {
                 if (!string.IsNullOrEmpty(image.ImageUrl))
                 {
                     var uri = new Uri(image.ImageUrl);
                     var key = uri.AbsolutePath.TrimStart('/');
-                    await s3.DeleteFileAsync(key);
+                    await _s3Service.DeleteFileAsync(key);
                 }
             }
+
             _context.MarketplaceListingImages.RemoveRange(listing.Images);
             _context.MarketplaceListings.Remove(listing);
         }
@@ -350,8 +354,6 @@ namespace MotorcycleForum.Web.Controllers
             if (post == null)
                 return;
 
-            var s3 = new S3Service();
-
             foreach (var image in post.Images)
             {
                 if (!string.IsNullOrEmpty(image.ImageUrl))
@@ -359,7 +361,7 @@ namespace MotorcycleForum.Web.Controllers
                     var uri = new Uri(image.ImageUrl);
                     var key = uri.AbsolutePath.TrimStart('/');
 
-                    await s3.DeleteFileAsync(key);
+                    await _s3Service.DeleteFileAsync(key);
                 }
             }
 
@@ -415,7 +417,7 @@ namespace MotorcycleForum.Web.Controllers
             }
 
             // Mark the user as banned
-            user.IsBanned = true;
+            //user.IsBanned = true;
 
             // Add to BannedEmails if not already there
             if (!_context.BannedEmails.Any(b => b.Email == email))
@@ -447,7 +449,7 @@ namespace MotorcycleForum.Web.Controllers
             }
 
             // Set user to not banned
-            user.IsBanned = false;
+            //user.IsBanned = false;
 
             // Remove from banned emails if exists
             var bannedEmail = await _context.BannedEmails.FirstOrDefaultAsync(b => b.Email == email);

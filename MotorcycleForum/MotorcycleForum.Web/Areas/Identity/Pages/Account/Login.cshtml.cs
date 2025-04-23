@@ -119,11 +119,11 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account
                     return Page();
                 }
 
-                if (user.IsBanned)
-                {
-                    _logger.LogWarning("Banned user attempted login.");
-                    return RedirectToPage("/Account/Banned");
-                }
+                //if (user.IsBanned)
+                //{
+                //    _logger.LogWarning("Banned user attempted login.");
+                //    return RedirectToPage("/Account/Banned");
+                //}
 
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
 

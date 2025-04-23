@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotorcycleForum.Data.Entities.Event_Tracker;
-using MotorcycleForum.Web.Models.Events;
+using MotorcycleForum.Services.Models.Events;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using MotorcycleForum.Data;

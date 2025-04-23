@@ -18,7 +18,6 @@ namespace MotorcycleForum.Data.Entities
         public string? Bio { get; set; }
         public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
         public bool IsBanned { get; set; } = false;
-
         public ICollection<Event> OrganizedEvents { get; set; } = new List<Event>();
         public ICollection<MarketplaceListing> MarketplaceListings { get; set; } = new List<MarketplaceListing>();
         public ICollection<ForumPost> ForumPosts { get; set; } = new List<ForumPost>();
