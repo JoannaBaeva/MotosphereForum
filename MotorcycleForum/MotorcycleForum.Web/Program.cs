@@ -9,6 +9,7 @@ using MotorcycleForum.Services;
 using MotorcycleForum.Services.Forum;
 using Microsoft.Extensions.Configuration;
 using MotorcycleForum.Services.Marketplace;
+using MotorcycleForum.Services.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IForumService, ForumService>();
 builder.Services.AddScoped<IMarketplaceService, MarketplaceService>();
-//builder.Services.AddScoped<IEventsService, EventsService>();
+builder.Services.AddScoped<IEventsService, EventsService>();
 //builder.Services.AddScoped<IAdminService, AdminService>();
 //builder.Services.AddScoped<IProfileService, ProfileService>();
 

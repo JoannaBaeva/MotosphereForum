@@ -20,13 +20,11 @@ namespace MotorcycleForum.Web.Controllers
 {
     public class ForumController : Controller
     {
-        private readonly MotorcycleForumDbContext _context;
         private readonly UserManager<User> _userManager;
         IForumService _forumService;
 
-        public ForumController(MotorcycleForumDbContext context, UserManager<User> userManager, IForumService forumService)
+        public ForumController(UserManager<User> userManager, IForumService forumService)
         {
-            _context = context;
             _userManager = userManager;
             _forumService = forumService;
         }
