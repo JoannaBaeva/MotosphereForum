@@ -8,8 +8,10 @@ using MotorcycleForum.Data.Entities;
 using MotorcycleForum.Services;
 using MotorcycleForum.Services.Forum;
 using Microsoft.Extensions.Configuration;
+using MotorcycleForum.Services.Admin;
 using MotorcycleForum.Services.Marketplace;
 using MotorcycleForum.Services.Events;
+using MotorcycleForum.Services.Profile;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,8 +58,8 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IForumService, ForumService>();
 builder.Services.AddScoped<IMarketplaceService, MarketplaceService>();
 builder.Services.AddScoped<IEventsService, EventsService>();
-//builder.Services.AddScoped<IAdminService, AdminService>();
-//builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 var app = builder.Build();
 

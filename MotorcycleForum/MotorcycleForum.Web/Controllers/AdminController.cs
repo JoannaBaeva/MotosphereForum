@@ -11,36 +11,24 @@ using MotorcycleForum.Data.Entities.Marketplace;
 using MotorcycleForum.Services.Models.Admin;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MotorcycleForum.Services.Admin;
 
 namespace MotorcycleForum.Web.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly MotorcycleForumDbContext _context;
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-        private readonly S3Service _s3Service;
+        IAdminService _adminService;
 
-        public AdminController(MotorcycleForumDbContext context, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, S3Service s3Service)
+        public AdminController(IAdminService adminService)
         {
-            _context = context;
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _s3Service = s3Service;
+            _adminService = adminService;
         }
 
         // Only Admins can access
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            var model = new AdminDashboardViewModel
-            {
-                TotalUsers = await _context.Users.CountAsync(),
-                ForumPostsCount = await _context.ForumPosts.CountAsync(),
-                MarketplaceListingsCount = await _context.MarketplaceListings.CountAsync(),
-                EventsCount = await _context.Events.CountAsync()
-            };
-
+            var model = await _adminService.GetDashboardStatsAsync();
             return View(model);
         }
 
@@ -49,16 +37,7 @@ namespace MotorcycleForum.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> CreateModerator()
         {
-            var users = await _userManager.Users
-                .Where(u => !(u.UserName == "motosphere.site@gmail.com"))
-                .Select(u => new UserListItem
-                {
-                    Id = u.Id,
-                    Username = u.FullName,
-                    ProfilePictureUrl = u.ProfilePictureUrl,
-                    IsModerator = _userManager.GetRolesAsync(u).Result.Contains("Moderator")
-                })
-                .ToListAsync();
+            var users = await _adminService.GetModeratorCandidatesAsync();
 
             var model = new CreateModeratorViewModel
             {
@@ -73,22 +52,15 @@ namespace MotorcycleForum.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Promote(Guid userId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var success = await _adminService.PromoteToModeratorAsync(userId);
 
-            if (user == null)
+            if (!success)
             {
                 TempData["Error"] = "User not found.";
                 return RedirectToAction(nameof(CreateModerator));
             }
 
-            if (!await _roleManager.RoleExistsAsync("Moderator"))
-            {
-                await _roleManager.CreateAsync(new IdentityRole<Guid>("Moderator"));
-            }
-
-            await _userManager.AddToRoleAsync(user, "Moderator");
-
-            TempData["ModeratorCreated"] = $"User {user.FullName} has been promoted to Moderator!";
+            TempData["ModeratorCreated"] = "User has been promoted to Moderator!";
             return RedirectToAction(nameof(CreateModerator));
         }
 
@@ -97,15 +69,14 @@ namespace MotorcycleForum.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Demote(Guid userId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
+            var success = await _adminService.DemoteFromModeratorAsync(userId);
+
+            if (!success)
                 return NotFound();
 
-            await _userManager.RemoveFromRoleAsync(user, "Moderator");
-            TempData["ModeratorDemoted"] = $"User {user.FullName} has been demoted.";
+            TempData["ModeratorDemoted"] = "User has been demoted.";
             return RedirectToAction(nameof(CreateModerator));
         }
-
 
 
         //Mods can access too
@@ -114,36 +85,23 @@ namespace MotorcycleForum.Web.Controllers
         [Authorize(Roles = "Moderator")]
         public async Task<IActionResult> Mod()
         {
-            var model = new AdminDashboardViewModel
-            {
-                TotalUsers = await _context.Users.CountAsync(),
-                ForumPostsCount = await _context.ForumPosts.CountAsync(),
-                MarketplaceListingsCount = await _context.MarketplaceListings.CountAsync(),
-                EventsCount = await _context.Events.CountAsync()
-            };
-
+            var model = await _adminService.GetDashboardStatsAsync();
             return View(model);
         }
-        
+
         // Create Marketplace Category
 
         [Authorize(Roles = "Admin, Moderator")]
         [HttpGet]
         public async Task<IActionResult> CreateMarketplaceCategory()
         {
-            var categories = await _context.Categories
-                .Select(u => new CreateMarketplaceCategoryViewModel()
-                {
-                    Id = u.CategoryId,
-                    Name = u.Name
-                })
-                .ToListAsync();
-            
+            var categories = await _adminService.GetMarketplaceCategoriesAsync();
+
             var model = new CreateMarketplaceCategoryViewModel
             {
                 Categories = categories
             };
-            
+
             return View(model);
         }
 
@@ -152,70 +110,41 @@ namespace MotorcycleForum.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateMarketplaceCategory(CreateMarketplaceCategoryViewModel category)
         {
-            if (category.Name == null)
+            if (string.IsNullOrWhiteSpace(category.Name))
             {
                 ModelState.AddModelError("Name", "Category name is required.");
+                category.Categories = await _adminService.GetMarketplaceCategoriesAsync(); // repopulate dropdown
                 return View(category);
             }
 
-            var newCategory = new Category { CategoryId = Guid.NewGuid(), Name = category.Name };
+            var success = await _adminService.CreateMarketplaceCategoryAsync(category.Name);
 
-            _context.Categories.Add(newCategory);
-            await _context.SaveChangesAsync();
+            if (success)
+                TempData["MarketplaceCategoryCreated"] = "Marketplace category created successfully!";
+            else
+                TempData["Error"] = "Something went wrong while creating the category.";
 
-            TempData["MarketplaceCategoryCreated"] = "Marketplace category created successfully!";
             return RedirectToAction(nameof(CreateMarketplaceCategory));
         }
-        
+
+
         [Authorize(Roles = "Admin, Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteMarketplaceCategory(Guid id)
         {
-            var categoryToDelete = await _context.Categories.FindAsync(id);
-            if (categoryToDelete == null)
-            {
-                return NotFound();
-            }
-            
-            var listingsInCategory = await _context.MarketplaceListings
-                .Where(l => l.CategoryId == id)
-                .ToListAsync();
+            var success = await _adminService.DeleteMarketplaceCategoryAsync(id);
 
-            foreach (var listing in listingsInCategory)
+            if (success)
             {
-                await DeleteListingDataAsync(listing.ListingId);
+                TempData["MarketplaceCategoryDeleted"] = "Marketplace category deleted successfully!";
             }
-            
-            _context.Categories.Remove(categoryToDelete);
-            
-            await _context.SaveChangesAsync();
-            
-            TempData["MarketplaceCategoryDeleted"] = "Marketplace category deleted successfully!";
+            else
+            {
+                TempData["Error"] = "Could not delete category. It may not exist.";
+            }
+
             return RedirectToAction(nameof(CreateMarketplaceCategory));
-        }
-
-        private async Task DeleteListingDataAsync(Guid listingId)
-        {
-            var listing = await _context.MarketplaceListings
-                .Include(l => l.Images)
-                .FirstOrDefaultAsync(l => l.ListingId == listingId);
-
-            if (listing == null)
-                return;
-
-            foreach (var image in listing.Images)
-            {
-                if (!string.IsNullOrEmpty(image.ImageUrl))
-                {
-                    var uri = new Uri(image.ImageUrl);
-                    var key = uri.AbsolutePath.TrimStart('/');
-                    await _s3Service.DeleteFileAsync(key);
-                }
-            }
-
-            _context.MarketplaceListingImages.RemoveRange(listing.Images);
-            _context.MarketplaceListings.Remove(listing);
         }
 
         // Create Event Category
@@ -224,17 +153,14 @@ namespace MotorcycleForum.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> CreateEventCategory()
         {
-            var categories = await _context.EventCategories
-                .Select(u => new CreateEventCategoryViewModel()
-                {
-                    Id = u.CategoryId,
-                    Name = u.Name
-                })
-                .ToListAsync();
-            
-            var model = new CreateEventCategoryViewModel { Categories = categories };
-            return View(model);
+            var categories = await _adminService.GetEventCategoriesAsync();
 
+            var model = new CreateEventCategoryViewModel
+            {
+                Categories = categories
+            };
+
+            return View(model);
         }
 
         [Authorize(Roles = "Admin, Moderator")]
@@ -242,56 +168,50 @@ namespace MotorcycleForum.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateEventCategory(CreateEventCategoryViewModel category)
         {
-            if (category.Name == null)
+            if (string.IsNullOrWhiteSpace(category.Name))
             {
                 ModelState.AddModelError("Name", "Category name is required.");
                 return View(category);
             }
 
-            var newCategory = new EventCategory { CategoryId = Guid.NewGuid(), Name = category.Name };
+            var success = await _adminService.CreateEventCategoryAsync(category.Name);
 
-            _context.EventCategories.Add(newCategory);
-            await _context.SaveChangesAsync();
+            if (!success)
+            {
+                ModelState.AddModelError("", "Something went wrong while creating the category.");
+                return View(category);
+            }
 
             TempData["EventCategoryCreated"] = "Event category created successfully!";
             return RedirectToAction(nameof(CreateEventCategory));
         }
+
 
         [Authorize(Roles = "Moderator, Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteEventCategory(Guid id)
         {
-            var categoryToDelete = await _context.EventCategories.FindAsync(id);
-            if (categoryToDelete == null)
+            var success = await _adminService.DeleteEventCategoryAsync(id);
+
+            if (!success)
             {
-                return NotFound();
+                TempData["Error"] = "Event category could not be deleted or was not found.";
+                return RedirectToAction(nameof(CreateEventCategory));
             }
 
-            _context.EventCategories.Remove(categoryToDelete);
-            _context.Events.RemoveRange(_context.Events.Where(e => e.CategoryId == id));
-            
-            await _context.SaveChangesAsync();
             TempData["EventCategoryDeleted"] = "Event category deleted successfully!";
             return RedirectToAction(nameof(CreateEventCategory));
         }
 
 
-
         //Create Forum Topic
-        
+
         [Authorize(Roles = "Admin,Moderator")]
         [HttpGet]
         public async Task<IActionResult> CreateForumTopic()
         {
-            var topics = await _context.ForumTopics
-                .Select(t => new CreateForumTopicViewModel()
-                {
-                    Id = t.TopicId,
-                    Name = t.Title
-                })
-                .ToListAsync();
-
+            var topics = await _adminService.GetForumTopicsAsync();
             var model = new CreateForumTopicViewModel { Topics = topics };
             return View(model);
         }
@@ -304,80 +224,32 @@ namespace MotorcycleForum.Web.Controllers
             if (string.IsNullOrWhiteSpace(topic.Name))
             {
                 ModelState.AddModelError("Name", "Name is required.");
+                topic.Topics = await _adminService.GetForumTopicsAsync();
                 return View(topic);
             }
 
-            var newTopic = new ForumTopic { Title = topic.Name };
+            var success = await _adminService.CreateForumTopicAsync(topic.Name);
 
-            _context.ForumTopics.Add(newTopic);
-            await _context.SaveChangesAsync();
+            if (success)
+                TempData["ForumTopicCreated"] = "Forum topic created successfully!";
 
-            TempData["ForumTopicCreated"] = "Forum topic created successfully!";
             return RedirectToAction(nameof(CreateForumTopic));
         }
+
 
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteForumTopic(int id)
         {
-            var topicToDelete = await _context.ForumTopics.FindAsync(id);
-            if (topicToDelete == null)
-            {
+            var success = await _adminService.DeleteForumTopicAsync(id);
+
+            if (!success)
                 return NotFound();
-            }
-
-            var postsInTopic = await _context.ForumPosts
-                .Where(p => p.TopicId == id)
-                .ToListAsync();
-
-            foreach (var post in postsInTopic)
-            {
-                await DeletePostDataAsync(post.ForumPostId);
-            }
-
-            _context.ForumTopics.Remove(topicToDelete);
-            await _context.SaveChangesAsync();
 
             TempData["ForumTopicDeleted"] = "Forum topic deleted successfully!";
             return RedirectToAction(nameof(CreateForumTopic));
         }
-
-        private async Task DeletePostDataAsync(Guid postId)
-        {
-            var post = await _context.ForumPosts
-                .Include(p => p.Images)
-                .Include(p => p.Comments)
-                .ThenInclude(c => c.Replies)
-                .FirstOrDefaultAsync(p => p.ForumPostId == postId);
-
-            if (post == null)
-                return;
-
-            foreach (var image in post.Images)
-            {
-                if (!string.IsNullOrEmpty(image.ImageUrl))
-                {
-                    var uri = new Uri(image.ImageUrl);
-                    var key = uri.AbsolutePath.TrimStart('/');
-
-                    await _s3Service.DeleteFileAsync(key);
-                }
-            }
-
-            foreach (var comment in post.Comments)
-            {
-                if (comment.Replies != null && comment.Replies.Any())
-                {
-                    _context.Comments.RemoveRange(comment.Replies);
-                }
-            }
-
-            _context.Comments.RemoveRange(post.Comments);
-            _context.ForumPostImages.RemoveRange(post.Images);
-            _context.ForumPosts.Remove(post);
-        }
-
 
         // Ban Users
         [Authorize(Roles = "Admin,Moderator")]
@@ -385,118 +257,74 @@ namespace MotorcycleForum.Web.Controllers
         public async Task<IActionResult> BanUsers()
         {
             var currentUserEmail = User.Identity?.Name;
-
-            var users = await _context.Users
-                .Where(u => u.Email != "motosphere.site@gmail.com" && u.Email != currentUserEmail)
-                .Select(u => new UserBanViewModel
-                {
-                    UserId = u.Id,
-                    Email = u.Email,
-                    Username = u.FullName,
-                    IsBanned = _context.BannedEmails.Any(b => b.Email == u.Email)
-                })
-                .OrderBy(u => u.Email)
-                .ToListAsync();
-
+            var users = await _adminService.GetBanUsersListAsync(currentUserEmail);
             return View(users);
         }
-
-
 
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> BanUser(string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var result = await _adminService.BanUserAsync(email);
 
-            if (user == null)
+            if (!result)
             {
                 TempData["Error"] = "User not found.";
-                return RedirectToAction(nameof(BanUsers));
             }
-
-            // Mark the user as banned
-            //user.IsBanned = true;
-
-            // Add to BannedEmails if not already there
-            if (!_context.BannedEmails.Any(b => b.Email == email))
+            else
             {
-                _context.BannedEmails.Add(new BannedEmail
-                {
-                    Id = Guid.NewGuid(),
-                    Email = email
-                });
+                TempData["UserBanned"] = $"{email} has been banned.";
             }
 
-            await _context.SaveChangesAsync();
-
-            TempData["UserBanned"] = $"{email} has been banned.";
             return RedirectToAction(nameof(BanUsers));
         }
+
 
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UnbanUser(string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var result = await _adminService.UnbanUserAsync(email);
 
-            if (user == null)
+            if (!result)
             {
                 TempData["Error"] = "User not found.";
-                return RedirectToAction(nameof(BanUsers));
             }
-
-            // Set user to not banned
-            //user.IsBanned = false;
-
-            // Remove from banned emails if exists
-            var bannedEmail = await _context.BannedEmails.FirstOrDefaultAsync(b => b.Email == email);
-            if (bannedEmail != null)
+            else
             {
-                _context.BannedEmails.Remove(bannedEmail);
+                TempData["UserUnbanned"] = $"{email} has been unbanned.";
             }
 
-            await _context.SaveChangesAsync();
-
-            TempData["UserUnbanned"] = $"{email} has been unbanned.";
             return RedirectToAction(nameof(BanUsers));
         }
-
 
         // Approve Events
         [Authorize(Roles = "Admin,Moderator")]
         [HttpGet]
         public async Task<IActionResult> ApproveEvents()
         {
-            var pendingEvents = await _context.Events
-                .Include(e => e.Category)
-                .Include(e => e.Organizer)
-                .Where(e => !e.IsApproved)
-                .OrderBy(e => e.CreatedDate)
-                .ToListAsync();
-
+            var pendingEvents = await _adminService.GetPendingEventsAsync();
             return View(pendingEvents);
         }
-
+        
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(Guid id)
         {
-            var eventToApprove = await _context.Events.FindAsync(id);
+            var success = await _adminService.ApproveEventAsync(id);
 
-            if (eventToApprove == null)
+            if (!success)
             {
                 TempData["Error"] = "Event not found.";
-                return RedirectToAction(nameof(ApproveEvents));
+            }
+            else
+            {
+                TempData["EventApproved"] = "The event was successfully approved!";
             }
 
-            eventToApprove.IsApproved = true;
-            await _context.SaveChangesAsync();
-
-            TempData["EventApproved"] = "The event was successfully approved!";
             return RedirectToAction(nameof(ApproveEvents));
         }
 
@@ -505,21 +333,19 @@ namespace MotorcycleForum.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(Guid id)
         {
-            var eventToReject = await _context.Events.FindAsync(id);
+            var success = await _adminService.RejectEventAsync(id);
 
-            if (eventToReject == null)
+            if (!success)
             {
                 TempData["Error"] = "Event not found.";
-                return RedirectToAction(nameof(ApproveEvents));
+            }
+            else
+            {
+                TempData["EventRejected"] = "The event was rejected and deleted.";
             }
 
-            _context.Events.Remove(eventToReject);
-            await _context.SaveChangesAsync();
-
-            TempData["EventRejected"] = "The event was rejected and deleted.";
             return RedirectToAction(nameof(ApproveEvents));
         }
-
 
     }
 }

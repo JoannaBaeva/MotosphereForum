@@ -11,14 +11,15 @@
 @if (SignInManager.IsSignedIn(User) && currentUser != null)
 {
     <li class="nav-item dropdown px-2">
-        <a class="nav-link dropdown-toggle d-flex align-items-center text-dark"
-           href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <a asp-controller="Profile" asp-action="Details" asp-route-id="@currentUser.Id"
+           class="nav-link d-flex align-items-center text-dark px-2">
             <img src="@profilePic"
                  alt="Avatar"
                  class="rounded-circle me-2"
                  style="width: 32px; height: 32px; object-fit: cover; border: 2px solid #d81324;" />
             <span class="fw-semibold">@fullName</span>
         </a>
+
         <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userDropdown">
             <li>
                 <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
