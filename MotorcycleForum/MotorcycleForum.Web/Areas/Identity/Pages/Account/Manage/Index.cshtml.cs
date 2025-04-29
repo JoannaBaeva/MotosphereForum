@@ -13,9 +13,9 @@ namespace MotorcycleForum.Web.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly S3Service _s3Service;
+        private readonly IS3Service _s3Service;
 
-        public IndexModel(UserManager<User> userManager, SignInManager<User> signInManager, S3Service s3Service)
+        public IndexModel(UserManager<User> userManager, SignInManager<User> signInManager, IS3Service s3Service)
         {
             _userManager = userManager;
             _signInManager = signInManager;

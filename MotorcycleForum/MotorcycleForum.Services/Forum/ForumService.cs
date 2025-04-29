@@ -17,9 +17,9 @@ namespace MotorcycleForum.Services
     {
         private readonly MotorcycleForumDbContext _context;
         private readonly UserManager<User> _userManager;
-        private readonly S3Service _s3Service;
+        private readonly IS3Service _s3Service;
 
-        public ForumService(MotorcycleForumDbContext context, UserManager<User> userManager, S3Service s3Service)
+        public ForumService(MotorcycleForumDbContext context, UserManager<User> userManager, IS3Service s3Service)
         {
             _context = context;
             _userManager = userManager;

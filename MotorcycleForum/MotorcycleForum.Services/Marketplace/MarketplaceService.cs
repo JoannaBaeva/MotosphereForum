@@ -16,9 +16,9 @@ namespace MotorcycleForum.Services.Marketplace
     public class MarketplaceService : IMarketplaceService
     {
         private readonly MotorcycleForumDbContext _context;
-        private readonly S3Service _s3Service;
+        private readonly IS3Service _s3Service;
 
-        public MarketplaceService(MotorcycleForumDbContext context, S3Service s3Service)
+        public MarketplaceService(MotorcycleForumDbContext context, IS3Service s3Service)
         {
             _context = context;
             _s3Service = s3Service;

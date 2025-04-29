@@ -2,8 +2,9 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using MotorcycleForum.Services;
 
-public class S3Service
+public class S3Service : IS3Service
 {
     private readonly string bucketName;
     private readonly RegionEndpoint region;

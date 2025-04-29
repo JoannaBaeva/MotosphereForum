@@ -1,7 +1,7 @@
 ﻿@model ProfileViewModel
 
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = @Model.Username;
 }
 
 <div class="py-5 container">
@@ -77,7 +77,7 @@
             }
             else
             {
-                <div class="text-muted my-5 text-center">
+                <div class="text-light my-5 text-center">
                     <i class="bi bi-inbox display-1 mb-3"></i>
                     <h5>No posts yet.</h5>
                 </div>
@@ -111,7 +111,7 @@
             }
             else
             {
-                <div class="text-muted my-5 text-center">
+                <div class="text-light my-5 text-center">
                     <i class="bi bi-shop-window display-1 mb-3"></i>
                     <h5>No listings yet.</h5>
                 </div>
@@ -142,7 +142,7 @@
             }
             else
             {
-                <div class="text-muted my-5 text-center">
+                <div class="text-light my-5 text-center">
                     <i class="bi bi-calendar-x display-1 mb-3"></i>
                     <h5>No events yet.</h5>
                 </div>

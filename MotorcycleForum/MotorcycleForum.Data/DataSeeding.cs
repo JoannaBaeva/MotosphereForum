@@ -27,7 +27,7 @@ namespace MotorcycleForum.Data
                     SecurityStamp = "2f3c8b65-12af-4b6d-bda9-8ec3d8651d3a",
                     ConcurrencyStamp = "e1cb31c4-fcd4-47d7-b1cb-9c7e9edcdd70",
                     Bio = 
-                        "I’m the MotosphereAdmin – CEO of \"It Worked on My Machine™\"\r\n😩 I code.\r\n🔫 I moderate.\r\n☕ I run on caffeine, sarcasm, and the tears of broken builds.\r\n\r\nBuilt this place so motorcyclists could post bikes, flex mods, and yell about oil brands in peace.\r\nIf something’s broken, I probably caused it. If it works, you're welcome.\r\nIf you spam, I will smite you with the Ban Hammer™ 🔨🔥\r\n\r\nBasically the final boss of this site. Proceed accordingly."
+                        "I’m the MotosphereAdmin – CEO of \"It Worked on My Machine™\"\r\n😩 I code.\r\n🔫 I moderate.\r\n☕ I run on caffeine, sarcasm, and the tears of broken builds.\r\n\r\nBuilt this place so motorcyclists could post bikes, flex mods, and yell about oil brands in peace.\r\nIf something’s broken, I probably caused it. If it works, you're welcome.\r\nIf you spam, I will smite you with the Ban Hammer™ 🔨🔥\r\n\r\nBasically the final boss of this site. Proceed accordingly.",
                     ProfilePictureUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/marketplace/seed-images/logo.png"
                     // password for admin - X;W0Q6^Ej0Xc 
                 },
@@ -44,7 +44,7 @@ namespace MotorcycleForum.Data
                     SecurityStamp = "17dd75f7-5070-4fca-b271-d481b06ada44",
                     ConcurrencyStamp = "e182eb5b-2197-4216-87f3-6be9ba6bddc1",
                     Bio = 
-                        "Moderating this place so you don’t have to.\nProbably asleep. Probably judging your post.\nIf it got removed, it deserved it.\nI don't make the rules. Actually, I kinda do."
+                        "Moderating this place so you don’t have to.\nProbably asleep. Probably judging your post.\nIf it got removed, it deserved it.\nI don't make the rules. Actually, I kinda do.",
                     ProfilePictureUrl = "https://motosphere-images.s3.eu-north-1.amazonaws.com/profiles/cat-profile-pic.jpg"
                     // password - i7;DFK2,aVY1
                 }

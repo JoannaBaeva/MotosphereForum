@@ -15,9 +15,9 @@ namespace MotorcycleForum.Services.Admin
         private readonly MotorcycleForumDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-        private readonly S3Service _s3Service;
+        private readonly IS3Service _s3Service;
 
-        public AdminService(MotorcycleForumDbContext context, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, S3Service s3Service)
+        public AdminService(MotorcycleForumDbContext context, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, IS3Service s3Service)
         {
             _context = context;
             _userManager = userManager;

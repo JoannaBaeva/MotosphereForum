@@ -34,14 +34,16 @@
    ```
 
 2. **Configuration Files:**
+   (Skip if you're not cloning the repo from GitHub)
    - Copy the provided template:
      ```bash
      cp appsettings.Template.json appsettings.Development.json
      ```
-   - Fill in your secrets manually:
-     - Database connection string
-     - AWS S3 credentials
-     - Email service settings
+   - Add your credentials to `appsettings.Development.json`, including:
+      - `"ConnectionStrings:DefaultConnection"`
+      - `"AWS:AccessKey"`, `"AWS:SecretKey"`
+      - Email service (SMTP or SendGrid) settings
+
 
 3. **Create Database Migration:**
    ```bash

@@ -39,17 +39,14 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 .AddDefaultTokenProviders()
 .AddDefaultUI();
 
-builder.Services.AddSingleton<S3Service>(sp =>
-{
-    var awsSection = configuration.GetSection("AWS");
+builder.Services.AddScoped<IS3Service>(sp =>
+    new S3Service(
+        accessKey: configuration["AWS:AccessKey"],
+        secretKey: configuration["AWS:SecretKey"],
+        bucketName: configuration["AWS:BucketName"],
+        regionName: configuration["AWS:Region"]
+    ));
 
-    var accessKey = awsSection["AccessKey"];
-    var secretKey = awsSection["SecretKey"];
-    var bucketName = awsSection["BucketName"];
-    var region = awsSection["Region"];
-
-    return new S3Service(accessKey, secretKey, bucketName, region);
-});
 
 // Other Services
 builder.Services.AddControllersWithViews();
