@@ -57,7 +57,7 @@
 
 5. **Build and Run Locally:**
    ```bash
-   docker-compose up --build
+   dotnet run --project MotorcycleForum.Web
    ```
 
 6. **Access the Application:**
