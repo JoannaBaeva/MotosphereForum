@@ -3,7 +3,7 @@
     name: motosphere-forum
     env: docker
     plan: starter
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./MotorcycleForum/MotorcycleForum.Web/Dockerfile
     autoDeploy: true
 
 databases:
