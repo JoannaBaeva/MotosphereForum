@@ -1,0 +1,7 @@
+﻿services:
+  - type: web
+    name: motorcycle-forum
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
