@@ -1,7 +1,10 @@
 ﻿services:
   - type: web
     name: motorcycle-forum
-    env: docker
+    runtime: docker
     plan: free
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./MotorcycleForum.Web/Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
     autoDeploy: true
