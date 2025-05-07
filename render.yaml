@@ -1,10 +1,13 @@
 ﻿services:
   - type: web
-    name: motorcycle-forum
-    runtime: docker
-    plan: free
+    name: motosphere-forum
+    env: docker
+    plan: starter
     dockerfilePath: ./Dockerfile
-    envVars:
-      - key: ASPNETCORE_ENVIRONMENT
-        value: Production
     autoDeploy: true
+
+databases:
+  - name: motosphere-db
+    engine: postgresql
+    version: "14"
+    plan: starter
