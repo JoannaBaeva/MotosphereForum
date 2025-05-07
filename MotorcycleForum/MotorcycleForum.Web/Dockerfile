@@ -12,9 +12,9 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["MotorcycleForum.Web/MotorcycleForum.Web.csproj", "MotorcycleForum.Web/"]
-COPY ["MotorcycleForum.Data/MotorcycleForum.Data.csproj", "MotorcycleForum.Data/"]
-COPY ["MotorcycleForum.Services/MotorcycleForum.Services.csproj", "MotorcycleForum.Services/"]
+COPY ["MotorcycleForum/MotorcycleForum.Web/MotorcycleForum.Web.csproj", "MotorcycleForum.Web/"]
+COPY ["MotorcycleForum/MotorcycleForum.Data/MotorcycleForum.Data.csproj", "MotorcycleForum.Data/"]
+COPY ["MotorcycleForum/MotorcycleForum.Services/MotorcycleForum.Services.csproj", "MotorcycleForum.Services/"]
 RUN dotnet restore "./MotorcycleForum.Web/MotorcycleForum.Web.csproj"
 COPY . .
 WORKDIR "/src/MotorcycleForum.Web"
