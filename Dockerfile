@@ -1,20 +1,22 @@
-# build stage
+# Stage 1: build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# copy csproj files
-COPY ["MotorcycleForum/MotorcycleForum.csproj", "MotorcycleForum/"]
+# Copy your three csproj files into subfolders that match your repo
+COPY ["MotorcycleForum.Web/MotorcycleForum.Web.csproj", "MotorcycleForum.Web/"]
 COPY ["MotorcycleForum.Data/MotorcycleForum.Data.csproj", "MotorcycleForum.Data/"]
 COPY ["MotorcycleForum.Services/MotorcycleForum.Services.csproj", "MotorcycleForum.Services/"]
 
-# restore & publish
-RUN dotnet restore "MotorcycleForum/MotorcycleForum.csproj"
+# Restore, then copy the rest of the code
+RUN dotnet restore "MotorcycleForum.Web/MotorcycleForum.Web.csproj"
 COPY . .
-WORKDIR /src/MotorcycleForum
+
+# Publish your web app
+WORKDIR /src/MotorcycleForum.Web
 RUN dotnet publish -c Release -o /app/publish
 
-# runtime stage
+# Stage 2: runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "MotorcycleForum.dll"]
+ENTRYPOINT ["dotnet", "MotorcycleForum.Web.dll"]
