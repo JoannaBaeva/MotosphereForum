@@ -3,7 +3,7 @@
     name: motorcycle-forum
     runtime: docker
     plan: free
-    dockerfilePath: ./MotorcycleForum.Web/Dockerfile
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
