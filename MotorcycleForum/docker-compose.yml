@@ -1,0 +1,6 @@
+services:
+  motorcycleforum.web:
+    image: ${DOCKER_REGISTRY-}motorcycleforumweb
+    build:
+      context: .
+      dockerfile: MotorcycleForum.Web/Dockerfile

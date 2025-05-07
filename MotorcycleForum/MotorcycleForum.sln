@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotorcycleForum.Services", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotorcycleForum.Tests", "MotorcycleForum.Tests\MotorcycleForum.Tests.csproj", "{E9CDFC1F-6A4A-4726-A1B4-D43621CB5CFE}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F4BF5679-1154-4B8C-B019-3753ED57890F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E9CDFC1F-6A4A-4726-A1B4-D43621CB5CFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9CDFC1F-6A4A-4726-A1B4-D43621CB5CFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9CDFC1F-6A4A-4726-A1B4-D43621CB5CFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4BF5679-1154-4B8C-B019-3753ED57890F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4BF5679-1154-4B8C-B019-3753ED57890F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4BF5679-1154-4B8C-B019-3753ED57890F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4BF5679-1154-4B8C-B019-3753ED57890F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
