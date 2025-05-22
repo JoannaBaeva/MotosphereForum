@@ -14,20 +14,6 @@ namespace MotorcycleForum.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("0ab81baf-1cdd-42cd-8d11-391f5118558e"),
-                column: "RegistrationDate",
-                value: new DateTime(2025, 5, 22, 22, 10, 50, 307, DateTimeKind.Utc).AddTicks(4425));
-
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
-                column: "RegistrationDate",
-                value: new DateTime(2025, 5, 22, 22, 10, 50, 307, DateTimeKind.Utc).AddTicks(4295));
-
-            migrationBuilder.UpdateData(
                 table: "Comments",
                 keyColumn: "CommentId",
                 keyValue: new Guid("be4ccd71-8576-4378-8b7f-d943f17d19bb"),
