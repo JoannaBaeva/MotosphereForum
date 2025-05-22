@@ -1,20 +1,12 @@
-version: '3.4'
+version: '3.8'
 
 services:
-  app:
-    build: .
+  motorcycleforum.web:
+    build:
+      context: .
+      dockerfile: MotorcycleForum.Web/Dockerfile
     ports:
-      - "5000:80"
+      - "8080:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=db;Database=MotorcycleForum;User=sa;Password=YourStrong!Pass123
-    depends_on:
-      - db
-
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      SA_PASSWORD: "YourStrong!Pass123"
-      ACCEPT_EULA: "Y"
-    ports:
-      - "1433:1433"
+      - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION}

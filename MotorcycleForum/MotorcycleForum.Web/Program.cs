@@ -12,6 +12,7 @@ using MotorcycleForum.Services.Admin;
 using MotorcycleForum.Services.Marketplace;
 using MotorcycleForum.Services.Events;
 using MotorcycleForum.Services.Profile;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +20,23 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Database
-var connectionString = configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// using Npgsql
+var defaultConn = builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    // Parse the URL into a proper Npgsql connection string
+    var pgBuilder = new NpgsqlConnectionStringBuilder(databaseUrl)
+    {
+        SslMode = SslMode.Require,
+        TrustServerCertificate = true
+    };
+    defaultConn = pgBuilder.ToString();
+}
+
 builder.Services.AddDbContext<MotorcycleForumDbContext>(options =>
-    options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+    options.UseNpgsql(defaultConn));
+
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
