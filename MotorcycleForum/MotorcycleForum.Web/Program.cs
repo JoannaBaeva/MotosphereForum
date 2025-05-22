@@ -20,22 +20,37 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Database
-// using Npgsql
-var defaultConn = builder.Configuration.GetConnectionString("DefaultConnection");
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-if (!string.IsNullOrEmpty(databaseUrl))
+
+string connStr;
+if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("postgres://"))
 {
-    // Parse the URL into a proper Npgsql connection string
-    var pgBuilder = new NpgsqlConnectionStringBuilder(databaseUrl)
+    // running in Render (DATABASE_URL is set to something like "postgresql://user:pass@host:port/dbname")
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+
+    var connectionStringBuilder = new NpgsqlConnectionStringBuilder
     {
+        Host = uri.Host,
+        Port = uri.Port == -1 ? 5432 : uri.Port,
+        Username = userInfo[0],
+        Password = userInfo[1],
+        Database = uri.AbsolutePath.TrimStart('/'),
         SslMode = SslMode.Require,
         TrustServerCertificate = true
     };
-    defaultConn = pgBuilder.ToString();
+
+    connStr = connectionStringBuilder.ConnectionString;
+}
+else
+{
+    // fallback to local dev
+    connStr = configuration.GetConnectionString("DefaultConnection");
 }
 
-builder.Services.AddDbContext<MotorcycleForumDbContext>(options =>
-    options.UseNpgsql(defaultConn));
+builder.Services.AddDbContext<MotorcycleForumDbContext>(opts =>
+    opts.UseNpgsql(connStr)
+);
 
 
 // Identity
