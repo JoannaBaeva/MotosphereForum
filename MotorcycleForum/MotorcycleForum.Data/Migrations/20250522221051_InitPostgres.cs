@@ -13,21 +13,6 @@ namespace MotorcycleForum.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "MarketplaceListingImages",
-                keyColumn: "ImageId",
-                keyValue: new Guid("09eaefbb-6878-499a-806c-d7ff978d710e"));
-
-            migrationBuilder.DeleteData(
-                table: "MarketplaceListingImages",
-                keyColumn: "ImageId",
-                keyValue: new Guid("5b5c2e5c-e6b5-4624-baf8-6016a15acfe2"));
-
-            migrationBuilder.DeleteData(
-                table: "MarketplaceListingImages",
-                keyColumn: "ImageId",
-                keyValue: new Guid("bfaa5a5f-b39b-43b4-91e6-bf47da7bb418"));
-
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
@@ -70,21 +55,6 @@ namespace MotorcycleForum.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "MarketplaceListingImages",
-                keyColumn: "ImageId",
-                keyValue: new Guid("5c21520e-f319-4981-b9ae-80459c97872c"));
-
-            migrationBuilder.DeleteData(
-                table: "MarketplaceListingImages",
-                keyColumn: "ImageId",
-                keyValue: new Guid("773c3fca-dd0e-4290-9d2d-b7cd20fbeb64"));
-
-            migrationBuilder.DeleteData(
-                table: "MarketplaceListingImages",
-                keyColumn: "ImageId",
-                keyValue: new Guid("bb80c17e-4883-4d2f-a6e6-02cb9b601148"));
-
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
