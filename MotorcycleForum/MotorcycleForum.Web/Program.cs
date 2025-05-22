@@ -23,7 +23,7 @@ var configuration = builder.Configuration;
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
 string connStr;
-if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("postgres://"))
+if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("postgresql://"))
 {
     // running in Render (DATABASE_URL is set to something like "postgresql://user:pass@host:port/dbname")
     var uri = new Uri(databaseUrl);
