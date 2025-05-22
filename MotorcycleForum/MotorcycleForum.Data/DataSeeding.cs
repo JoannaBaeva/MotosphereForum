@@ -144,7 +144,10 @@ namespace MotorcycleForum.Data
                     Description = "High-quality road tires for sport-touring motorcycles, excellent grip and durability.",
                     Price = 300.00M,
                     Location = "Varna",
-                    CreatedDate = DateTime.UtcNow,
+                    CreatedDate = DateTime.SpecifyKind(
+                        DateTime.Parse("2025-04-28"),
+                        DateTimeKind.Utc
+                    ),
                     CategoryId = Guid.Parse("d5b06706-b7ed-4252-a257-57b6c4117968"),
                     IsActive = true,
                     SellerPhoneNumber = "1111111111"
@@ -156,7 +159,10 @@ namespace MotorcycleForum.Data
                     Description = "Lightweight, performance-enhancing titanium slip-on exhaust. Fits most sport bikes. Used but in excellent condition. That signature growl? Yeah, it's got it.",
                     Price = 780.00M,
                     Location = "Sofia",
-                    CreatedDate = DateTime.UtcNow,
+                    CreatedDate = DateTime.SpecifyKind(
+                        DateTime.Parse("2025-04-28"),
+                        DateTimeKind.Utc
+                    ),
                     CategoryId = Guid.Parse("34080d33-7073-48ae-87ee-03c8990ff696"),
                     IsActive = true,
                     SellerPhoneNumber = "1111111111"
@@ -203,9 +209,15 @@ namespace MotorcycleForum.Data
                     EventId = Guid.Parse("6fe266bb-545f-45e3-a66c-ecad09f96171"),
                     Title = "Spring Motorcycle Meetup",
                     Description = "Join us for a big spring motorcycle meetup at the central park!",
-                    EventDate = DateTime.Parse("2025-11-19 13:00"),
+                    EventDate = DateTime.SpecifyKind(
+                        DateTime.Parse("2025-11-19 13:00"),
+                        DateTimeKind.Utc
+                    ),
                     Location = "Central Park, NY",
-                    CreatedDate = DateTime.Parse("2025-04-21"),
+                    CreatedDate = DateTime.SpecifyKind(
+                        DateTime.Parse("2025-04-21"),
+                        DateTimeKind.Utc
+                    ),
                     IsApproved = true,
                     OrganizerId = Guid.Parse("f23a5f6d-1c7b-4a5b-97eb-08dbf6a6c3f8"),
                     CategoryId = Guid.Parse("9eae427f-4376-493b-a662-c1060dc6d30b")
@@ -216,9 +228,9 @@ namespace MotorcycleForum.Data
                     Title = "Motorcycle Maintenance Workshop",
                     Description =
                         "Learn the basics of motorcycle maintenance and repair from experienced mechanics!",
-                    EventDate = DateTime.Parse("2025-04-02 11:30"),
+                    EventDate = DateTime.SpecifyKind(DateTime.Parse("2025-04-02 11:30"), DateTimeKind.Utc),
                     Location = "Sofia Tech Park",
-                    CreatedDate = DateTime.Parse("2025-03-03"),
+                    CreatedDate = DateTime.SpecifyKind(DateTime.Parse("2025-03-03"), DateTimeKind.Utc),
                     IsApproved = true,
                     OrganizerId = Guid.Parse("0ab81baf-1cdd-42cd-8d11-391f5118558e"),
                     CategoryId = Guid.Parse("85a66af6-084e-46ed-beb4-9b3062b17dc6")
