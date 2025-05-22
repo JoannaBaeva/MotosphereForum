@@ -1,22 +1,22 @@
 ﻿@model CommentViewModel
 
-<div class="card my-3 comment-card border-0 shadow-sm" data-comment-id="@Model.Id">
+<div class="card comment-card my-3 border-0 shadow-sm" data-comment-id="@Model.Id">
     <div class="card-body">
-        <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-2">
+        <div class="d-flex flex-column flex-md-row justify-content-between mb-2 gap-2">
             <div class="d-flex">
                 <a href="~/Profile/@Model.CreatorId">
-                    <img src="@Model.CreatorProfilePictureUrl" class="rounded-circle me-3 border-secondary border"
+                    <img src="@Model.CreatorProfilePictureUrl" class="rounded-circle border-secondary me-3 border"
                          style="width: 40px; height: 40px; object-fit: cover;" alt="Commenter avatar" />
                 </a>
 
                 <div>
-                    <p class="mb-1 text-dark">@Model.Content</p>
+                    <p class="text-dark mb-1">@Model.Content</p>
                     <small class="text-muted">
                         <a href="~/Profile/@Model.CreatorId" class="text-black-50 text-decoration-none"><strong>@Model.CreatorName</strong></a> · @Model.CreatedDate.ToString("MMM dd, yyyy")
                     </small>
                 </div>
             </div>
-            <div class="d-flex justify-content-start justify-content-md-end align-items-center gap-2 mt-2 mt-md-0">
+            <div class="d-flex justify-content-start justify-content-md-end align-items-center mt-md-0 mt-2 gap-2">
                 <button class="btn btn-sm btn-outline-secondary reply-btn" data-comment-id="@Model.Id" title="Reply">
                     <i class="bi bi-reply"></i>
                 </button>
@@ -44,26 +44,26 @@
                         class="btn btn-sm btn-link text-secondary toggle-replies-btn mb-2 px-2">
                     Hide Replies
                 </button>
-                <div class="replies ps-3 ps-md-4 border-start border-danger border-2">
+                <div class="replies ps-md-4 border-start border-danger border-2 ps-3">
                     @foreach (var reply in Model.Replies)
                     {
-                        <div class="card my-2 bg-light reply-card border-0" data-comment-id="@reply.Id">
-                            <div class="card-body d-flex flex-column flex-md-row justify-content-between gap-2 align-items-start">
+                        <div class="card bg-light reply-card my-2 border-0" data-comment-id="@reply.Id">
+                            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start gap-2">
                                 <div class="d-flex">
-                                    <a href="~/Profile/@Model.CreatorId">
-                                        <img src="@reply.CreatorProfilePictureUrl" class="rounded-circle me-3 border-secondary border"
+                                    <a href="~/Profile/@reply.CreatorId">
+                                        <img src="@reply.CreatorProfilePictureUrl" class="rounded-circle border-secondary me-3 border"
                                              style="width: 36px; height: 36px; object-fit: cover;" alt="Reply avatar"/>
                                     </a>
                                     <div>
-                                        <p class="mb-1 text-dark">@reply.Content</p>
+                                        <p class="text-dark mb-1">@reply.Content</p>
                                         <small class="text-muted">
-                                            <a href="~/Profile/@Model.CreatorId" class="text-black-50 text-decoration-none"><strong>@reply.CreatorName</strong></a> · @reply.CreatedDate.ToString("MMM dd, yyyy")
+                                            <a href="~/Profile/@reply.CreatorId" class="text-black-50 text-decoration-none"><strong>@reply.CreatorName</strong></a> · @reply.CreatedDate.ToString("MMM dd, yyyy")
                                         </small>
                                     </div>
                                 </div>
                                 @if (reply.IsOwner || User.IsInRole("Moderator") || User.IsInRole("Admin"))
                                 {
-                                    <div class="mt-2 mt-md-0">
+                                    <div class="mt-md-0 mt-2">
                                         <button class="btn btn-sm btn-outline-danger delete-comment-btn" data-comment-id="@reply.Id" title="Delete">
                                             <i class="bi bi-trash3"></i>
                                         </button>
