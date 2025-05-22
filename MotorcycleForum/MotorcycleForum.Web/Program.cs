@@ -94,6 +94,12 @@ if (app.Environment.IsDevelopment())
 else
     app.UseHsts();
 
+// Database migration
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MotorcycleForumDbContext>();
+    db.Database.Migrate();
+}
 app.UseExceptionHandler("/Home/Error");
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 
@@ -109,5 +115,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
 
 app.Run();
