@@ -1,4 +1,5 @@
-﻿@model HomePageViewModel
+﻿@using System.Globalization
+@model HomePageViewModel
 
 @{
     ViewData["Title"] = "Home";
@@ -9,7 +10,7 @@
 }
 
 <!-- Hero Section -->
-<section class="hero bg-dark text-white py-5 position-relative animate__animated animate__fadeIn text-center" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/assets/img/header2.jpg') no-repeat center center; background-size: cover;">
+<section class="hero bg-dark position-relative animate__animated animate__fadeIn py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/assets/img/header2.jpg') no-repeat center center; background-size: cover;">
     <div class="container">
         <h1 class="display-3 fw-bold mb-3">Welcome to Motosphere</h1>
         <p class="lead mb-4">The ultimate place for motorcycle lovers: ride, connect, trade, and explore.</p>
@@ -20,7 +21,7 @@
 </section>
 
 <!-- About Section -->
-<section class="intro py-5 animate__animated animate__fadeInUp" style="background-color: #f9f9f9;">
+<section class="intro animate__animated animate__fadeInUp py-5" style="background-color: #f9f9f9;">
     <div class="container text-center">
         <h2 class="fw-bold">What is Motosphere?</h2>
         <p class="lead text-muted">A passionate hub where motorcyclists meet, share adventures, trade gear, and plan epic rides together.</p>
@@ -28,9 +29,9 @@
 </section>
 
 <!-- Upcoming Events -->
-<section class="py-5 animate__animated animate__fadeInUp">
+<section class="animate__animated animate__fadeInUp py-5">
     <div class="container">
-        <h2 class="fw-bold mb-4 text-light text-center">Upcoming Events</h2>
+        <h2 class="fw-bold text-light mb-4 text-center">Upcoming Events</h2>
         <div class="row g-4">
             @if (Model.UpcomingEvents != null && Model.UpcomingEvents.Count > 0)
             {
@@ -59,9 +60,9 @@
 </section>
 
 <!-- Marketplace Section -->
-<section class="py-5 animate__animated animate__fadeInUp" style="background-color: #f9f9f9;">
+<section class="animate__animated animate__fadeInUp py-5" style="background-color: #f9f9f9;">
     <div class="container">
-        <h2 class="fw-bold mb-4 text-dark text-center">Marketplace Highlights</h2>
+        <h2 class="fw-bold text-dark mb-4 text-center">Marketplace Highlights</h2>
         <div class="row g-4">
             @if (Model.LatestListings != null && Model.LatestListings.Count > 0)
             {
@@ -78,13 +79,13 @@
                             }
                             else
                             {
-                                <div class="bg-secondary text-dark p-5 rounded-top text-center">
+                                <div class="bg-secondary text-dark rounded-top p-5 text-center">
                                     No Image
                                 </div>
                             }
                             <div class="card-body text-center">
                                 <h6 class="fw-bold text-dark">@listing.Title</h6>
-                                <p class="text-muted small">@listing.Price.ToString("C")</p>
+                                <p class="text-muted small">@listing.Price.ToString("C", CultureInfo.GetCultureInfo("de-DE"))</p>
                                 <a asp-controller="Marketplace" asp-action="Details" asp-route-id="@listing.ListingId" class="btn btn-primary btn-sm fw-bold">View</a>
                             </div>
                         </div>
@@ -102,9 +103,9 @@
 </section>
 
 <!-- Forum Section -->
-<section class="py-5 animate__animated animate__fadeInUp">
+<section class="animate__animated animate__fadeInUp py-5">
     <div class="container">
-        <h2 class="fw-bold mb-4 text-light text-center">Trending Discussions</h2>
+        <h2 class="fw-bold text-light mb-4 text-center">Trending Discussions</h2>
         <div class="list-group shadow-sm">
             @if (Model.TrendingPosts != null && Model.TrendingPosts.Count > 0)
             {
@@ -132,7 +133,7 @@
 </section>
 
 <!-- Final CTA -->
-<section class="py-5 text-white animate__animated animate__fadeInUp text-center" style="background-color: #d81324;">
+<section class="animate__animated animate__fadeInUp py-5 text-center text-white" style="background-color: #d81324;">
     <div class="container">
         <h2 class="fw-bold">Join thousands of riders on Motosphere today!</h2>
         <p class="lead">Find new friends, epic rides, amazing events, and great deals.</p>
