@@ -1,8 +1,11 @@
 ﻿@model MarketplaceListingViewModel
+@{
+    ViewData["Title"] = "Create Listing";
+}
 
-<div class="py-5 container">
-    <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-dark fw-bold mb-4 border-bottom pb-2">✨ Create New Listing</h2>
+<div class="container py-5">
+    <div class="rounded bg-white p-4 shadow">
+        <h2 class="text-dark fw-bold border-bottom mb-4 pb-2">✨ Create New Listing</h2>
 
         <form asp-controller="Marketplace" asp-action="Create" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
@@ -53,9 +56,9 @@
             <div class="form-group mb-4">
                 <label class="form-label fw-semibold text-dark">Upload Images</label>
 
-                <div id="dropZone" class="p-4 bg-light mb-3 rounded border border-dashed text-center">
+                <div id="dropZone" class="bg-light mb-3 rounded border border-dashed p-4 text-center">
                     <p><i class="bi bi-cloud-arrow-up fs-2 text-muted"></i></p>
-                    <p class="mb-1 text-muted">Drag and drop images here, or click to select</p>
+                    <p class="text-muted mb-1">Drag and drop images here, or click to select</p>
                     <input id="imageInput" asp-for="ImageFiles" type="file" class="form-control d-none" multiple accept="image/*" />
                     <button type="button" id="uploadTrigger" class="btn btn-outline-dark mt-2">Select Files</button>
                 </div>
@@ -63,7 +66,7 @@
                 <div id="previewContainer" class="row"></div>
             </div>
 
-            <div class="mt-4 d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center mt-4">
                 <a href="@Url.Action("Index", "Marketplace")" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left"></i> Go Back
                 </a>
