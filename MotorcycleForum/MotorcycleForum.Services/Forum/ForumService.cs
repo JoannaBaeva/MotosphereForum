@@ -306,6 +306,7 @@ namespace MotorcycleForum.Services
                             Content = r.Content,
                             CreatedDate = r.CreatedDate,
                             CreatorName = r.Author.FullName,
+                            CreatorId = r.AuthorId,
                             CreatorProfilePictureUrl = r.Author.ProfilePictureUrl,
                             IsOwner = userId.HasValue && r.AuthorId == userId.Value,
                         }).ToList()
